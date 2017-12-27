@@ -18,18 +18,22 @@ main =
 
 type Msg
     = SwitchMode ViewMode
+    | PresentationIDReceived String
+    | PresentationIDSubmitted
     | GotQuestions (List Question)
     | QuestionTextReceived String
     | QuestionAsked
 
 
 type ViewMode
-    = QuestionList
+    = LandingPage
+    | QuestionList
     | AskQuestion
 
 
 type alias Model =
     { mode : ViewMode
+    , presentation : String
     , questions : List Question
     , question : String
     }
@@ -44,8 +48,15 @@ init =
             , { presentation = "012", questionText = "Do unicorns exist?", nods = 1, answered = False }
             , { presentation = "345", questionText = "What does the scouter say about his power level?", nods = 9001, answered = False }
             ]
+
+        model =
+            { mode = LandingPage
+            , presentation = ""
+            , questions = initQuestions
+            , question = ""
+            }
     in
-        ( Model QuestionList initQuestions "", Cmd.none )
+        ( model, Cmd.none )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -53,6 +64,13 @@ update msg model =
     case msg of
         SwitchMode viewMode ->
             ( { model | mode = viewMode }, Cmd.none )
+
+        PresentationIDReceived presID ->
+            ( { model | presentation = presID }, Cmd.none )
+
+        PresentationIDSubmitted ->
+            -- TODO
+            ( { model | mode = QuestionList }, Cmd.none )
 
         GotQuestions questions ->
             ( { model | questions = questions }, Cmd.none )
@@ -75,16 +93,20 @@ view model =
     let
         content =
             case model.mode of
+                LandingPage ->
+                    [ viewLanding ]
+
                 QuestionList ->
-                    viewQuestionList model
+                    [ viewNav model
+                    , viewQuestionList model
+                    ]
 
                 AskQuestion ->
-                    viewAskQuestion
+                    [ viewNav model
+                    , viewAskQuestion
+                    ]
     in
-        div []
-            [ viewNav model
-            , content
-            ]
+        div [] content
 
 
 viewNav : Model -> Html Msg
@@ -94,6 +116,19 @@ viewNav model =
             [ li [] [ a [ onClick (SwitchMode QuestionList), href "#" ] [ text "Questions" ] ]
             , li [] [ a [ onClick (SwitchMode AskQuestion), href "#" ] [ text "Ask" ] ]
             ]
+        ]
+
+
+viewLanding : Html Msg
+viewLanding =
+    div []
+        [ input
+            [ type_ "text"
+            , placeholder "Presentation ID"
+            , onInput PresentationIDReceived
+            ]
+            []
+        , button [ onClick PresentationIDSubmitted ] [ text "Go" ]
         ]
 
 
