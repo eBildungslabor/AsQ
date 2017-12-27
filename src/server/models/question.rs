@@ -9,6 +9,6 @@ pub struct Question {
     //pub time_asked: time::Instant,
     #[serde(rename="questionText")]
     pub question_text: String,
-    pub upvotes: u32,
+    pub nods: u32,
     pub answered: bool,
 }
