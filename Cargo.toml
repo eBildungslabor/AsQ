@@ -3,6 +3,10 @@ name = "asq"
 version = "0.1.0"
 authors = ["Zack Mullaly <zsck@riseup.net>"]
 
+[[bin]]
+name = "asq"
+path = "src/server/main.rs"
+
 [dependencies]
 rocket = "^0.3"
 rocket_codegen = "^0.3"
