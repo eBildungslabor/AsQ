@@ -21,7 +21,10 @@ fn hello() -> &'static str {
 fn main() {
     let routes = routes![
         hello,
+        api::index,
+        api::css_file,
+        api::js_file,
         questions::questions_list,
     ];
-    rocket::ignite().mount("/api", routes).launch();
+    rocket::ignite().mount("/", routes).launch();
 }
