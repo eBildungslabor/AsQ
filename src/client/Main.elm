@@ -176,6 +176,8 @@ viewQuestionList : Model -> Html Msg
 viewQuestionList model =
     ul []
         (model.questions
+            |> List.sortBy .nods
+            |> List.reverse
             |> List.map Question.view
             |> List.map (Html.map QuestionAction)
         )
