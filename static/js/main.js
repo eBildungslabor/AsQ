@@ -9035,10 +9035,31 @@ var _elm_lang$http$Http$stringPart = _elm_lang$http$Http$StringPart;
 
 var _user$project$Config$apiServerAddress = '127.0.0.1:8000';
 
+var _user$project$Question$askQuestionRequest = function (_p0) {
+	var _p1 = _p0;
+	return _elm_lang$core$Json_Encode$object(
+		{
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'presentation',
+				_1: _elm_lang$core$Json_Encode$string(_p1.presentation)
+			},
+			_1: {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'question',
+					_1: _elm_lang$core$Json_Encode$string(_p1.question)
+				},
+				_1: {ctor: '[]'}
+			}
+		});
+};
 var _user$project$Question$update = F2(
 	function (msg, question) {
-		var _p0 = msg;
-		return _elm_lang$core$Native_Utils.eq(question.id, _p0._0.id) ? {
+		var _p2 = msg;
+		return _elm_lang$core$Native_Utils.eq(question.id, _p2._0.id) ? {
 			ctor: '_Tuple2',
 			_0: _elm_lang$core$Native_Utils.update(
 				question,
@@ -9083,6 +9104,31 @@ var _user$project$Question$presentationQuestions = function (presentationID) {
 			A2(_elm_lang$core$Basics_ops['++'], '/api/questions?presentation=', presentationID)));
 	return A2(_elm_lang$http$Http$get, url, _user$project$Question$getQuestionResponse);
 };
+var _user$project$Question$AskQuestionRequest = F2(
+	function (a, b) {
+		return {presentation: a, question: b};
+	});
+var _user$project$Question$QuestionAskedResponse = function (a) {
+	return {error: a};
+};
+var _user$project$Question$questionAskedResponse = A2(
+	_elm_lang$core$Json_Decode$map,
+	_user$project$Question$QuestionAskedResponse,
+	A2(
+		_elm_lang$core$Json_Decode$field,
+		'error',
+		_elm_lang$core$Json_Decode$maybe(_elm_lang$core$Json_Decode$string)));
+var _user$project$Question$ask = F2(
+	function (presentationID, questionText) {
+		var body = _elm_lang$http$Http$jsonBody(
+			_user$project$Question$askQuestionRequest(
+				{presentation: presentationID, question: questionText}));
+		var url = A2(
+			_elm_lang$core$Basics_ops['++'],
+			'http://',
+			A2(_elm_lang$core$Basics_ops['++'], _user$project$Config$apiServerAddress, '/api/questions'));
+		return A3(_elm_lang$http$Http$post, url, body, _user$project$Question$questionAskedResponse);
+	});
 var _user$project$Question$QuestionNoddedTo = function (a) {
 	return {ctor: 'QuestionNoddedTo', _0: a};
 };
