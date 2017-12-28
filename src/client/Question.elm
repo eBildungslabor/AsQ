@@ -1,4 +1,4 @@
-module Question exposing (Question, Msg, update, view)
+module Question exposing (Question, Msg(QuestionNoddedTo), update, view)
 
 {-| A model of questions asked during presentations, and functions for views etc.
 -}
