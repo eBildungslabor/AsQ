@@ -23,6 +23,7 @@ pub struct QuestionAsked {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct QuestionAskedResponse {
     pub error: Option<String>,
+    pub id: String,
 }
 
 /// Get a list of questions asked during a given presentation.
@@ -73,5 +74,6 @@ pub fn questions_list(presentation: &str) -> Json<QuestionList> {
 pub fn ask(question: Json<QuestionAsked>) -> Json<QuestionAskedResponse> {
     Json(QuestionAskedResponse{
         error: None,
+        id: "newquestionid",
     })
 }

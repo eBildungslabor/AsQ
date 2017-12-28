@@ -120,6 +120,8 @@ update msg model =
             updateQuestionAsked result model
 
 
+{-| Apply an update to the application model when a response to a request to get questions from the API is received.
+-}
 updateQuestionsReceived : Result Http.Error Question.GetQuestionsResponse -> Model -> ( Model, Cmd Msg )
 updateQuestionsReceived result model =
     case result of
@@ -144,6 +146,8 @@ updateQuestionsReceived result model =
                     ( { model | questions = questions }, Cmd.none )
 
 
+{-| Apply an update to the application model when a response to a question being asked is received rom the API.
+-}
 updateQuestionAsked : Result Http.Error Question.QuestionAskedResponse -> Model -> ( Model, Cmd Msg )
 updateQuestionAsked result model =
     case result of
