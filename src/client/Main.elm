@@ -39,7 +39,8 @@ type ViewMode
 
 
 type alias Model =
-    { mode : ViewMode
+    { error : Maybe String
+    , mode : ViewMode
     , presentation : String
     , questions : List Question
     , question : String
@@ -50,7 +51,8 @@ init : ( Model, Cmd Msg )
 init =
     let
         model =
-            { mode = LandingPage
+            { error = Nothing
+            , mode = LandingPage
             , presentation = ""
             , questions = []
             , question = ""
@@ -82,21 +84,9 @@ update msg model =
             ( { model | question = questionText }, Cmd.none )
 
         QuestionAsked ->
-            let
-                newQuestion =
-                    { id = ""
-                    , presentation = model.presentation
-                    , questionText = model.question
-                    , nods = 0
-                    , answered = False
-                    }
-
-                _ =
-                    Debug.log "Asking a new question " newQuestion
-            in
-                ( { model | questions = newQuestion :: model.questions }
-                , Http.send (\x -> FromAPI <| APIQuestionAsked x) <| Question.ask model.presentation model.question
-                )
+            ( { model | mode = QuestionList, question = "" }
+            , Http.send (\x -> FromAPI <| APIQuestionAsked x) <| Question.ask model.presentation model.question
+            )
 
         QuestionAction questionMsg ->
             let
@@ -126,21 +116,12 @@ updateQuestionsReceived : Result Http.Error Question.GetQuestionsResponse -> Mod
 updateQuestionsReceived result model =
     case result of
         Err error ->
-            let
-                _ =
-                    Debug.log "ERROR " error
-            in
-                -- TODO - Error handle
-                ( model, Cmd.none )
+            ( { model | error = Just "Failed to make request." }, Cmd.none )
 
         Ok { error, questions } ->
             case error of
                 Just errorMessage ->
-                    let
-                        _ =
-                            Debug.log "API ERROR " errorMessage
-                    in
-                        ( model, Cmd.none )
+                    ( { model | error = Just errorMessage }, Cmd.none )
 
                 Nothing ->
                     ( { model | questions = questions }, Cmd.none )
@@ -152,25 +133,18 @@ updateQuestionAsked : Result Http.Error Question.QuestionAskedResponse -> Model 
 updateQuestionAsked result model =
     case result of
         Err error ->
-            let
-                _ =
-                    Debug.log "ERROR " error
-            in
-                -- TODO - Error handle
-                ( model, Cmd.none )
+            ( { model | error = Just "Failed to make request." }, Cmd.none )
 
-        Ok { error } ->
-            case error of
-                Just errorMessage ->
-                    let
-                        _ =
-                            Debug.log "API ERROR " errorMessage
-                    in
-                        ( model, Cmd.none )
+        Ok { error, question } ->
+            case ( error, question ) of
+                ( Just errorMessage, _ ) ->
+                    ( { model | error = Just errorMessage }, Cmd.none )
 
-                Nothing ->
-                    -- TODO - Get the ID of the newly created question and figure out how to update it.
-                    ( model, Cmd.none )
+                ( Nothing, Just question ) ->
+                    ( { model | questions = question :: model.questions }, Cmd.none )
+
+                ( Nothing, Nothing ) ->
+                    ( { model | error = Just "Got an unexpected response from the API server. " }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
@@ -188,11 +162,13 @@ view model =
 
                 QuestionList ->
                     [ viewNav model
+                    , viewError model
                     , viewQuestionList model
                     ]
 
                 AskQuestion ->
                     [ viewNav model
+                    , viewError model
                     , viewAskQuestion
                     ]
     in
@@ -220,6 +196,20 @@ viewLanding =
             []
         , button [ onClick PresentationIDSubmitted ] [ text "Go" ]
         ]
+
+
+viewError : Model -> Html Msg
+viewError model =
+    let
+        content =
+            case model.error of
+                Just errorMessage ->
+                    [ text errorMessage ]
+
+                Nothing ->
+                    []
+    in
+        div [ class "error" ] content
 
 
 viewQuestionList : Model -> Html Msg

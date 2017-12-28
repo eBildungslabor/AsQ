@@ -58,6 +58,7 @@ type alias AskQuestionRequest =
 -}
 type alias QuestionAskedResponse =
     { error : Maybe String
+    , question : Maybe Question
     }
 
 
@@ -140,4 +141,6 @@ askQuestionRequest { presentation, question } =
 
 questionAskedResponse : Decoder QuestionAskedResponse
 questionAskedResponse =
-    Json.Decode.map QuestionAskedResponse <| field "error" (maybe string)
+    Json.Decode.map2 QuestionAskedResponse
+        (field "error" (maybe string))
+        (field "question" (maybe question))

@@ -9108,16 +9108,21 @@ var _user$project$Question$AskQuestionRequest = F2(
 	function (a, b) {
 		return {presentation: a, question: b};
 	});
-var _user$project$Question$QuestionAskedResponse = function (a) {
-	return {error: a};
-};
-var _user$project$Question$questionAskedResponse = A2(
-	_elm_lang$core$Json_Decode$map,
+var _user$project$Question$QuestionAskedResponse = F2(
+	function (a, b) {
+		return {error: a, question: b};
+	});
+var _user$project$Question$questionAskedResponse = A3(
+	_elm_lang$core$Json_Decode$map2,
 	_user$project$Question$QuestionAskedResponse,
 	A2(
 		_elm_lang$core$Json_Decode$field,
 		'error',
-		_elm_lang$core$Json_Decode$maybe(_elm_lang$core$Json_Decode$string)));
+		_elm_lang$core$Json_Decode$maybe(_elm_lang$core$Json_Decode$string)),
+	A2(
+		_elm_lang$core$Json_Decode$field,
+		'question',
+		_elm_lang$core$Json_Decode$maybe(_user$project$Question$question)));
 var _user$project$Question$ask = F2(
 	function (presentationID, questionText) {
 		var body = _elm_lang$http$Http$jsonBody(
@@ -9168,50 +9173,120 @@ var _user$project$Question$view = function (question) {
 		});
 };
 
-var _user$project$Main$subscriptions = function (_p0) {
+var _user$project$Main$viewError = function (model) {
+	var content = function () {
+		var _p0 = model.error;
+		if (_p0.ctor === 'Just') {
+			return {
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(_p0._0),
+				_1: {ctor: '[]'}
+			};
+		} else {
+			return {ctor: '[]'};
+		}
+	}();
+	return A2(
+		_elm_lang$html$Html$div,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('error'),
+			_1: {ctor: '[]'}
+		},
+		content);
+};
+var _user$project$Main$subscriptions = function (_p1) {
 	return _elm_lang$core$Platform_Sub$none;
 };
 var _user$project$Main$updateQuestionAsked = F2(
 	function (result, model) {
-		var _p1 = result;
-		if (_p1.ctor === 'Err') {
-			var _p2 = A2(_elm_lang$core$Debug$log, 'ERROR ', _p1._0);
-			return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+		var _p2 = result;
+		if (_p2.ctor === 'Err') {
+			return {
+				ctor: '_Tuple2',
+				_0: _elm_lang$core$Native_Utils.update(
+					model,
+					{
+						error: _elm_lang$core$Maybe$Just('Failed to make request.')
+					}),
+				_1: _elm_lang$core$Platform_Cmd$none
+			};
 		} else {
-			var _p3 = _p1._0.error;
-			if (_p3.ctor === 'Just') {
-				var _p4 = A2(_elm_lang$core$Debug$log, 'API ERROR ', _p3._0);
-				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+			var _p3 = {ctor: '_Tuple2', _0: _p2._0.error, _1: _p2._0.question};
+			if (_p3._0.ctor === 'Just') {
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							error: _elm_lang$core$Maybe$Just(_p3._0._0)
+						}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
 			} else {
-				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+				if (_p3._1.ctor === 'Just') {
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{
+								questions: {ctor: '::', _0: _p3._1._0, _1: model.questions}
+							}),
+						_1: _elm_lang$core$Platform_Cmd$none
+					};
+				} else {
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{
+								error: _elm_lang$core$Maybe$Just('Got an unexpected response from the API server. ')
+							}),
+						_1: _elm_lang$core$Platform_Cmd$none
+					};
+				}
 			}
 		}
 	});
 var _user$project$Main$updateQuestionsReceived = F2(
 	function (result, model) {
-		var _p5 = result;
-		if (_p5.ctor === 'Err') {
-			var _p6 = A2(_elm_lang$core$Debug$log, 'ERROR ', _p5._0);
-			return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+		var _p4 = result;
+		if (_p4.ctor === 'Err') {
+			return {
+				ctor: '_Tuple2',
+				_0: _elm_lang$core$Native_Utils.update(
+					model,
+					{
+						error: _elm_lang$core$Maybe$Just('Failed to make request.')
+					}),
+				_1: _elm_lang$core$Platform_Cmd$none
+			};
 		} else {
-			var _p7 = _p5._0.error;
-			if (_p7.ctor === 'Just') {
-				var _p8 = A2(_elm_lang$core$Debug$log, 'API ERROR ', _p7._0);
-				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+			var _p5 = _p4._0.error;
+			if (_p5.ctor === 'Just') {
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							error: _elm_lang$core$Maybe$Just(_p5._0)
+						}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
 			} else {
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{questions: _p5._0.questions}),
+						{questions: _p4._0.questions}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			}
 		}
 	});
-var _user$project$Main$Model = F4(
-	function (a, b, c, d) {
-		return {mode: a, presentation: b, questions: c, question: d};
+var _user$project$Main$Model = F5(
+	function (a, b, c, d, e) {
+		return {error: a, mode: b, presentation: c, questions: d, question: e};
 	});
 var _user$project$Main$APIQuestionAsked = function (a) {
 	return {ctor: 'APIQuestionAsked', _0: a};
@@ -9330,10 +9405,10 @@ var _user$project$Main$AskQuestion = {ctor: 'AskQuestion'};
 var _user$project$Main$QuestionList = {ctor: 'QuestionList'};
 var _user$project$Main$update = F2(
 	function (msg, model) {
-		var _p9 = msg;
-		switch (_p9.ctor) {
+		var _p6 = msg;
+		switch (_p6.ctor) {
 			case 'SwitchMode':
-				if (_p9._0.ctor === 'QuestionList') {
+				if (_p6._0.ctor === 'QuestionList') {
 					return {
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
@@ -9352,7 +9427,7 @@ var _user$project$Main$update = F2(
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
 							model,
-							{mode: _p9._0}),
+							{mode: _p6._0}),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				}
@@ -9361,7 +9436,7 @@ var _user$project$Main$update = F2(
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{presentation: _p9._0}),
+						{presentation: _p6._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'PresentationIDSubmitted':
@@ -9383,19 +9458,15 @@ var _user$project$Main$update = F2(
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{question: _p9._0}),
+						{question: _p6._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'QuestionAsked':
-				var newQuestion = {id: '', presentation: model.presentation, questionText: model.question, nods: 0, answered: false};
-				var _p10 = A2(_elm_lang$core$Debug$log, 'Asking a new question ', newQuestion);
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{
-							questions: {ctor: '::', _0: newQuestion, _1: model.questions}
-						}),
+						{mode: _user$project$Main$QuestionList, question: ''}),
 					_1: A2(
 						_elm_lang$http$Http$send,
 						function (x) {
@@ -9405,11 +9476,11 @@ var _user$project$Main$update = F2(
 						A2(_user$project$Question$ask, model.presentation, model.question))
 				};
 			case 'QuestionAction':
-				var updateQuestion = _user$project$Question$update(_p9._0);
-				var _p11 = _elm_lang$core$List$unzip(
+				var updateQuestion = _user$project$Question$update(_p6._0);
+				var _p7 = _elm_lang$core$List$unzip(
 					A2(_elm_lang$core$List$map, updateQuestion, model.questions));
-				var questions = _p11._0;
-				var commands = _p11._1;
+				var questions = _p7._0;
+				var commands = _p7._1;
 				var topLevelCommands = A2(
 					_elm_lang$core$List$map,
 					_elm_lang$core$Platform_Cmd$map(_user$project$Main$QuestionAction),
@@ -9422,10 +9493,10 @@ var _user$project$Main$update = F2(
 					_1: _elm_lang$core$Platform_Cmd$batch(topLevelCommands)
 				};
 			default:
-				if (_p9._0.ctor === 'APIReceivedQuestions') {
-					return A2(_user$project$Main$updateQuestionsReceived, _p9._0._0, model);
+				if (_p6._0.ctor === 'APIReceivedQuestions') {
+					return A2(_user$project$Main$updateQuestionsReceived, _p6._0._0, model);
 				} else {
-					return A2(_user$project$Main$updateQuestionAsked, _p9._0._0, model);
+					return A2(_user$project$Main$updateQuestionAsked, _p6._0._0, model);
 				}
 		}
 	});
@@ -9498,8 +9569,8 @@ var _user$project$Main$viewNav = function (model) {
 };
 var _user$project$Main$view = function (model) {
 	var content = function () {
-		var _p12 = model.mode;
-		switch (_p12.ctor) {
+		var _p8 = model.mode;
+		switch (_p8.ctor) {
 			case 'LandingPage':
 				return {
 					ctor: '::',
@@ -9512,8 +9583,12 @@ var _user$project$Main$view = function (model) {
 					_0: _user$project$Main$viewNav(model),
 					_1: {
 						ctor: '::',
-						_0: _user$project$Main$viewQuestionList(model),
-						_1: {ctor: '[]'}
+						_0: _user$project$Main$viewError(model),
+						_1: {
+							ctor: '::',
+							_0: _user$project$Main$viewQuestionList(model),
+							_1: {ctor: '[]'}
+						}
 					}
 				};
 			default:
@@ -9522,8 +9597,12 @@ var _user$project$Main$view = function (model) {
 					_0: _user$project$Main$viewNav(model),
 					_1: {
 						ctor: '::',
-						_0: _user$project$Main$viewAskQuestion,
-						_1: {ctor: '[]'}
+						_0: _user$project$Main$viewError(model),
+						_1: {
+							ctor: '::',
+							_0: _user$project$Main$viewAskQuestion,
+							_1: {ctor: '[]'}
+						}
 					}
 				};
 		}
@@ -9536,6 +9615,7 @@ var _user$project$Main$view = function (model) {
 var _user$project$Main$LandingPage = {ctor: 'LandingPage'};
 var _user$project$Main$init = function () {
 	var model = {
+		error: _elm_lang$core$Maybe$Nothing,
 		mode: _user$project$Main$LandingPage,
 		presentation: '',
 		questions: {ctor: '[]'},

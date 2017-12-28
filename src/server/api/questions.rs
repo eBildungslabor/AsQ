@@ -23,7 +23,7 @@ pub struct QuestionAsked {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct QuestionAskedResponse {
     pub error: Option<String>,
-    pub id: String,
+    pub question: Option<Question>,
 }
 
 /// Get a list of questions asked during a given presentation.
@@ -73,7 +73,18 @@ pub fn questions_list(presentation: &str) -> Json<QuestionList> {
 #[post("/api/questions", data = "<question>")]
 pub fn ask(question: Json<QuestionAsked>) -> Json<QuestionAskedResponse> {
     Json(QuestionAskedResponse{
+        error: Some("Oh no I blew up!".to_string()),
+        question: None,
+        /*
         error: None,
-        id: "newquestionid",
+        question: Some(Question {
+            id: "newquestionid".to_string(),
+            presentation: "somepresentation".to_string(),
+            // time_asked: Instant::now(),
+            question_text: "The question you asked".to_string(),
+            nods: 0,
+            answered: false,
+        }),
+        */
     })
 }
