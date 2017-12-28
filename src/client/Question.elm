@@ -1,4 +1,12 @@
-module Question exposing (Question, Msg(QuestionNoddedTo), update, view, presentationQuestions)
+module Question
+    exposing
+        ( Question
+        , Msg(QuestionNoddedTo)
+        , GetQuestionsResponse
+        , update
+        , view
+        , presentationQuestions
+        )
 
 {-| A model of questions asked during presentations, and functions for views etc.
 -}
@@ -6,7 +14,7 @@ module Question exposing (Question, Msg(QuestionNoddedTo), update, view, present
 import Html exposing (..)
 import Html.Events exposing (onClick)
 import Http exposing (Request)
-import Json.Decode exposing (Decoder, field, string, int, bool, list)
+import Json.Decode exposing (Decoder, field, string, int, bool, list, maybe)
 import Config
 
 
@@ -54,15 +62,21 @@ view question =
         ]
 
 
+type alias GetQuestionsResponse =
+    { error : Maybe String
+    , questions : List Question
+    }
+
+
 {-| Produce an HTTP request that will attempt to decode a list of questions for a presentation.
 -}
-presentationQuestions : String -> Request (List Question)
+presentationQuestions : String -> Request GetQuestionsResponse
 presentationQuestions presentationID =
     let
         url =
             "http://" ++ Config.apiServerAddress ++ "/api/questions?presentation=" ++ presentationID
     in
-        Http.get url (list question)
+        Http.get url getQuestionResponse
 
 
 question : Decoder Question
@@ -73,3 +87,10 @@ question =
         (field "questionText" string)
         (field "nods" int)
         (field "answered" bool)
+
+
+getQuestionResponse : Decoder GetQuestionsResponse
+getQuestionResponse =
+    Json.Decode.map2 GetQuestionsResponse
+        (field "error" (maybe string))
+        (field "questions" (list question))

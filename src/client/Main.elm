@@ -21,7 +21,7 @@ type Msg
     = SwitchMode ViewMode
     | PresentationIDReceived String
     | PresentationIDSubmitted
-    | GotQuestionsFromAPI (Result Http.Error (List Question))
+    | GotQuestionsFromAPI (Result Http.Error Question.GetQuestionsResponse)
     | QuestionTextReceived String
     | QuestionAsked
     | QuestionAction Question.Msg
@@ -73,16 +73,8 @@ update msg model =
             , Http.send GotQuestionsFromAPI <| Question.presentationQuestions model.presentation
             )
 
-        GotQuestionsFromAPI (Ok questions) ->
-            ( { model | questions = questions }, Cmd.none )
-
-        GotQuestionsFromAPI (Err error) ->
-            let
-                _ =
-                    Debug.log "ERROR " error
-            in
-                -- TODO - Error handle
-                ( model, Cmd.none )
+        GotQuestionsFromAPI result ->
+            updateQuestionsReceived result model
 
         QuestionTextReceived questionText ->
             ( { model | question = questionText }, Cmd.none )
@@ -105,6 +97,30 @@ update msg model =
                     List.map (Cmd.map QuestionAction) commands
             in
                 ( { model | questions = questions }, Cmd.batch topLevelCommands )
+
+
+updateQuestionsReceived : Result Http.Error Question.GetQuestionsResponse -> Model -> ( Model, Cmd Msg )
+updateQuestionsReceived result model =
+    case result of
+        Err error ->
+            let
+                _ =
+                    Debug.log "ERROR " error
+            in
+                -- TODO - Error handle
+                ( model, Cmd.none )
+
+        Ok { error, questions } ->
+            case error of
+                Just errorMessage ->
+                    let
+                        _ =
+                            Debug.log "API ERROR " errorMessage
+                    in
+                        ( model, Cmd.none )
+
+                Nothing ->
+                    ( { model | questions = questions }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
