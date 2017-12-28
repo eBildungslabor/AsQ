@@ -3,6 +3,7 @@ module Main exposing (..)
 import Html exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Html.Attributes exposing (..)
+import Http
 import Question exposing (Question)
 
 
@@ -20,7 +21,7 @@ type Msg
     = SwitchMode ViewMode
     | PresentationIDReceived String
     | PresentationIDSubmitted
-    | GotQuestions (List Question)
+    | GotQuestionsFromAPI (Result Http.Error (List Question))
     | QuestionTextReceived String
     | QuestionAsked
     | QuestionAction Question.Msg
@@ -43,17 +44,10 @@ type alias Model =
 init : ( Model, Cmd Msg )
 init =
     let
-        initQuestions =
-            [ { id = "abc123", presentation = "abc", questionText = "Hello world", nods = 32, answered = False }
-            , { id = "dHss31", presentation = "def", questionText = "Are monads burritos?", nods = 100, answered = False }
-            , { id = "42Vdf4", presentation = "012", questionText = "Do unicorns exist?", nods = 1, answered = False }
-            , { id = "9fAb40", presentation = "345", questionText = "What does the scouter say about his power level?", nods = 9001, answered = False }
-            ]
-
         model =
             { mode = LandingPage
             , presentation = ""
-            , questions = initQuestions
+            , questions = []
             , question = ""
             }
     in
@@ -63,6 +57,11 @@ init =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        SwitchMode QuestionList ->
+            ( { model | mode = QuestionList }
+            , Http.send GotQuestionsFromAPI <| Question.presentationQuestions model.presentation
+            )
+
         SwitchMode viewMode ->
             ( { model | mode = viewMode }, Cmd.none )
 
@@ -70,11 +69,20 @@ update msg model =
             ( { model | presentation = presID }, Cmd.none )
 
         PresentationIDSubmitted ->
-            -- TODO
-            ( { model | mode = QuestionList }, Cmd.none )
+            ( { model | mode = QuestionList }
+            , Http.send GotQuestionsFromAPI <| Question.presentationQuestions model.presentation
+            )
 
-        GotQuestions questions ->
+        GotQuestionsFromAPI (Ok questions) ->
             ( { model | questions = questions }, Cmd.none )
+
+        GotQuestionsFromAPI (Err error) ->
+            let
+                _ =
+                    Debug.log "ERROR " error
+            in
+                -- TODO - Error handle
+                ( model, Cmd.none )
 
         QuestionTextReceived questionText ->
             ( { model | question = questionText }, Cmd.none )

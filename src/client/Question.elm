@@ -1,10 +1,13 @@
-module Question exposing (Question, Msg(QuestionNoddedTo), update, view)
+module Question exposing (Question, Msg(QuestionNoddedTo), update, view, presentationQuestions)
 
 {-| A model of questions asked during presentations, and functions for views etc.
 -}
 
 import Html exposing (..)
 import Html.Events exposing (onClick)
+import Http exposing (Request)
+import Json.Decode exposing (Decoder, field, string, int, bool, list)
+import Config
 
 
 {-| A model of a question asked during a presentation.
@@ -49,3 +52,24 @@ view question =
         , text question.questionText
         , button [ onClick (QuestionNoddedTo question) ] [ text "Nod" ]
         ]
+
+
+{-| Produce an HTTP request that will attempt to decode a list of questions for a presentation.
+-}
+presentationQuestions : String -> Request (List Question)
+presentationQuestions presentationID =
+    let
+        url =
+            "http://" ++ Config.apiServerAddress ++ "/api/questions?presentation=" ++ presentationID
+    in
+        Http.get url (list question)
+
+
+question : Decoder Question
+question =
+    Json.Decode.map5 Question
+        (field "id" string)
+        (field "presentation" string)
+        (field "questionText" string)
+        (field "nods" int)
+        (field "answered" bool)
