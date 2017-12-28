@@ -12,6 +12,19 @@ pub struct QuestionList {
     pub questions: Vec<Question>,
 }
 
+/// The data expected to be present in a request to have a question asked.
+#[derive(Debug, Deserialize)]
+pub struct QuestionAsked {
+    pub presentation: String,
+    pub question: String,
+}
+
+/// The response to a request to have a question asked.d
+#[derive(Debug, Serialize, Deserialize)]
+pub struct QuestionAskedResponse {
+    pub error: Option<String>,
+}
+
 /// Get a list of questions asked during a given presentation.
 #[get("/api/questions?<presentation>")]
 pub fn questions_list(presentation: &str) -> Json<QuestionList> {
@@ -53,4 +66,12 @@ pub fn questions_list(presentation: &str) -> Json<QuestionList> {
         ],
     };
     Json(response)
+}
+
+/// Ask a question during a presentation.
+#[post("/api/questions", data = "<question>")]
+pub fn ask(question: Json<QuestionAsked>) -> Json<QuestionAskedResponse> {
+    Json(QuestionAskedResponse{
+        error: None,
+    })
 }

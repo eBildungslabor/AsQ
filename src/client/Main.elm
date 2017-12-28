@@ -186,9 +186,8 @@ viewQuestionList model =
 viewAskQuestion : Html Msg
 viewAskQuestion =
     div []
-        [ input
-            [ type_ "textarea"
-            , placeholder "Ask your question here"
+        [ textarea
+            [ placeholder "Ask your question here"
             , onInput QuestionTextReceived
             ]
             []

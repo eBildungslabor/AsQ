@@ -9182,18 +9182,14 @@ var _user$project$Main$viewAskQuestion = A2(
 	{
 		ctor: '::',
 		_0: A2(
-			_elm_lang$html$Html$input,
+			_elm_lang$html$Html$textarea,
 			{
 				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$type_('textarea'),
+				_0: _elm_lang$html$Html_Attributes$placeholder('Ask your question here'),
 				_1: {
 					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$placeholder('Ask your question here'),
-					_1: {
-						ctor: '::',
-						_0: _elm_lang$html$Html_Events$onInput(_user$project$Main$QuestionTextReceived),
-						_1: {ctor: '[]'}
-					}
+					_0: _elm_lang$html$Html_Events$onInput(_user$project$Main$QuestionTextReceived),
+					_1: {ctor: '[]'}
 				}
 			},
 			{ctor: '[]'}),
