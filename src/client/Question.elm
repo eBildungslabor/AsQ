@@ -3,9 +3,11 @@ module Question
         ( Question
         , Msg(QuestionNoddedTo)
         , GetQuestionsResponse
+        , QuestionAskedResponse
         , update
         , view
         , presentationQuestions
+        , ask
         )
 
 {-| A model of questions asked during presentations, and functions for views etc.

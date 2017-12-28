@@ -17,14 +17,19 @@ main =
         }
 
 
+type APIResponse
+    = APIReceivedQuestions (Result Http.Error Question.GetQuestionsResponse)
+    | APIQuestionAsked (Result Http.Error Question.QuestionAskedResponse)
+
+
 type Msg
     = SwitchMode ViewMode
     | PresentationIDReceived String
     | PresentationIDSubmitted
-    | GotQuestionsFromAPI (Result Http.Error Question.GetQuestionsResponse)
     | QuestionTextReceived String
     | QuestionAsked
     | QuestionAction Question.Msg
+    | FromAPI APIResponse
 
 
 type ViewMode
@@ -59,7 +64,7 @@ update msg model =
     case msg of
         SwitchMode QuestionList ->
             ( { model | mode = QuestionList }
-            , Http.send GotQuestionsFromAPI <| Question.presentationQuestions model.presentation
+            , Http.send (\x -> FromAPI <| APIReceivedQuestions x) <| Question.presentationQuestions model.presentation
             )
 
         SwitchMode viewMode ->
@@ -70,18 +75,28 @@ update msg model =
 
         PresentationIDSubmitted ->
             ( { model | mode = QuestionList }
-            , Http.send GotQuestionsFromAPI <| Question.presentationQuestions model.presentation
+            , Http.send (\x -> FromAPI <| APIReceivedQuestions x) <| Question.presentationQuestions model.presentation
             )
-
-        GotQuestionsFromAPI result ->
-            updateQuestionsReceived result model
 
         QuestionTextReceived questionText ->
             ( { model | question = questionText }, Cmd.none )
 
         QuestionAsked ->
-            -- TODO
-            ( model, Cmd.none )
+            let
+                newQuestion =
+                    { id = ""
+                    , presentation = model.presentation
+                    , questionText = model.question
+                    , nods = 0
+                    , answered = False
+                    }
+
+                _ =
+                    Debug.log "Asking a new question " newQuestion
+            in
+                ( { model | questions = newQuestion :: model.questions }
+                , Http.send (\x -> FromAPI <| APIQuestionAsked x) <| Question.ask model.presentation model.question
+                )
 
         QuestionAction questionMsg ->
             let
@@ -97,6 +112,12 @@ update msg model =
                     List.map (Cmd.map QuestionAction) commands
             in
                 ( { model | questions = questions }, Cmd.batch topLevelCommands )
+
+        FromAPI (APIReceivedQuestions result) ->
+            updateQuestionsReceived result model
+
+        FromAPI (APIQuestionAsked result) ->
+            updateQuestionAsked result model
 
 
 updateQuestionsReceived : Result Http.Error Question.GetQuestionsResponse -> Model -> ( Model, Cmd Msg )
@@ -121,6 +142,31 @@ updateQuestionsReceived result model =
 
                 Nothing ->
                     ( { model | questions = questions }, Cmd.none )
+
+
+updateQuestionAsked : Result Http.Error Question.QuestionAskedResponse -> Model -> ( Model, Cmd Msg )
+updateQuestionAsked result model =
+    case result of
+        Err error ->
+            let
+                _ =
+                    Debug.log "ERROR " error
+            in
+                -- TODO - Error handle
+                ( model, Cmd.none )
+
+        Ok { error } ->
+            case error of
+                Just errorMessage ->
+                    let
+                        _ =
+                            Debug.log "API ERROR " errorMessage
+                    in
+                        ( model, Cmd.none )
+
+                Nothing ->
+                    -- TODO - Get the ID of the newly created question and figure out how to update it.
+                    ( model, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
