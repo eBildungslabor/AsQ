@@ -23,6 +23,7 @@ type Msg
     | GotQuestions (List Question)
     | QuestionTextReceived String
     | QuestionAsked
+    | QuestionAction Question.Msg
 
 
 type ViewMode
@@ -43,10 +44,10 @@ init : ( Model, Cmd Msg )
 init =
     let
         initQuestions =
-            [ { presentation = "abc", questionText = "Hello world", nods = 32, answered = False }
-            , { presentation = "def", questionText = "Are monads burritos?", nods = 100, answered = False }
-            , { presentation = "012", questionText = "Do unicorns exist?", nods = 1, answered = False }
-            , { presentation = "345", questionText = "What does the scouter say about his power level?", nods = 9001, answered = False }
+            [ { id = "abc123", presentation = "abc", questionText = "Hello world", nods = 32, answered = False }
+            , { id = "dHss31", presentation = "def", questionText = "Are monads burritos?", nods = 100, answered = False }
+            , { id = "42Vdf4", presentation = "012", questionText = "Do unicorns exist?", nods = 1, answered = False }
+            , { id = "9fAb40", presentation = "345", questionText = "What does the scouter say about his power level?", nods = 9001, answered = False }
             ]
 
         model =
@@ -81,6 +82,21 @@ update msg model =
         QuestionAsked ->
             -- TODO
             ( model, Cmd.none )
+
+        QuestionAction questionMsg ->
+            let
+                updateQuestion =
+                    Question.update questionMsg
+
+                ( questions, commands ) =
+                    model.questions
+                        |> List.map updateQuestion
+                        |> List.unzip
+
+                topLevelCommands =
+                    List.map (Cmd.map QuestionAction) commands
+            in
+                ( { model | questions = questions }, Cmd.batch topLevelCommands )
 
 
 subscriptions : Model -> Sub Msg
@@ -134,8 +150,11 @@ viewLanding =
 
 viewQuestionList : Model -> Html Msg
 viewQuestionList model =
-    ul [] <|
-        List.map Question.view model.questions
+    ul []
+        (model.questions
+            |> List.map Question.view
+            |> List.map (Html.map QuestionAction)
+        )
 
 
 viewAskQuestion : Html Msg

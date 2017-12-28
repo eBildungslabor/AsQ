@@ -19,6 +19,7 @@ pub fn questions_list(presentation: &str) -> Json<QuestionList> {
         error: None,
         questions: vec![
             Question {
+                id:           "A0142sfudgSDgj34".to_string(),
                 presentation: "ABCDEF0123456789".to_string(),
                 //time_asked:    Instant::now(),
                 question_text: "How is a monad related to a burrito, in 280 charcters or less?".to_string(),
@@ -26,6 +27,7 @@ pub fn questions_list(presentation: &str) -> Json<QuestionList> {
                 answered:      true,
             },
             Question {
+                id:           "A014345ifgSDgj34".to_string(),
                 presentation: "DEFABC0123456789".to_string(),
                 //time_asked:    Instant::now(),
                 question_text: "What is the type of Clojure's 'mapping' transducer?".to_string(),
@@ -33,6 +35,7 @@ pub fn questions_list(presentation: &str) -> Json<QuestionList> {
                 answered:      false,
             },
             Question {
+                id:           "Sh59sfG23dfHa2yt".to_string(),
                 presentation: "000FED0123456789".to_string(),
                 //time_asked:    Instant::now(),
                 question_text: "How do I learn Haskell in less than a year?".to_string(),
@@ -40,6 +43,8 @@ pub fn questions_list(presentation: &str) -> Json<QuestionList> {
                 answered:      true,
             },
             Question {
+                id:           "SDF43rfHDJ232Dsd".to_string(),
+                presentation: "000FED0123456789".to_string(),
                 presentation: "CABBAC0123456789".to_string(),
                 //time_asked:    Instant::now(),
                 question_text: "Should I learn Rust?".to_string(),
