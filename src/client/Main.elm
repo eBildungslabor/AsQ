@@ -20,6 +20,7 @@ main =
 type APIResponse
     = APIReceivedQuestions (Result Http.Error Question.GetQuestionsResponse)
     | APIQuestionAsked (Result Http.Error Question.QuestionAskedResponse)
+    | APIQuestionUpdated (Result Http.Error Question.QuestionUpdateResponse)
 
 
 type Msg
@@ -109,6 +110,9 @@ update msg model =
         FromAPI (APIQuestionAsked result) ->
             updateQuestionAsked result model
 
+        FromAPI (APIQuestionUpdated result) ->
+            updateQuestionUpdated result model
+
 
 {-| Apply an update to the application model when a response to a request to get questions from the API is received.
 -}
@@ -142,6 +146,37 @@ updateQuestionAsked result model =
 
                 ( Nothing, Just question ) ->
                     ( { model | questions = question :: model.questions }, Cmd.none )
+
+                ( Nothing, Nothing ) ->
+                    ( { model | error = Just "Got an unexpected response from the API server. " }, Cmd.none )
+
+
+updateQuestionUpdated : Result Http.Error Question.QuestionUpdateResponse -> Model -> ( Model, Cmd Msg )
+updateQuestionUpdated result model =
+    case result of
+        Err error ->
+            ( { model | error = Just "Failed to make request." }, Cmd.none )
+
+        Ok { error, question } ->
+            case ( error, question ) of
+                ( Just errorMessage, _ ) ->
+                    ( { model | error = Just errorMessage }, Cmd.none )
+
+                ( Nothing, Just question ) ->
+                    let
+                        pickUpdated newQuestion =
+                            if question.id == newQuestion.id then
+                                question
+                            else
+                                newQuestion
+
+                        foldQuestions nextQuestion ls =
+                            (pickUpdated nextQuestion) :: ls
+
+                        updatedQuestions =
+                            List.foldl foldQuestions [] model.questions
+                    in
+                        ( { model | questions = updatedQuestions }, Cmd.none )
 
                 ( Nothing, Nothing ) ->
                     ( { model | error = Just "Got an unexpected response from the API server. " }, Cmd.none )

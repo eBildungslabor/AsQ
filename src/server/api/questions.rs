@@ -30,6 +30,7 @@ pub struct QuestionAskedResponse {
 #[derive(Debug, Serialize)]
 pub struct QuestionUpdateResponse {
     pub error: Option<String>,
+    pub question: Option<Question>,
 }
 
 /// Get a list of questions asked during a given presentation.
@@ -100,5 +101,13 @@ pub fn ask(question: Json<QuestionAsked>) -> Json<QuestionAskedResponse> {
 pub fn nod(id: String) -> Json<QuestionUpdateResponse> {
     Json(QuestionUpdateResponse{
         error: None,
+        question: Some(Question {
+            id: id,
+            presentation: "somepresentation".to_string(),
+            // time_asked: Instant::now(),
+            question_text: "The question you asked".to_string(),
+            nods: 0,
+            answered: false,
+        }),
     })
 }

@@ -4,10 +4,12 @@ module Question
         , Msg(QuestionNoddedTo)
         , GetQuestionsResponse
         , QuestionAskedResponse
+        , QuestionUpdateResponse
         , update
         , view
         , presentationQuestions
         , ask
+        , nod
         )
 
 {-| A model of questions asked during presentations, and functions for views etc.
@@ -36,6 +38,7 @@ type alias Question =
 -}
 type Msg
     = QuestionNoddedTo Question
+    | GotNodResponse (Result Http.Error QuestionUpdateResponse)
 
 
 {-| Response type produced by a request to get a list of questions asked during a presentation.
@@ -62,19 +65,41 @@ type alias QuestionAskedResponse =
     }
 
 
+{-| Response type produced by a request to update a question.
+-}
+type alias QuestionUpdateResponse =
+    { error : Maybe String
+    , question : Maybe Question
+    }
+
+
 {-| Apply updates to a message in response to a message.
 -}
 update : Msg -> Question -> ( Question, Cmd Msg )
 update msg question =
     case msg of
         QuestionNoddedTo noddedQuestion ->
-            if
-                question.id == noddedQuestion.id
-                -- TODO
-            then
-                ( { question | nods = question.nods + 1 }, Cmd.none )
-            else
-                ( question, Cmd.none )
+            ( question
+            , Http.send GotNodResponse <| nod noddedQuestion
+            )
+
+        GotNodResponse result ->
+            case result of
+                Err error ->
+                    -- TODO How can I avoid swallowing this error?
+                    ( question, Cmd.none )
+
+                Ok response ->
+                    case ( response.error, response.question ) of
+                        ( _, Just updatedQuestion ) ->
+                            if updatedQuestion.id == question.id then
+                                ( updatedQuestion, Cmd.none )
+                            else
+                                ( question, Cmd.none )
+
+                        ( _, _ ) ->
+                            -- TODO How can I avoid swallowing this error?
+                            ( question, Cmd.none )
 
 
 {-| Render a question as a list item, displaying the number of nods (upvotes) it has.
@@ -100,7 +125,7 @@ presentationQuestions presentationID =
         Http.get url getQuestionResponse
 
 
-{-| Produces a HTTP request that will POST a new question for a presentation.
+{-| Produces an HTTP request that will POST a new question for a presentation.
 -}
 ask : String -> String -> Request QuestionAskedResponse
 ask presentationID questionText =
@@ -112,6 +137,25 @@ ask presentationID questionText =
             Http.jsonBody <| askQuestionRequest { presentation = presentationID, question = questionText }
     in
         Http.post url body questionAskedResponse
+
+
+{-| Produces a PUT request to have a question be "nodded at".
+-}
+nod : Question -> Request QuestionUpdateResponse
+nod question =
+    let
+        url =
+            "http://" ++ Config.apiServerAddress ++ "/api/questions/" ++ question.id ++ "/nod"
+    in
+        Http.request
+            { method = "PUT"
+            , url = url
+            , headers = []
+            , body = Http.emptyBody
+            , expect = Http.expectJson questionUpdateResponse
+            , timeout = Nothing
+            , withCredentials = False
+            }
 
 
 question : Decoder Question
@@ -141,6 +185,13 @@ askQuestionRequest { presentation, question } =
 
 questionAskedResponse : Decoder QuestionAskedResponse
 questionAskedResponse =
+    Json.Decode.map2 QuestionAskedResponse
+        (field "error" (maybe string))
+        (field "question" (maybe question))
+
+
+questionUpdateResponse : Decoder QuestionUpdateResponse
+questionUpdateResponse =
     Json.Decode.map2 QuestionAskedResponse
         (field "error" (maybe string))
         (field "question" (maybe question))
