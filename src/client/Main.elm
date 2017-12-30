@@ -67,7 +67,9 @@ update msg model =
     case msg of
         SwitchMode QuestionList ->
             ( { model | mode = QuestionList }
-            , Http.send (\x -> FromAPI <| APIReceivedQuestions x) <| Question.presentationQuestions model.presentation
+            , model.presentation
+                |> Question.presentationQuestions
+                |> Http.send (APIReceivedQuestions >> FromAPI)
             )
 
         SwitchMode viewMode ->
@@ -78,7 +80,9 @@ update msg model =
 
         PresentationIDSubmitted ->
             ( { model | mode = QuestionList }
-            , Http.send (\x -> FromAPI <| APIReceivedQuestions x) <| Question.presentationQuestions model.presentation
+            , model.presentation
+                |> Question.presentationQuestions
+                |> Http.send (APIReceivedQuestions >> FromAPI)
             )
 
         QuestionTextReceived questionText ->
@@ -86,7 +90,8 @@ update msg model =
 
         QuestionAsked ->
             ( { model | mode = QuestionList, question = "" }
-            , Http.send (\x -> FromAPI <| APIQuestionAsked x) <| Question.ask model.presentation model.question
+            , Question.ask model.presentation model.question
+                |> Http.send (APIQuestionAsked >> FromAPI)
             )
 
         QuestionAction questionMsg ->

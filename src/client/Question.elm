@@ -134,7 +134,9 @@ ask presentationID questionText =
             "http://" ++ Config.apiServerAddress ++ "/api/questions"
 
         body =
-            Http.jsonBody <| askQuestionRequest { presentation = presentationID, question = questionText }
+            { presentation = presentationID, question = questionText }
+                |> askQuestionRequest
+                |> Http.jsonBody
     in
         Http.post url body questionAskedResponse
 
