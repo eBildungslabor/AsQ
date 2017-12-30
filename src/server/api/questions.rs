@@ -28,7 +28,7 @@ pub struct QuestionAskedResponse {
 
 /// The response to a request to update a question.
 #[derive(Debug, Serialize)]
-pub struct QuestionUpdatedResponse {
+pub struct QuestionUpdateResponse {
     pub error: Option<String>,
 }
 
@@ -97,7 +97,7 @@ pub fn ask(question: Json<QuestionAsked>) -> Json<QuestionAskedResponse> {
 
 /// Nod to a question, indicating an audience member's interest in having the question answered.
 #[put("/api/questions/<id>/nod")]
-fn nod(id: &str) -> Json<QuestionUpdateResponse> {
+pub fn nod(id: String) -> Json<QuestionUpdateResponse> {
     Json(QuestionUpdateResponse{
         error: None,
     })

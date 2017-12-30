@@ -26,6 +26,7 @@ fn main() {
         api::js_file,
         questions::questions_list,
         questions::ask,
+        questions::nod,
     ];
     rocket::ignite().mount("/", routes).launch();
 }
