@@ -31,6 +31,7 @@ type Msg
     | QuestionAsked
     | QuestionAction Question.Msg
     | FromAPI APIResponse
+    | HideError
 
 
 type ViewMode
@@ -113,6 +114,9 @@ update msg model =
                     List.map (Cmd.map QuestionAction) commands
             in
                 ( { model | questions = questions }, Cmd.batch topLevelCommands )
+
+        HideError ->
+            ( { model | error = Nothing }, Cmd.none )
 
         FromAPI (APIReceivedQuestions result) ->
             updateQuestionsReceived result model
@@ -249,7 +253,9 @@ viewError model =
         content =
             case model.error of
                 Just errorMessage ->
-                    [ text errorMessage ]
+                    [ text errorMessage
+                    , a [ href "#", onClick HideError ] [ text "hide" ]
+                    ]
 
                 Nothing ->
                     []

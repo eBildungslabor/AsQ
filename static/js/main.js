@@ -9230,35 +9230,13 @@ var _user$project$Question$view = function (question) {
 		});
 };
 
-var _user$project$Main$viewError = function (model) {
-	var content = function () {
-		var _p0 = model.error;
-		if (_p0.ctor === 'Just') {
-			return {
-				ctor: '::',
-				_0: _elm_lang$html$Html$text(_p0._0),
-				_1: {ctor: '[]'}
-			};
-		} else {
-			return {ctor: '[]'};
-		}
-	}();
-	return A2(
-		_elm_lang$html$Html$div,
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$class('error'),
-			_1: {ctor: '[]'}
-		},
-		content);
-};
-var _user$project$Main$subscriptions = function (_p1) {
+var _user$project$Main$subscriptions = function (_p0) {
 	return _elm_lang$core$Platform_Sub$none;
 };
 var _user$project$Main$updateQuestionUpdated = F2(
 	function (result, model) {
-		var _p2 = result;
-		if (_p2.ctor === 'Err') {
+		var _p1 = result;
+		if (_p1.ctor === 'Err') {
 			return {
 				ctor: '_Tuple2',
 				_0: _elm_lang$core$Native_Utils.update(
@@ -9269,22 +9247,22 @@ var _user$project$Main$updateQuestionUpdated = F2(
 				_1: _elm_lang$core$Platform_Cmd$none
 			};
 		} else {
-			var _p3 = {ctor: '_Tuple2', _0: _p2._0.error, _1: _p2._0.question};
-			if (_p3._0.ctor === 'Just') {
+			var _p2 = {ctor: '_Tuple2', _0: _p1._0.error, _1: _p1._0.question};
+			if (_p2._0.ctor === 'Just') {
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
 						{
-							error: _elm_lang$core$Maybe$Just(_p3._0._0)
+							error: _elm_lang$core$Maybe$Just(_p2._0._0)
 						}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			} else {
-				if (_p3._1.ctor === 'Just') {
-					var _p4 = _p3._1._0;
+				if (_p2._1.ctor === 'Just') {
+					var _p3 = _p2._1._0;
 					var pickUpdated = function (newQuestion) {
-						return _elm_lang$core$Native_Utils.eq(_p4.id, newQuestion.id) ? _p4 : newQuestion;
+						return _elm_lang$core$Native_Utils.eq(_p3.id, newQuestion.id) ? _p3 : newQuestion;
 					};
 					var foldQuestions = F2(
 						function (nextQuestion, ls) {
@@ -9322,8 +9300,8 @@ var _user$project$Main$updateQuestionUpdated = F2(
 	});
 var _user$project$Main$updateQuestionAsked = F2(
 	function (result, model) {
-		var _p5 = result;
-		if (_p5.ctor === 'Err') {
+		var _p4 = result;
+		if (_p4.ctor === 'Err') {
 			return {
 				ctor: '_Tuple2',
 				_0: _elm_lang$core$Native_Utils.update(
@@ -9334,25 +9312,25 @@ var _user$project$Main$updateQuestionAsked = F2(
 				_1: _elm_lang$core$Platform_Cmd$none
 			};
 		} else {
-			var _p6 = {ctor: '_Tuple2', _0: _p5._0.error, _1: _p5._0.question};
-			if (_p6._0.ctor === 'Just') {
+			var _p5 = {ctor: '_Tuple2', _0: _p4._0.error, _1: _p4._0.question};
+			if (_p5._0.ctor === 'Just') {
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
 						{
-							error: _elm_lang$core$Maybe$Just(_p6._0._0)
+							error: _elm_lang$core$Maybe$Just(_p5._0._0)
 						}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			} else {
-				if (_p6._1.ctor === 'Just') {
+				if (_p5._1.ctor === 'Just') {
 					return {
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
 							model,
 							{
-								questions: {ctor: '::', _0: _p6._1._0, _1: model.questions}
+								questions: {ctor: '::', _0: _p5._1._0, _1: model.questions}
 							}),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
@@ -9372,8 +9350,8 @@ var _user$project$Main$updateQuestionAsked = F2(
 	});
 var _user$project$Main$updateQuestionsReceived = F2(
 	function (result, model) {
-		var _p7 = result;
-		if (_p7.ctor === 'Err') {
+		var _p6 = result;
+		if (_p6.ctor === 'Err') {
 			return {
 				ctor: '_Tuple2',
 				_0: _elm_lang$core$Native_Utils.update(
@@ -9384,14 +9362,14 @@ var _user$project$Main$updateQuestionsReceived = F2(
 				_1: _elm_lang$core$Platform_Cmd$none
 			};
 		} else {
-			var _p8 = _p7._0.error;
-			if (_p8.ctor === 'Just') {
+			var _p7 = _p6._0.error;
+			if (_p7.ctor === 'Just') {
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
 						{
-							error: _elm_lang$core$Maybe$Just(_p8._0)
+							error: _elm_lang$core$Maybe$Just(_p7._0)
 						}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
@@ -9400,7 +9378,7 @@ var _user$project$Main$updateQuestionsReceived = F2(
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{questions: _p7._0.questions}),
+						{questions: _p6._0.questions}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			}
@@ -9418,6 +9396,48 @@ var _user$project$Main$APIQuestionAsked = function (a) {
 };
 var _user$project$Main$APIReceivedQuestions = function (a) {
 	return {ctor: 'APIReceivedQuestions', _0: a};
+};
+var _user$project$Main$HideError = {ctor: 'HideError'};
+var _user$project$Main$viewError = function (model) {
+	var content = function () {
+		var _p8 = model.error;
+		if (_p8.ctor === 'Just') {
+			return {
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(_p8._0),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$a,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$href('#'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$HideError),
+								_1: {ctor: '[]'}
+							}
+						},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text('hide'),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				}
+			};
+		} else {
+			return {ctor: '[]'};
+		}
+	}();
+	return A2(
+		_elm_lang$html$Html$div,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('error'),
+			_1: {ctor: '[]'}
+		},
+		content);
 };
 var _user$project$Main$FromAPI = function (a) {
 	return {ctor: 'FromAPI', _0: a};
@@ -9614,6 +9634,14 @@ var _user$project$Main$update = F2(
 						model,
 						{questions: questions}),
 					_1: _elm_lang$core$Platform_Cmd$batch(topLevelCommands)
+				};
+			case 'HideError':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{error: _elm_lang$core$Maybe$Nothing}),
+					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			default:
 				switch (_p9._0.ctor) {
