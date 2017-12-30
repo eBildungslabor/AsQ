@@ -19,11 +19,17 @@ pub struct QuestionAsked {
     pub question: String,
 }
 
-/// The response to a request to have a question asked.d
-#[derive(Debug, Serialize, Deserialize)]
+/// The response to a request to have a question asked.
+#[derive(Debug, Serialize)]
 pub struct QuestionAskedResponse {
     pub error: Option<String>,
     pub question: Option<Question>,
+}
+
+/// The response to a request to update a question.
+#[derive(Debug, Serialize)]
+pub struct QuestionUpdatedResponse {
+    pub error: Option<String>,
 }
 
 /// Get a list of questions asked during a given presentation.
@@ -86,5 +92,13 @@ pub fn ask(question: Json<QuestionAsked>) -> Json<QuestionAskedResponse> {
             answered: false,
         }),
         */
+    })
+}
+
+/// Nod to a question, indicating an audience member's interest in having the question answered.
+#[put("/api/questions/<id>/nod")]
+fn nod(id: &str) -> Json<QuestionUpdateResponse> {
+    Json(QuestionUpdateResponse{
+        error: None,
     })
 }
