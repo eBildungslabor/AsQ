@@ -66,11 +66,16 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         SwitchMode QuestionList ->
-            ( { model | mode = QuestionList }
-            , model.presentation
-                |> Question.presentationQuestions
-                |> Http.send (APIReceivedQuestions >> FromAPI)
-            )
+            let
+                newModel =
+                    { model | mode = QuestionList, error = Nothing }
+
+                command =
+                    model.presentation
+                        |> Question.presentationQuestions
+                        |> Http.send (APIReceivedQuestions >> FromAPI)
+            in
+                ( newModel, command )
 
         SwitchMode viewMode ->
             ( { model | mode = viewMode }, Cmd.none )
