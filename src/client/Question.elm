@@ -1,7 +1,7 @@
 module Question
     exposing
         ( Question
-        , Msg(QuestionNoddedTo)
+        , Msg(BubblingError)
         , GetQuestionsResponse
         , QuestionAskedResponse
         , QuestionUpdateResponse
@@ -21,6 +21,7 @@ import Http exposing (Request)
 import Json.Decode exposing (Decoder, field, string, int, bool, list, maybe)
 import Json.Encode as Encode
 import Config
+import Error exposing (Error)
 
 
 {-| A model of a question asked during a presentation.
@@ -37,7 +38,8 @@ type alias Question =
 {-| Local message type for events that can be emitted by the related view.
 -}
 type Msg
-    = QuestionNoddedTo Question
+    = BubblingError Error
+    | QuestionNoddedTo Question
     | GotNodResponse (Result Http.Error QuestionUpdateResponse)
 
 
@@ -78,6 +80,10 @@ type alias QuestionUpdateResponse =
 update : Msg -> Question -> ( Question, Cmd Msg )
 update msg question =
     case msg of
+        BubblingError _ ->
+            -- We don't handle these; they are meant for Main.
+            ( question, Cmd.none )
+
         QuestionNoddedTo noddedQuestion ->
             ( question
             , Http.send GotNodResponse <| nod noddedQuestion
@@ -86,20 +92,25 @@ update msg question =
         GotNodResponse result ->
             case result of
                 Err error ->
-                    -- TODO How can I avoid swallowing this error?
-                    ( question, Cmd.none )
+                    ( question
+                    , Error.bubble BubblingError "Failed to make request."
+                    )
 
                 Ok response ->
                     case ( response.error, response.question ) of
+                        ( Just errorMessage, _ ) ->
+                            ( question, Error.bubble BubblingError errorMessage )
+
                         ( _, Just updatedQuestion ) ->
                             if updatedQuestion.id == question.id then
                                 ( updatedQuestion, Cmd.none )
                             else
                                 ( question, Cmd.none )
 
-                        ( _, _ ) ->
-                            -- TODO How can I avoid swallowing this error?
-                            ( question, Cmd.none )
+                        ( Nothing, Nothing ) ->
+                            ( question
+                            , Error.bubble BubblingError "Got unexpected response from API server."
+                            )
 
 
 {-| Render a question as a list item, displaying the number of nods (upvotes) it has.

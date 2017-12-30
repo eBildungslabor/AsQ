@@ -4,6 +4,7 @@ import Html exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Html.Attributes exposing (..)
 import Http
+import Error exposing (Error)
 import Question exposing (Question)
 
 
@@ -41,7 +42,7 @@ type ViewMode
 
 
 type alias Model =
-    { error : Maybe String
+    { error : Maybe Error
     , mode : ViewMode
     , presentation : String
     , questions : List Question
@@ -99,6 +100,9 @@ update msg model =
             , Question.ask model.presentation model.question
                 |> Http.send (APIQuestionAsked >> FromAPI)
             )
+
+        QuestionAction (Question.BubblingError error) ->
+            ( { model | error = Just error }, Cmd.none )
 
         QuestionAction questionMsg ->
             let

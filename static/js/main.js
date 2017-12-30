@@ -9035,6 +9035,14 @@ var _elm_lang$http$Http$stringPart = _elm_lang$http$Http$StringPart;
 
 var _user$project$Config$apiServerAddress = '127.0.0.1:8000';
 
+var _user$project$Error$bubble = F2(
+	function (toMsg, err) {
+		return A2(
+			_elm_lang$core$Task$perform,
+			toMsg,
+			_elm_lang$core$Task$succeed(err));
+	});
+
 var _user$project$Question$askQuestionRequest = function (_p0) {
 	var _p1 = _p0;
 	return _elm_lang$core$Json_Encode$object(
@@ -9163,34 +9171,6 @@ var _user$project$Question$QuestionUpdateResponse = F2(
 var _user$project$Question$GotNodResponse = function (a) {
 	return {ctor: 'GotNodResponse', _0: a};
 };
-var _user$project$Question$update = F2(
-	function (msg, question) {
-		var _p2 = msg;
-		if (_p2.ctor === 'QuestionNoddedTo') {
-			return {
-				ctor: '_Tuple2',
-				_0: question,
-				_1: A2(
-					_elm_lang$http$Http$send,
-					_user$project$Question$GotNodResponse,
-					_user$project$Question$nod(_p2._0))
-			};
-		} else {
-			var _p3 = _p2._0;
-			if (_p3.ctor === 'Err') {
-				return {ctor: '_Tuple2', _0: question, _1: _elm_lang$core$Platform_Cmd$none};
-			} else {
-				var _p6 = _p3._0;
-				var _p4 = {ctor: '_Tuple2', _0: _p6.error, _1: _p6.question};
-				if (_p4._1.ctor === 'Just') {
-					var _p5 = _p4._1._0;
-					return _elm_lang$core$Native_Utils.eq(_p5.id, question.id) ? {ctor: '_Tuple2', _0: _p5, _1: _elm_lang$core$Platform_Cmd$none} : {ctor: '_Tuple2', _0: question, _1: _elm_lang$core$Platform_Cmd$none};
-				} else {
-					return {ctor: '_Tuple2', _0: question, _1: _elm_lang$core$Platform_Cmd$none};
-				}
-			}
-		}
-	});
 var _user$project$Question$QuestionNoddedTo = function (a) {
 	return {ctor: 'QuestionNoddedTo', _0: a};
 };
@@ -9229,6 +9209,56 @@ var _user$project$Question$view = function (question) {
 			}
 		});
 };
+var _user$project$Question$BubblingError = function (a) {
+	return {ctor: 'BubblingError', _0: a};
+};
+var _user$project$Question$update = F2(
+	function (msg, question) {
+		var _p2 = msg;
+		switch (_p2.ctor) {
+			case 'BubblingError':
+				return {ctor: '_Tuple2', _0: question, _1: _elm_lang$core$Platform_Cmd$none};
+			case 'QuestionNoddedTo':
+				return {
+					ctor: '_Tuple2',
+					_0: question,
+					_1: A2(
+						_elm_lang$http$Http$send,
+						_user$project$Question$GotNodResponse,
+						_user$project$Question$nod(_p2._0))
+				};
+			default:
+				var _p3 = _p2._0;
+				if (_p3.ctor === 'Err') {
+					return {
+						ctor: '_Tuple2',
+						_0: question,
+						_1: A2(_user$project$Error$bubble, _user$project$Question$BubblingError, 'Failed to make request.')
+					};
+				} else {
+					var _p6 = _p3._0;
+					var _p4 = {ctor: '_Tuple2', _0: _p6.error, _1: _p6.question};
+					if (_p4._0.ctor === 'Just') {
+						return {
+							ctor: '_Tuple2',
+							_0: question,
+							_1: A2(_user$project$Error$bubble, _user$project$Question$BubblingError, _p4._0._0)
+						};
+					} else {
+						if (_p4._1.ctor === 'Just') {
+							var _p5 = _p4._1._0;
+							return _elm_lang$core$Native_Utils.eq(_p5.id, question.id) ? {ctor: '_Tuple2', _0: _p5, _1: _elm_lang$core$Platform_Cmd$none} : {ctor: '_Tuple2', _0: question, _1: _elm_lang$core$Platform_Cmd$none};
+						} else {
+							return {
+								ctor: '_Tuple2',
+								_0: question,
+								_1: A2(_user$project$Error$bubble, _user$project$Question$BubblingError, 'Got unexpected response from API server.')
+							};
+						}
+					}
+				}
+		}
+	});
 
 var _user$project$Main$subscriptions = function (_p0) {
 	return _elm_lang$core$Platform_Sub$none;
@@ -9619,22 +9649,34 @@ var _user$project$Main$update = F2(
 						A2(_user$project$Question$ask, model.presentation, model.question))
 				};
 			case 'QuestionAction':
-				var updateQuestion = _user$project$Question$update(_p9._0);
-				var _p13 = _elm_lang$core$List$unzip(
-					A2(_elm_lang$core$List$map, updateQuestion, model.questions));
-				var questions = _p13._0;
-				var commands = _p13._1;
-				var topLevelCommands = A2(
-					_elm_lang$core$List$map,
-					_elm_lang$core$Platform_Cmd$map(_user$project$Main$QuestionAction),
-					commands);
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{questions: questions}),
-					_1: _elm_lang$core$Platform_Cmd$batch(topLevelCommands)
-				};
+				if (_p9._0.ctor === 'BubblingError') {
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{
+								error: _elm_lang$core$Maybe$Just(_p9._0._0)
+							}),
+						_1: _elm_lang$core$Platform_Cmd$none
+					};
+				} else {
+					var updateQuestion = _user$project$Question$update(_p9._0);
+					var _p13 = _elm_lang$core$List$unzip(
+						A2(_elm_lang$core$List$map, updateQuestion, model.questions));
+					var questions = _p13._0;
+					var commands = _p13._1;
+					var topLevelCommands = A2(
+						_elm_lang$core$List$map,
+						_elm_lang$core$Platform_Cmd$map(_user$project$Main$QuestionAction),
+						commands);
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{questions: questions}),
+						_1: _elm_lang$core$Platform_Cmd$batch(topLevelCommands)
+					};
+				}
 			case 'HideError':
 				return {
 					ctor: '_Tuple2',
