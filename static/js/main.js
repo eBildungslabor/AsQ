@@ -9219,35 +9219,36 @@ var _user$project$Question$update = F2(
 			case 'BubblingError':
 				return {ctor: '_Tuple2', _0: question, _1: _elm_lang$core$Platform_Cmd$none};
 			case 'QuestionNoddedTo':
-				return {
+				var _p3 = _p2._0;
+				return _elm_lang$core$Native_Utils.eq(_p3.id, question.id) ? {
 					ctor: '_Tuple2',
 					_0: question,
 					_1: A2(
 						_elm_lang$http$Http$send,
 						_user$project$Question$GotNodResponse,
-						_user$project$Question$nod(_p2._0))
-				};
+						_user$project$Question$nod(_p3))
+				} : {ctor: '_Tuple2', _0: question, _1: _elm_lang$core$Platform_Cmd$none};
 			default:
-				var _p3 = _p2._0;
-				if (_p3.ctor === 'Err') {
+				var _p4 = _p2._0;
+				if (_p4.ctor === 'Err') {
 					return {
 						ctor: '_Tuple2',
 						_0: question,
 						_1: A2(_user$project$Error$bubble, _user$project$Question$BubblingError, 'Failed to make request.')
 					};
 				} else {
-					var _p6 = _p3._0;
-					var _p4 = {ctor: '_Tuple2', _0: _p6.error, _1: _p6.question};
-					if (_p4._0.ctor === 'Just') {
+					var _p7 = _p4._0;
+					var _p5 = {ctor: '_Tuple2', _0: _p7.error, _1: _p7.question};
+					if (_p5._0.ctor === 'Just') {
 						return {
 							ctor: '_Tuple2',
 							_0: question,
-							_1: A2(_user$project$Error$bubble, _user$project$Question$BubblingError, _p4._0._0)
+							_1: A2(_user$project$Error$bubble, _user$project$Question$BubblingError, _p5._0._0)
 						};
 					} else {
-						if (_p4._1.ctor === 'Just') {
-							var _p5 = _p4._1._0;
-							return _elm_lang$core$Native_Utils.eq(_p5.id, question.id) ? {ctor: '_Tuple2', _0: _p5, _1: _elm_lang$core$Platform_Cmd$none} : {ctor: '_Tuple2', _0: question, _1: _elm_lang$core$Platform_Cmd$none};
+						if (_p5._1.ctor === 'Just') {
+							var _p6 = _p5._1._0;
+							return _elm_lang$core$Native_Utils.eq(_p6.id, question.id) ? {ctor: '_Tuple2', _0: _p6, _1: _elm_lang$core$Platform_Cmd$none} : {ctor: '_Tuple2', _0: question, _1: _elm_lang$core$Platform_Cmd$none};
 						} else {
 							return {
 								ctor: '_Tuple2',
@@ -9814,7 +9815,11 @@ var _user$project$Main$init = function () {
 		error: _elm_lang$core$Maybe$Nothing,
 		mode: _user$project$Main$LandingPage,
 		presentation: '',
-		questions: {ctor: '[]'},
+		questions: {
+			ctor: '::',
+			_0: {id: 'banan', presentation: '', questionText: 'do u liek banan', nods: 1, answered: false},
+			_1: {ctor: '[]'}
+		},
 		question: ''
 	};
 	return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};

@@ -85,9 +85,12 @@ update msg question =
             ( question, Cmd.none )
 
         QuestionNoddedTo noddedQuestion ->
-            ( question
-            , Http.send GotNodResponse <| nod noddedQuestion
-            )
+            if noddedQuestion.id == question.id then
+                ( question
+                , Http.send GotNodResponse <| nod noddedQuestion
+                )
+            else
+                ( question, Cmd.none )
 
         GotNodResponse result ->
             case result of
