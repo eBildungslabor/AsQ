@@ -13,14 +13,8 @@ mod api;
 use api::questions;
 
 
-#[get("/hello")]
-fn hello() -> &'static str {
-    "Hello, world"
-}
-
 fn main() {
     let routes = routes![
-        hello,
         api::index,
         api::css_file,
         api::js_file,
