@@ -9,7 +9,7 @@ suite : Test
 suite =
     describe "The Question module"
         [ describe "The update function"
-            [ test "updates the question nodded to on QuestionNoddedTo" nodsUpdateCorrectQuestion
+            [ test "updates the question nodded to on GotNodResponse" nodsUpdateCorrectQuestion
             , test "does not update the given question if it was not nodded to" nodDoesntAffectUnrelatedQuestions
             ]
         ]
@@ -26,8 +26,11 @@ nodsUpdateCorrectQuestion _ =
             , answered = False
             }
 
+        expectedQuestion =
+            { question | nods = question.nods + 1 }
+
         message =
-            QuestionNoddedTo question
+            Question.GotNodResponse (Ok { error = Nothing, question = Just expectedQuestion })
 
         ( updatedQuestion, _ ) =
             Question.update message question

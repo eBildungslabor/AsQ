@@ -1,7 +1,7 @@
 module Question
     exposing
         ( Question
-        , Msg(BubblingError)
+        , Msg(..)
         , GetQuestionsResponse
         , QuestionAskedResponse
         , QuestionUpdateResponse
