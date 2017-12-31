@@ -24,9 +24,9 @@ fn main() {
         api::index,
         api::css_file,
         api::js_file,
-        questions::questions_list,
-        questions::ask,
-        questions::nod,
+        questions::list::list,
+        questions::ask::ask,
+        questions::nod::nod,
     ];
     rocket::ignite().mount("/", routes).launch();
 }

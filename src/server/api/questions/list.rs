@@ -12,7 +12,7 @@ pub struct QuestionList {
 
 /// Get a list of questions asked during a given presentation.
 #[get("/api/questions?<presentation>")]
-pub fn questions_list(presentation: &str) -> Json<QuestionList> {
+pub fn list(presentation: &str) -> Json<QuestionList> {
     let response = QuestionList {
         error: None,
         questions: vec![
