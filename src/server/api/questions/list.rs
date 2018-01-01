@@ -1,3 +1,4 @@
+use chrono::prelude::*;
 use rocket_contrib::json::Json;
 
 use models::question::Question;
@@ -19,7 +20,7 @@ pub fn list(presentation: &str) -> Json<QuestionList> {
             Question {
                 id:           "A0142sfudgSDgj34".to_string(),
                 presentation: "ABCDEF0123456789".to_string(),
-                //time_asked:    Instant::now(),
+                time_asked:    Utc::now(),
                 question_text: "How is a monad related to a burrito, in 280 charcters or less?".to_string(),
                 nods:          9001,
                 answered:      true,
@@ -27,7 +28,7 @@ pub fn list(presentation: &str) -> Json<QuestionList> {
             Question {
                 id:           "A014345ifgSDgj34".to_string(),
                 presentation: "DEFABC0123456789".to_string(),
-                //time_asked:    Instant::now(),
+                time_asked:    Utc::now(),
                 question_text: "What is the type of Clojure's 'mapping' transducer?".to_string(),
                 nods:          1,
                 answered:      false,
@@ -35,7 +36,7 @@ pub fn list(presentation: &str) -> Json<QuestionList> {
             Question {
                 id:           "Sh59sfG23dfHa2yt".to_string(),
                 presentation: "000FED0123456789".to_string(),
-                //time_asked:    Instant::now(),
+                time_asked:    Utc::now(),
                 question_text: "How do I learn Haskell in less than a year?".to_string(),
                 nods:          42,
                 answered:      true,
@@ -43,7 +44,7 @@ pub fn list(presentation: &str) -> Json<QuestionList> {
             Question {
                 id:           "SDF43rfHDJ232Dsd".to_string(),
                 presentation: "CABBAC0123456789".to_string(),
-                //time_asked:    Instant::now(),
+                time_asked:    Utc::now(),
                 question_text: "Should I learn Rust?".to_string(),
                 nods:          101,
                 answered:      true,

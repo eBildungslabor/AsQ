@@ -1,4 +1,4 @@
-//use std::time;
+use chrono::prelude::*;
 
 
 /// Information about a question asked during a presentation.
@@ -6,8 +6,8 @@
 pub struct Question {
     pub id: String,
     pub presentation: String,
-    //#[serde(rename="timeAsked")]
-    //pub time_asked: time::Instant,
+    #[serde(rename="timeAsked")]
+    pub time_asked: DateTime<Utc>,
     #[serde(rename="questionText")]
     pub question_text: String,
     pub nods: u32,

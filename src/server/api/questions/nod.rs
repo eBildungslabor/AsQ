@@ -1,3 +1,4 @@
+use chrono::prelude::*;
 use rocket_contrib::json::Json;
 
 use models::question::Question;
@@ -19,7 +20,7 @@ pub fn nod(id: String) -> Json<QuestionUpdateResponse> {
         question: Some(Question {
             id: id,
             presentation: "somepresentation".to_string(),
-            // time_asked: Instant::now(),
+            time_asked: Utc::now(),
             question_text: "The question you asked".to_string(),
             nods: 0,
             answered: false,

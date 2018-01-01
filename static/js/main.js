@@ -9043,39 +9043,63 @@ var _user$project$Error$bubble = F2(
 			_elm_lang$core$Task$succeed(err));
 	});
 
-var _user$project$Question$askQuestionRequest = function (_p0) {
-	var _p1 = _p0;
+var _user$project$Question$cleanDate = function (dateStr) {
+	var nth = F2(
+		function (i, ls) {
+			return _elm_lang$core$List$head(
+				A2(_elm_lang$core$List$drop, i, ls));
+		});
+	var parsed = A2(
+		_elm_lang$core$Maybe$andThen,
+		nth(0),
+		A2(
+			_elm_lang$core$Maybe$map,
+			_elm_lang$core$String$split('.'),
+			A2(
+				nth,
+				1,
+				A2(_elm_lang$core$String$split, 'T', dateStr))));
+	var _p0 = parsed;
+	if (_p0.ctor === 'Just') {
+		return _p0._0;
+	} else {
+		return '???';
+	}
+};
+var _user$project$Question$askQuestionRequest = function (_p1) {
+	var _p2 = _p1;
 	return _elm_lang$core$Json_Encode$object(
 		{
 			ctor: '::',
 			_0: {
 				ctor: '_Tuple2',
 				_0: 'presentation',
-				_1: _elm_lang$core$Json_Encode$string(_p1.presentation)
+				_1: _elm_lang$core$Json_Encode$string(_p2.presentation)
 			},
 			_1: {
 				ctor: '::',
 				_0: {
 					ctor: '_Tuple2',
 					_0: 'question',
-					_1: _elm_lang$core$Json_Encode$string(_p1.question)
+					_1: _elm_lang$core$Json_Encode$string(_p2.question)
 				},
 				_1: {ctor: '[]'}
 			}
 		});
 };
-var _user$project$Question$Question = F5(
-	function (a, b, c, d, e) {
-		return {id: a, presentation: b, questionText: c, nods: d, answered: e};
+var _user$project$Question$Question = F6(
+	function (a, b, c, d, e, f) {
+		return {id: a, presentation: b, questionText: c, nods: d, answered: e, timeAsked: f};
 	});
-var _user$project$Question$question = A6(
-	_elm_lang$core$Json_Decode$map5,
+var _user$project$Question$question = A7(
+	_elm_lang$core$Json_Decode$map6,
 	_user$project$Question$Question,
 	A2(_elm_lang$core$Json_Decode$field, 'id', _elm_lang$core$Json_Decode$string),
 	A2(_elm_lang$core$Json_Decode$field, 'presentation', _elm_lang$core$Json_Decode$string),
 	A2(_elm_lang$core$Json_Decode$field, 'questionText', _elm_lang$core$Json_Decode$string),
 	A2(_elm_lang$core$Json_Decode$field, 'nods', _elm_lang$core$Json_Decode$int),
-	A2(_elm_lang$core$Json_Decode$field, 'answered', _elm_lang$core$Json_Decode$bool));
+	A2(_elm_lang$core$Json_Decode$field, 'answered', _elm_lang$core$Json_Decode$bool),
+	A2(_elm_lang$core$Json_Decode$field, 'timeAsked', _elm_lang$core$Json_Decode$string));
 var _user$project$Question$GetQuestionsResponse = F2(
 	function (a, b) {
 		return {error: a, questions: b};
@@ -9187,23 +9211,32 @@ var _user$project$Question$view = function (question) {
 				_0: _elm_lang$html$Html$text(' | '),
 				_1: {
 					ctor: '::',
-					_0: _elm_lang$html$Html$text(question.questionText),
+					_0: _elm_lang$html$Html$text(
+						_user$project$Question$cleanDate(question.timeAsked)),
 					_1: {
 						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$button,
-							{
+						_0: _elm_lang$html$Html$text(' | '),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(question.questionText),
+							_1: {
 								ctor: '::',
-								_0: _elm_lang$html$Html_Events$onClick(
-									_user$project$Question$QuestionNoddedTo(question)),
+								_0: A2(
+									_elm_lang$html$Html$button,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Events$onClick(
+											_user$project$Question$QuestionNoddedTo(question)),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text('Nod'),
+										_1: {ctor: '[]'}
+									}),
 								_1: {ctor: '[]'}
-							},
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html$text('Nod'),
-								_1: {ctor: '[]'}
-							}),
-						_1: {ctor: '[]'}
+							}
+						}
 					}
 				}
 			}
@@ -9214,41 +9247,41 @@ var _user$project$Question$BubblingError = function (a) {
 };
 var _user$project$Question$update = F2(
 	function (msg, question) {
-		var _p2 = msg;
-		switch (_p2.ctor) {
+		var _p3 = msg;
+		switch (_p3.ctor) {
 			case 'BubblingError':
 				return {ctor: '_Tuple2', _0: question, _1: _elm_lang$core$Platform_Cmd$none};
 			case 'QuestionNoddedTo':
-				var _p3 = _p2._0;
-				return _elm_lang$core$Native_Utils.eq(_p3.id, question.id) ? {
+				var _p4 = _p3._0;
+				return _elm_lang$core$Native_Utils.eq(_p4.id, question.id) ? {
 					ctor: '_Tuple2',
 					_0: question,
 					_1: A2(
 						_elm_lang$http$Http$send,
 						_user$project$Question$GotNodResponse,
-						_user$project$Question$nod(_p3))
+						_user$project$Question$nod(_p4))
 				} : {ctor: '_Tuple2', _0: question, _1: _elm_lang$core$Platform_Cmd$none};
 			default:
-				var _p4 = _p2._0;
-				if (_p4.ctor === 'Err') {
+				var _p5 = _p3._0;
+				if (_p5.ctor === 'Err') {
 					return {
 						ctor: '_Tuple2',
 						_0: question,
 						_1: A2(_user$project$Error$bubble, _user$project$Question$BubblingError, 'Failed to make request.')
 					};
 				} else {
-					var _p7 = _p4._0;
-					var _p5 = {ctor: '_Tuple2', _0: _p7.error, _1: _p7.question};
-					if (_p5._0.ctor === 'Just') {
+					var _p8 = _p5._0;
+					var _p6 = {ctor: '_Tuple2', _0: _p8.error, _1: _p8.question};
+					if (_p6._0.ctor === 'Just') {
 						return {
 							ctor: '_Tuple2',
 							_0: question,
-							_1: A2(_user$project$Error$bubble, _user$project$Question$BubblingError, _p5._0._0)
+							_1: A2(_user$project$Error$bubble, _user$project$Question$BubblingError, _p6._0._0)
 						};
 					} else {
-						if (_p5._1.ctor === 'Just') {
-							var _p6 = _p5._1._0;
-							return _elm_lang$core$Native_Utils.eq(_p6.id, question.id) ? {ctor: '_Tuple2', _0: _p6, _1: _elm_lang$core$Platform_Cmd$none} : {ctor: '_Tuple2', _0: question, _1: _elm_lang$core$Platform_Cmd$none};
+						if (_p6._1.ctor === 'Just') {
+							var _p7 = _p6._1._0;
+							return _elm_lang$core$Native_Utils.eq(_p7.id, question.id) ? {ctor: '_Tuple2', _0: _p7, _1: _elm_lang$core$Platform_Cmd$none} : {ctor: '_Tuple2', _0: question, _1: _elm_lang$core$Platform_Cmd$none};
 						} else {
 							return {
 								ctor: '_Tuple2',
@@ -9815,11 +9848,7 @@ var _user$project$Main$init = function () {
 		error: _elm_lang$core$Maybe$Nothing,
 		mode: _user$project$Main$LandingPage,
 		presentation: '',
-		questions: {
-			ctor: '::',
-			_0: {id: 'banan', presentation: '', questionText: 'do u liek banan', nods: 1, answered: false},
-			_1: {ctor: '[]'}
-		},
+		questions: {ctor: '[]'},
 		question: ''
 	};
 	return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};

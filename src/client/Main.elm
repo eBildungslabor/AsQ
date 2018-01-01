@@ -57,7 +57,7 @@ init =
             { error = Nothing
             , mode = LandingPage
             , presentation = ""
-            , questions = [ { id = "banan", presentation = "", questionText = "do u liek banan", nods = 1, answered = False } ]
+            , questions = []
             , question = ""
             }
     in

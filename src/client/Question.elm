@@ -32,6 +32,7 @@ type alias Question =
     , questionText : String
     , nods : Int
     , answered : Bool
+    , timeAsked : String
     }
 
 
@@ -123,6 +124,8 @@ view question =
     li []
         [ text <| toString question.nods
         , text " | "
+        , text <| cleanDate question.timeAsked
+        , text " | "
         , text question.questionText
         , button [ onClick (QuestionNoddedTo question) ] [ text "Nod" ]
         ]
@@ -176,12 +179,13 @@ nod question =
 
 question : Decoder Question
 question =
-    Json.Decode.map5 Question
+    Json.Decode.map6 Question
         (field "id" string)
         (field "presentation" string)
         (field "questionText" string)
         (field "nods" int)
         (field "answered" bool)
+        (field "timeAsked" string)
 
 
 getQuestionResponse : Decoder GetQuestionsResponse
@@ -211,3 +215,24 @@ questionUpdateResponse =
     Json.Decode.map2 QuestionAskedResponse
         (field "error" (maybe string))
         (field "question" (maybe question))
+
+
+cleanDate : String -> String
+cleanDate dateStr =
+    let
+        nth i ls =
+            List.head (List.drop i ls)
+
+        parsed =
+            dateStr
+                |> String.split "T"
+                |> nth 1
+                |> Maybe.map (String.split ".")
+                |> Maybe.andThen (nth 0)
+    in
+        case parsed of
+            Just time ->
+                time
+
+            Nothing ->
+                "???"
