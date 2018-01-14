@@ -3,18 +3,5 @@ pub mod ask;
 pub mod nod;
 
 pub use self::list::ListH;
-pub use self::ask::ask;
-pub use self::nod::nod;
-
-
-#[derive(Serialize, Deserialize)]
-pub struct Question {
-    pub id: String,
-    pub presentation: String,
-    #[serde(rename = "questionText")]
-    pub text: String,
-    pub nods: u32,
-    pub answered: bool,
-    #[serde(rename = "timeAsked")]
-    pub asked: String,
-}
+pub use self::ask::AskH;
+pub use self::nod::NodH;

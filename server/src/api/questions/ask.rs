@@ -1,3 +1,5 @@
+use std::sync::{Arc, Mutex};
+
 use bodyparser;
 use iron::prelude::*;
 use iron::Handler;
@@ -5,10 +7,12 @@ use iron::headers::ContentType;
 use iron::status;
 use serde_json as json;
 
-use api::questions::Question;
+use models::Question;
+use models::question::{QuestionRecord};
 
 
 pub struct AskH {
+    persistent_medium: Arc<Mutex<QuestionRecord>>
 }
 
 #[derive(Clone, Deserialize)]
@@ -24,8 +28,9 @@ struct AskQuestionResponse {
 }
 
 impl AskH {
-    pub fn new() -> Self {
+    pub fn new(record: Arc<Mutex<QuestionRecord>>) -> Self {
         AskH {
+            persistent_medium: record,
         }
     }
 }

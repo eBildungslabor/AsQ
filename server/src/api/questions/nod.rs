@@ -1,13 +1,18 @@
+use std::sync::{Arc, Mutex};
+
 use iron::prelude::*;
 use iron::Handler;
 use iron::headers::ContentType;
 use iron::status;
 use router::Router;
 use serde_json as json;
-use api::questions::Question;
+
+use models::Question;
+use models::question::{QuestionRecord};
 
 
 pub struct NodH {
+    persistent_medium: Arc<Mutex<QuestionRecord>>,
 }
 
 #[derive(Serialize)]
@@ -17,14 +22,15 @@ struct NodToQuestionResponse {
 }
 
 impl NodH {
-    pub fn new() -> Self {
+    pub fn new(record: Arc<Mutex<QuestionRecord>>) -> Self {
         NodH {
+            persistent_medium: record,
         }
     }
 }
 
 impl Handler for NodH {
-    pub fn handle(&self, req: &mut Request) -> IronResult<Response> {
+    fn handle(&self, req: &mut Request) -> IronResult<Response> {
         let id = req.extensions
             .get::<Router>()
             .unwrap()

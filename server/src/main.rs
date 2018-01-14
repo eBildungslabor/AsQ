@@ -6,7 +6,10 @@ extern crate serde;
 extern crate serde_json;
 extern crate router;
 
+pub mod models;
 mod api;
+
+use std::sync::{Arc, Mutex};
 
 use iron::prelude::*;
 use persistent::Read;
@@ -17,9 +20,11 @@ const MAX_BODY_LENGTH: usize = 10 * 1024 * 1024;
 
 
 fn main() {
-    let list_questions = api::questions::ListH::new();
-    let ask_question = api::questions::AskH::new();
-    let nod_to_question = api::questions::NodH::new();
+    let questions_record = Arc::new(Mutex::new(models::question::QuestionRecord::new()));
+
+    let list_questions = api::questions::ListH::new(questions_record.clone());
+    let ask_question = api::questions::AskH::new(questions_record.clone());
+    let nod_to_question = api::questions::NodH::new(questions_record);
 
     let mut router = Router::new();
     router.get("/api/questions", list_questions, "list_questions");
