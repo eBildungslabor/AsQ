@@ -31,19 +31,23 @@ impl ListH {
 impl Handler for ListH {
     fn handle(&self, _: &mut Request) -> IronResult<Response> {
         let database = self.persistent_medium.lock().unwrap();
-        let questions = database
-            .all(AllQuestionsQuery {
-                presentation: "TODO".to_string(),
-            })
-            .unwrap();
+        let fetch_result = database.all(AllQuestionsQuery {
+            presentation: "TODO".to_string(),
+        });
+        let (status_code, error, questions) = match fetch_result {
+            Ok(questions) => (status::Ok, None, questions),
+            Err(_)        => (status::InternalServerError,
+                              Some("database communication error".to_string()),
+                              vec![]),
+        };
         let response = ListQuestionsResponse {
-            error: None,
+            error: error,
             questions: questions,
         };
         let body = json::to_string(&response).unwrap();
         Ok(Response::with((
             ContentType::json().0,
-            status::Ok,
+            status_code,
             body,
         )))
     }
