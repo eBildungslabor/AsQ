@@ -5,6 +5,8 @@ authors = ["Zack Mullaly <zsck@riseup.net>"]
 
 [dependencies]
 iron = "*"
+bodyparser = "*"
+persistent = "*"
 serde = "^1.0"
 serde_json = "^1.0"
 serde_derive = "^1.0"

@@ -1,21 +1,8 @@
 use iron::prelude::*;
-use iron::status;
 use iron::headers::ContentType;
+use iron::status;
 use serde_json as json;
-
-
-#[derive(Serialize, Deserialize)]
-pub struct Question {
-    pub id: String,
-    pub presentation: String,
-    #[serde(rename = "questionText")]
-    pub text: String,
-    pub nods: u32,
-    pub answered: bool,
-    #[serde(rename = "timeAsked")]
-    pub asked: String,
-}
-
+use api::questions::Question;
 
 pub fn list(_: &mut Request) -> IronResult<Response> {
     let body = json::to_string(&vec![
