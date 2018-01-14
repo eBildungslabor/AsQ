@@ -1,2 +1,1 @@
-cargo build
-elm-make src/client/Main.elm --output static/js/main.js
+elm-make client/Main.elm --output static/js/main.js

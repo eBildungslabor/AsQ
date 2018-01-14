@@ -1,5 +1,4 @@
 *.swp
-Cargo.lock
-/target/
-**/*.rs.bk
 elm-stuff/
+server/target/
+server/Cargo.lock
