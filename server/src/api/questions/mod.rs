@@ -2,7 +2,7 @@ pub mod list;
 pub mod ask;
 pub mod nod;
 
-pub use self::list::list;
+pub use self::list::ListH;
 pub use self::ask::ask;
 pub use self::nod::nod;
 
