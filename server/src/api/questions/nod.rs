@@ -7,7 +7,7 @@ use iron::status;
 use router::Router;
 use serde_json as json;
 
-use models::Question;
+use models::{Question, Resource};
 use models::question::{QuestionRecord};
 
 
@@ -31,22 +31,39 @@ impl NodH {
 
 impl Handler for NodH {
     fn handle(&self, req: &mut Request) -> IronResult<Response> {
-        let id = req.extensions
+        let find_param_result = req.extensions
             .get::<Router>()
-            .unwrap()
-            .find("id")
-            .unwrap();
+            .and_then(|router| router.find("id"));
+        let requested_question_id = match find_param_result {
+            Some(id) => id,
+            _ => {
+                let body = json::to_string(&NodToQuestionResponse {
+                    error: Some("invalid request".to_string()),
+                    question: None,
+                })
+                .unwrap();
+                return Ok(Response::with((
+                    ContentType::json().0,
+                    status::BadRequest,
+                    body,
+                )));
+            },
+        };
+        let database = self.persistent_medium.lock().unwrap();
+        let mut question = Question {
+            id: requested_question_id.to_owned(),
+            presentation: "somepresentation".to_string(),
+            text: "whatever the text was".to_string(),
+            nods: 100,
+            answered: true,
+            asked: "Some time ago".to_string(),
+        };
+        database.update(&mut question).unwrap();
         let body = json::to_string(&NodToQuestionResponse {
             error: None,
-            question: Some(Question {
-                id: id.to_owned(),
-                presentation: "somepresentation".to_string(),
-                text: "whatever the text was".to_string(),
-                nods: 100,
-                answered: true,
-                asked: "Some time ago".to_string(),
-            }),
-        }).unwrap();
+            question: Some(question),
+        })
+        .unwrap();
         Ok(Response::with((
             ContentType::json().0,
             status::Ok,

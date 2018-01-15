@@ -69,7 +69,8 @@ impl Handler for AskH {
         let body = json::to_string(&AskQuestionResponse {
             error: error,
             question: question,
-        }).unwrap();
+        })
+        .unwrap();
         Ok(Response::with((
             ContentType::json().0,
             status_code,
