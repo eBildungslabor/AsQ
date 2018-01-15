@@ -38,8 +38,8 @@ impl QuestionRecord {
 impl Resource<AllQuestionsQuery, FindQuestionQuery> for QuestionRecord {
     type Model = Question;
 
-    fn save(&self, _model: &mut Question) -> Result<(), ModelError> {
-        Ok(())
+    fn save(&self, model: Question) -> Result<Question, ModelError> {
+        Ok(model)
     }
 
     fn load(&self, query: FindQuestionQuery) -> Result<Question, ModelError> {
@@ -57,7 +57,7 @@ impl Resource<AllQuestionsQuery, FindQuestionQuery> for QuestionRecord {
         Ok(vec![])
     }
 
-    fn update(&self, _model: &mut Question) -> Result<(), ModelError> {
+    fn update(&self, _model: &Question) -> Result<(), ModelError> {
         Ok(())
     }
 }

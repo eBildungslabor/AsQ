@@ -10,7 +10,7 @@ pub trait Resource<AllQuery, FindQuery> {
     type Model;
 
     /// Store a value in the persistence medium.
-    fn save(&self, &mut Self::Model) -> Result<(), ModelError>;
+    fn save(&self, Self::Model) -> Result<Self::Model, ModelError>;
 
     /// Retrieve a value from the persistence medium.
     fn load(&self, FindQuery) -> Result<Self::Model, ModelError>;
@@ -19,5 +19,5 @@ pub trait Resource<AllQuery, FindQuery> {
     fn all(&self, AllQuery) -> Result<Vec<Self::Model>, ModelError>;
 
     /// Update an instance of a model in the persitence layer.
-    fn update(&self, &mut Self::Model) -> Result<(), ModelError>;
+    fn update(&self, &Self::Model) -> Result<(), ModelError>;
 }

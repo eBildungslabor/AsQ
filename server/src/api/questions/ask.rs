@@ -53,7 +53,7 @@ impl Handler for AskH {
             }
         };
         let database = self.persistent_medium.lock().unwrap();
-        let mut question = Question {
+        let question = Question {
             id: "newquestion".to_string(),
             presentation: request.presentation,
             text: request.question,
@@ -61,11 +61,10 @@ impl Handler for AskH {
             answered: false,
             asked: "Just now".to_string(),
         };
-        let (status_code, error) = match database.save(&mut question) {
-            Ok(_) => (status::Ok, None),
-            _     => (status::InternalServerError, Some("database communication error".to_string())),
+        let (status_code, error, question) = match database.save(question) {
+            Ok(q) => (status::Ok, None, Some(q)),
+            _     => (status::InternalServerError, Some("database communication error".to_string()), None),
         };
-        let question = if error.is_some() { None } else { Some(question) };
         let body = json::to_string(&AskQuestionResponse {
             error: error,
             question: question,
