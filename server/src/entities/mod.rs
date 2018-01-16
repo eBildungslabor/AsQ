@@ -1,5 +1,12 @@
-/// Entities are responsible for managing the persistence of models of application data.
-pub trait Entity {
+mod presenter;
+mod initializers;
+
+pub use entities::presenter::{PresenterSQLite, FindPresenterByEmailSQLite};
+pub use entities::initializers::{init_sqlite_tables};
+
+
+/// Resources manage the persistence of models of application data.
+pub trait Resource {
     type Model;
     type Error;
 
@@ -14,19 +21,19 @@ pub trait Entity {
 }
 
 /// Queries abstract search operations, enabling a variety of interfaces for looking up model instances.
-pub trait Query {
+pub trait QueryEngine<Query> {
     type Model;
     type Error;
 
     /// Perform a search query, potentially returning an instance of the model that the query is defined on.
-    fn search(&self) -> Result<Self::Model, Self::Error>;
+    fn search(&self, Query) -> Result<Vec<Self::Model>, Self::Error>;
 }
 
-macro_rules! mock_entity {
+macro_rules! mock_resource {
     ($name:ident, M = $m:ty, E = $e:ty, save = $s:expr, update = $u:expr, delete = $d:expr) => {
         struct $name;
 
-        impl Entity for $name {
+        impl Resource for $name {
             type Model = $m;
             type Error = $e;
 
@@ -45,16 +52,16 @@ macro_rules! mock_entity {
     }
 }
 
-macro_rules! mock_query {
-    ($name:ident, M = $m:ty, E = $e:ty, search = $s:expr) => {
+macro_rules! mock_query_engine {
+    ($name:ident, Q = $q:ty, M = $m:ty, E = $e:ty, search = $s:expr) => {
         struct $name;
 
-        impl Query for $name {
+        impl QueryEngine<$q> for $name {
             type Model = $m;
             type Error = $e;
 
-            fn search(&self) -> Result<$m, $e> {
-                $s()
+            fn search(&self, query: $q) -> Result<Vec<$m>, $e> {
+                $s(query)
             }
         }
     }
@@ -69,16 +76,16 @@ mod tests {
         #[derive(Debug, PartialEq, Eq)]
         struct Empty;
 
-        mock_entity!(
-            ArbitraryEntity, M = Empty, E = Empty,
+        mock_resource!(
+            ArbitraryResource, M = Empty, E = Empty,
             save = |model| Ok(model),
             update = |_| Ok(()),
             delete = |_| Ok(())
         );
 
-        assert_eq!(Empty, ArbitraryEntity.save(Empty).unwrap());
-        assert_eq!((), ArbitraryEntity.update(&Empty).unwrap());
-        assert_eq!((), ArbitraryEntity.delete(Empty).unwrap());
+        assert_eq!(Empty, ArbitraryResource.save(Empty).unwrap());
+        assert_eq!((), ArbitraryResource.update(&Empty).unwrap());
+        assert_eq!((), ArbitraryResource.delete(Empty).unwrap());
     }
 
     #[test]
@@ -86,11 +93,11 @@ mod tests {
         #[derive(Debug, PartialEq, Eq)]
         struct Empty;
 
-        mock_query!(
-            ArbitraryQuery, M = Empty, E = Empty,
-            search = || Ok(Empty)
+        mock_query_engine!(
+            ArbitraryQuery, Q = Empty, M = Empty, E = Empty,
+            search = |_| Ok(vec![Empty])
         );
 
-        assert_eq!(Empty, ArbitraryQuery.search().unwrap());
+        assert_eq!(Empty, ArbitraryQuery.search(Empty).unwrap()[0]);
     }
 }

@@ -1,5 +1,7 @@
 *.swp
 elm-stuff/
+server_old/target/
+server_old/Cargo.lock
 server/target/
 server/Cargo.lock
-asq.db
+*.db

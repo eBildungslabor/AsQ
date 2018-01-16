@@ -5,9 +5,4 @@ extern crate serde;
 extern crate serde_json;
 
 pub mod models;
-mod entities;
-
-
-fn main() {
-    println!("Hello, world!");
-}
+pub mod entities;
