@@ -1,3 +1,7 @@
+use std::sync::{Arc, Mutex};
+
+use sqlite::Connection;
+
 use models::{Resource, ModelError};
 
 
@@ -25,12 +29,13 @@ pub struct AllQuestionsQuery {
 
 /// Implements `Recordable` to handle the persistence of Questions.
 pub struct QuestionRecord {
-    // TODO - Put a database reference in here.
+    db_connection: Arc<Mutex<Connection>>,
 }
 
 impl QuestionRecord {
-    pub fn new() -> Self {
-        QuestionRecord{
+    pub fn new(conn: Arc<Mutex<Connection>>) -> Self {
+        QuestionRecord {
+            db_connection: conn,
         }
     }
 }

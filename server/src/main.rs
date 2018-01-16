@@ -5,6 +5,7 @@ extern crate persistent;
 extern crate serde;
 extern crate serde_json;
 extern crate router;
+extern crate rusqlite as sqlite;
 
 pub mod models;
 mod api;
@@ -17,10 +18,16 @@ use router::Router;
 
 
 const MAX_BODY_LENGTH: usize = 10 * 1024 * 1024;
+const DATABASE_FILE: &'static str = "asq.db";
 
 
 fn main() {
-    let questions_record = Arc::new(Mutex::new(models::question::QuestionRecord::new()));
+    let db_connection = Arc::new(Mutex::new(
+        sqlite::Connection::open(DATABASE_FILE).expect("Could not connect to database.")
+    ));
+    let questions_record = Arc::new(Mutex::new(
+        models::question::QuestionRecord::new(db_connection)
+    ));
 
     let list_questions = api::questions::ListH::new(questions_record.clone());
     let ask_question = api::questions::AskH::new(questions_record.clone());

@@ -2,3 +2,4 @@
 elm-stuff/
 server/target/
 server/Cargo.lock
+asq.db
