@@ -16,6 +16,11 @@ rusqlite = "*"
 serde = "^1.0"
 serde_json = "^1.0"
 serde_derive = "^1.0"
+ring-pwhash = "^0.12"
+iron = "*"
+bodyparser = "*"
+persistent = "*"
+router = "*"
 
 [dependencies.chrono]
 version = "^0.4"

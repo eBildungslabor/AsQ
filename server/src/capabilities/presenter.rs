@@ -11,9 +11,11 @@ use models::{Id, Presenter};
 pub struct PresenterSQLite {
 }
 
-pub struct FindPresenterByEmailSQLite {
+pub struct FindPresenterByEmail {
     pub email_address: Id,
 }
+
+pub struct FindAllPresenters;
 
 impl PresenterSQLite {
     pub fn new(db: Arc<Mutex<Connection>>) -> Self {
@@ -39,11 +41,20 @@ impl Resource for PresenterSQLite {
     }
 }
 
-impl QueryEngine<FindPresenterByEmailSQLite> for PresenterSQLite {
+impl QueryEngine<FindPresenterByEmail> for PresenterSQLite {
     type Model = Presenter;
     type Error = String;
 
-    fn search(&self, query: FindPresenterByEmailSQLite) -> Result<Vec<Presenter>, Self::Error> {
+    fn search(&self, query: FindPresenterByEmail) -> Result<Vec<Presenter>, Self::Error> {
+        Ok(vec![])
+    }
+}
+
+impl QueryEngine<FindAllPresenters> for PresenterSQLite {
+    type Model = Presenter;
+    type Error = String;
+
+    fn search(&self, query: FindAllPresenters) -> Result<Vec<Presenter>, Self::Error> {
         Ok(vec![])
     }
 }
