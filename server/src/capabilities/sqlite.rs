@@ -1,4 +1,5 @@
 use std::sync::{Arc, Mutex};
+
 use chrono::prelude::*;
 use sqlite::Connection;
 
@@ -24,21 +25,20 @@ impl Capability<Save<Presenter>> for SQLite {
     type Data = Presenter;
     type Error = String; // TODO - Create a real error type.
 
-    fn perform(&self, save_presenter: Save<Presenter>) -> Result<Self::Data, Self::Error> {
-        Ok(save_presenter.0)
+    fn perform(&self, operation: Save<Presenter>) -> Result<Self::Data, Self::Error> {
+        Ok(operation.0)
     }
 }
 
-impl Capability<Search<Id>> for SQLite {
-    type Data = Presenter;
+impl Capability<Search<Presenter>> for SQLite {
+    type Data = Vec<Presenter>;
     type Error = String;
 
-    fn perform(&self, search: Search<Id>) -> Result<Self::Data, Self::Error> {
-        Ok(Presenter {
+    fn perform(&self, operation: Search<Presenter>) -> Result<Self::Data, Self::Error> {
+        Ok(vec![Presenter {
             email_address: Id("test@site.com".to_string()),
             password_hash: String::new(),
             join_date: Utc::now(),
-        })
+        }])
     }
 }
-

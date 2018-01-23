@@ -34,10 +34,9 @@ impl<DB> RegistrationHandler<DB> {
 }
 
 impl<DB> Handler for RegistrationHandler<DB>
-    where DB: 'static + Sync + Send + Capability<Save<Presenter>, Data = Presenter>
+    where DB: 'static + Sync + Send + Capability<Save<Presenter>>
 {
     fn handle(&self, request: &mut Request) -> IronResult<Response> {
-        println!("Got a request");
         let req_data = match request.get::<bodyparser::Struct<RegistrationRequest>>() {
             Ok(Some(request_data)) => request_data,
             _ => {
@@ -50,12 +49,9 @@ impl<DB> Handler for RegistrationHandler<DB>
                  )));
             },
         };
-        println!("Parsed request data");
         let presenter = Presenter::new(req_data.email_address, req_data.password);
-        println!("Created presenter {:?}", presenter);
         match self.database.perform(Save(presenter)) {
             Ok(presenter) => {
-                println!("Saved presenter");
                 let body = json::to_string(&RegistrationResponse {
                     error: None,
                 }).unwrap();
@@ -65,7 +61,6 @@ impl<DB> Handler for RegistrationHandler<DB>
                 )))
             },
             Err(err_msg) => {
-                println!("Encountered an error");
                 let body = json::to_string(&RegistrationResponse {
                     error: Some("Something went wrong!".to_string()),
                 }).unwrap();

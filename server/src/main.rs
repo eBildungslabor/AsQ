@@ -28,9 +28,9 @@ fn main() {
     let db_connection = Arc::new(Mutex::new(
         sqlite::Connection::open(DATABASE_FILE).expect("Could not connect to database.")
     ));
-    let db_capability = capabilities::sqlite::SQLite::new(db_connection);
+    let db_authority = capabilities::sqlite::SQLite::new(db_connection);
 
-    let register_presenter = api::presenters::RegistrationHandler::new(db_capability);
+    let register_presenter = api::presenters::RegistrationHandler::new(db_authority);
 
     let mut router = Router::new();
     router.post("/api/presenters", register_presenter, "register_presenter");

@@ -30,7 +30,7 @@ pub trait Capability<Operation> {
     type Data;
     type Error;
 
-    fn perform(&self, Operation) -> Result<Self::Data, Self::Error>;
+    fn perform(&self, operation: Operation) -> Result<Self::Data, Self::Error>;
 }
 
 /// A name to tie to save operations on particular data types.
@@ -44,5 +44,4 @@ pub struct Delete<T>(pub T);
 
 /// A name to tie to search operations on particular data types.
 pub struct Search<T>(pub T);
-
 
