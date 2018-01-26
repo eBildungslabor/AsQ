@@ -39,6 +39,8 @@ pub struct Delete<T>(pub T);
 /// A name to tie to search operations on particular data types.
 pub struct Search<T>(pub T);
 
+/// A name to tie to a find-all operation on a particular data type.
+pub struct FindAll<T>(pub T);
 
 impl<T> CreateTable<T> {
     pub fn new() -> Self {

@@ -1,9 +1,12 @@
 use std::sync::{Arc, Mutex};
 
+
+
+/// A name to tie to a find-all operation on a particular data type.
 use chrono::prelude::*;
 use sqlite::Connection;
 
-use capabilities::{Capability, CreateTable, Save, Update, Delete, Search};
+use capabilities::{Capability, CreateTable, FindAll, Save, Update, Delete, Search};
 use models::{Id, Question};
 
 
@@ -11,6 +14,11 @@ use models::{Id, Question};
 #[derive(Clone)]
 pub struct SQLite {
     database: Arc<Mutex<Connection>>,
+}
+
+/// A type used as an input for queries to find all questions asked during a presentation.
+pub struct QuestionsForPresentation {
+    pub presentation_id: Id,
 }
 
 impl SQLite {
@@ -56,5 +64,14 @@ impl Capability<Update<Question>> for SQLite {
 
     fn perform(&self, operation: Update<Question>) -> Result<Self::Data, Self::Error> {
         Ok(())
+    }
+}
+
+impl Capability<FindAll<QuestionsForPresentation>> for SQLite {
+    type Data = Vec<Question>;
+    type Error = String;
+
+    fn perform(&self, operation: FindAll<QuestionsForPresentation>) -> Result<Self::Data, Self::Error> {
+        Ok(vec![])
     }
 }

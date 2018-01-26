@@ -39,7 +39,7 @@ impl<DB> Handler for RegistrationHandler<DB>
     where DB: 'static + Sync + Send + Capability<Save<Presenter>>
 {
     fn handle(&self, request: &mut Request) -> IronResult<Response> {
-        let req_data = decode_or_write_error!(request, RegistrationRequest, |_: Option<&Error>| RegistrationResponse {
+        let req_data = decode_body_or_write_error!(request, RegistrationRequest, |_: Option<&Error>| RegistrationResponse {
             error: Some("Missing or invalid request data.".to_string()),
         });
         let presenter = Presenter::new(req_data.email_address, req_data.password);

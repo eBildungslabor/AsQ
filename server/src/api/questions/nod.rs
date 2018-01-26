@@ -13,7 +13,7 @@ use models::{Id, Question};
 
 /// Handles requests to have a question nodded to.
 pub struct NodHandler<DB> {
-    database: DB
+    database: DB,
 }
 
 #[derive(Clone, Debug, Deserialize)]
@@ -39,7 +39,7 @@ impl<DB> Handler for NodHandler<DB>
     where DB: 'static + Sync + Send + Capability<Search<Question>, Data = Question, Error = String> + Capability<Update<Question>, Error = String>
 {
     fn handle(&self, request: &mut Request) -> IronResult<Response> {
-        let req_data = decode_or_write_error!(request, NodRequest, |_: Option<&Error>| NodResponse {
+        let req_data = decode_body_or_write_error!(request, NodRequest, |_: Option<&Error>| NodResponse {
             error: Some("Missing or invalid request data.".to_string()),
         });
         let db_result = try_do!({

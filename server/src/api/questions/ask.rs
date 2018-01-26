@@ -41,7 +41,7 @@ impl<DB> Handler for AskHandler<DB>
     where DB: 'static + Sync + Send + Capability<Save<Question>, Data = Question>
 {
     fn handle(&self, request: &mut Request) -> IronResult<Response> {
-        let req_data = decode_or_write_error!(request, AskRequest, |_: Option<&Error>| AskResponse {
+        let req_data = decode_body_or_write_error!(request, AskRequest, |_: Option<&Error>| AskResponse {
             error: Some("Missing or invalid request data.".to_string()),
             question: None,
         });
