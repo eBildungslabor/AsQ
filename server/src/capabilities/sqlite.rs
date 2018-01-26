@@ -49,3 +49,12 @@ impl Capability<Search<Question>> for SQLite {
         Ok(operation.0)
     }
 }
+
+impl Capability<Update<Question>> for SQLite {
+    type Data = ();
+    type Error = String;
+
+    fn perform(&self, operation: Update<Question>) -> Result<Self::Data, Self::Error> {
+        Ok(())
+    }
+}

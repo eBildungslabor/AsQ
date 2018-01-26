@@ -38,9 +38,11 @@ fn main() {
     */
 
     let ask_question = api::questions::ask::AskHandler::new(db_authority.clone());
+    let nod_to_question = api::questions::nod::NodHandler::new(db_authority.clone());
 
     let mut router = Router::new();
     router.post("/api/questions/ask", ask_question, "ask_question");
+    router.put("/api/questions/nod", nod_to_question, "nod_to_question");
 
     let mut chain = Chain::new(router);
     chain.link_before(Read::<bodyparser::MaxBodyLength>::one(MAX_BODY_LENGTH));

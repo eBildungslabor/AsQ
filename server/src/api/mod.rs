@@ -37,7 +37,7 @@ macro_rules! json_response {
 
 macro_rules! try_do {
     ($b:block) => {
-        (|| -> Result<_, _> $b)()
+        (|| -> Result<_, _> { $b })()
     }
 }
 
