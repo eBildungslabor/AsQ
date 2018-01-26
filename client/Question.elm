@@ -29,7 +29,7 @@ import Error exposing (Error)
 type alias Question =
     { id : String
     , presentation : String
-    , questionText : String
+    , text: String
     , nods : Int
     , answered : Bool
     , timeAsked : String
@@ -59,6 +59,9 @@ type alias AskQuestionRequest =
     , question : String
     }
 
+type alias NodToQuestionRequest =
+    { question : String
+    }
 
 {-| Response type produced by a request to ask a question.
 -}
@@ -126,7 +129,7 @@ view question =
         , text " | "
         , text <| cleanDate question.timeAsked
         , text " | "
-        , text question.questionText
+        , text question.text
         , button [ onClick (QuestionNoddedTo question) ] [ text "Nod" ]
         ]
 
@@ -148,7 +151,7 @@ ask : String -> String -> Request QuestionAskedResponse
 ask presentationID questionText =
     let
         url =
-            "http://" ++ Config.apiServerAddress ++ "/api/questions"
+            "http://" ++ Config.apiServerAddress ++ "/api/questions/ask"
 
         body =
             { presentation = presentationID, question = questionText }
@@ -164,13 +167,18 @@ nod : Question -> Request QuestionUpdateResponse
 nod question =
     let
         url =
-            "http://" ++ Config.apiServerAddress ++ "/api/questions/" ++ question.id ++ "/nod"
+            "http://" ++ Config.apiServerAddress ++ "/api/questions/nod"
+
+        body =
+            { question = question.id }
+                |> nodToQuestionRequest
+                |> Http.jsonBody
     in
         Http.request
             { method = "PUT"
             , url = url
             , headers = []
-            , body = Http.emptyBody
+            , body = body
             , expect = Http.expectJson questionUpdateResponse
             , timeout = Nothing
             , withCredentials = False
@@ -182,7 +190,7 @@ question =
     Json.Decode.map6 Question
         (field "id" string)
         (field "presentation" string)
-        (field "questionText" string)
+        (field "text" string)
         (field "nods" int)
         (field "answered" bool)
         (field "timeAsked" string)
@@ -208,6 +216,12 @@ questionAskedResponse =
     Json.Decode.map2 QuestionAskedResponse
         (field "error" (maybe string))
         (field "question" (maybe question))
+
+
+nodToQuestionRequest : NodToQuestionRequest -> Encode.Value
+nodToQuestionRequest { question } =
+    Encode.object
+        [ ( "question", Encode.string question ) ]
 
 
 questionUpdateResponse : Decoder QuestionUpdateResponse

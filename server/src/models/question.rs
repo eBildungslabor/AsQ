@@ -3,13 +3,14 @@ use chrono::prelude::*;
 use models::Id;
 
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Question {
     pub id: Id,
     pub presentation: Id,
     pub text: String,
     pub nods: u32,
-    #[serde(rename = "askDate")]
+    pub answered: bool,
+    #[serde(rename = "timeAsked")]
     pub ask_date: DateTime<Utc>,
 }
 
@@ -21,6 +22,7 @@ impl Question {
             presentation: presentation,
             text: question_text,
             nods: 0,
+            answered: false,
             ask_date: Utc::now(),
         }
     }
@@ -32,6 +34,7 @@ impl Question {
             presentation: Id(String::new()),
             text: String::new(),
             nods: 0,
+            answered: false,
             ask_date: Utc::now(),
         }
     }

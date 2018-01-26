@@ -8,4 +8,4 @@ module Config exposing (..)
 -}
 apiServerAddress : String
 apiServerAddress =
-    "127.0.0.1:8000"
+    "127.0.0.1:9001"
