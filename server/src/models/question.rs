@@ -11,3 +11,14 @@ pub struct Question {
     #[serde(rename = "askDate")]
     pub ask_date: DateTime<Utc>,
 }
+
+impl Question {
+    pub fn new(presentation: Id, question_text: String) -> Self {
+        Question {
+            id: Id(String::new()),
+            presentation: presentation,
+            text: question_text,
+            ask_date: Utc::now(),
+        }
+    }
+}

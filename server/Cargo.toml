@@ -25,3 +25,6 @@ router = "*"
 [dependencies.chrono]
 version = "^0.4"
 features = ["serde"]
+
+[dev-dependencies]
+iron-test = "*"

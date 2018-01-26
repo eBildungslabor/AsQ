@@ -1,3 +1,5 @@
+use std::error::Error;
+
 use bodyparser;
 use iron::middleware::Handler;
 use iron::prelude::*;
@@ -37,18 +39,9 @@ impl<DB> Handler for RegistrationHandler<DB>
     where DB: 'static + Sync + Send + Capability<Save<Presenter>>
 {
     fn handle(&self, request: &mut Request) -> IronResult<Response> {
-        let req_data = match request.get::<bodyparser::Struct<RegistrationRequest>>() {
-            Ok(Some(request_data)) => request_data,
-            _ => {
-                let body = json::to_string(&RegistrationResponse {
-                    error: Some("Missing or invalid request data.".to_string()),
-                }).unwrap();
-                return Ok(Response::with((
-                    status::BadRequest,
-                    body,
-                 )));
-            },
-        };
+        let req_data = decode_or_write_error!(request, RegistrationRequest, |_: Option<&Error>| RegistrationResponse {
+            error: Some("Missing or invalid request data.".to_string()),
+        });
         let presenter = Presenter::new(req_data.email_address, req_data.password);
         match self.database.perform(Save(presenter)) {
             Ok(presenter) => {

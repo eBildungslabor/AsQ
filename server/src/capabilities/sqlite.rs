@@ -3,11 +3,12 @@ use std::sync::{Arc, Mutex};
 use chrono::prelude::*;
 use sqlite::Connection;
 
-use capabilities::{Capability, Save, Update, Delete, Search};
-use models::{Id, Presenter};
+use capabilities::{Capability, CreateTable, Save, Update, Delete, Search};
+use models::{Id, Question};
 
 
 /// SQLite implements a number of capabilities enabling CRUD operations on various models.
+#[derive(Clone)]
 pub struct SQLite {
     database: Arc<Mutex<Connection>>,
 }
@@ -21,24 +22,30 @@ impl SQLite {
     }
 }
 
-impl Capability<Save<Presenter>> for SQLite {
-    type Data = Presenter;
-    type Error = String; // TODO - Create a real error type.
+impl Capability<CreateTable<Question>> for SQLite {
+    type Data = ();
+    type Error = String;
 
-    fn perform(&self, operation: Save<Presenter>) -> Result<Self::Data, Self::Error> {
+    fn perform(&self, operation: CreateTable<Question>) -> Result<Self::Data, Self::Error> {
+        Ok(())
+    }
+}
+
+impl Capability<Save<Question>> for SQLite {
+    type Data = Question;
+    type Error = String;
+
+    fn perform(&self, operation: Save<Question>) -> Result<Self::Data, Self::Error> {
         Ok(operation.0)
     }
 }
 
-impl Capability<Search<Presenter>> for SQLite {
-    type Data = Vec<Presenter>;
+impl Capability<Search<Question>> for SQLite {
+    type Data = Question;
     type Error = String;
 
-    fn perform(&self, operation: Search<Presenter>) -> Result<Self::Data, Self::Error> {
-        Ok(vec![Presenter {
-            email_address: Id("test@site.com".to_string()),
-            password_hash: String::new(),
-            join_date: Utc::now(),
-        }])
+
+    fn perform(&self, operation: Search<Question>) -> Result<Self::Data, Self::Error> {
+        Ok(operation.0)
     }
 }

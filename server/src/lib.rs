@@ -6,4 +6,4 @@ extern crate serde;
 extern crate serde_json;
 
 pub mod models;
-pub mod capabilities;
+#[macro_use] pub mod capabilities;
