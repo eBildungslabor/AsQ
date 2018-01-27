@@ -38,7 +38,6 @@ type Msg
 type ViewMode
     = LandingPage
     | QuestionList
-    | AskQuestion
 
 
 type alias Model =
@@ -216,13 +215,8 @@ view model =
                 QuestionList ->
                     [ viewNav model
                     , viewError model
-                    , viewQuestionList model
-                    ]
-
-                AskQuestion ->
-                    [ viewNav model
-                    , viewError model
                     , viewAskQuestion
+                    , viewQuestionList model
                     ]
     in
         div [] content
@@ -232,8 +226,7 @@ viewNav : Model -> Html Msg
 viewNav model =
     nav []
         [ ul []
-            [ li [] [ a [ onClick (SwitchMode QuestionList), href "#" ] [ text "Questions" ] ]
-            , li [] [ a [ onClick (SwitchMode AskQuestion), href "#" ] [ text "Ask" ] ]
+            [ li [ id "logo" ] [ text "AsQ" ]
             ]
         ]
 
@@ -269,22 +262,41 @@ viewError model =
 
 viewQuestionList : Model -> Html Msg
 viewQuestionList model =
-    ul []
-        (model.questions
-            |> List.sortBy .nods
-            |> List.reverse
-            |> List.map Question.view
-            |> List.map (Html.map QuestionAction)
-        )
+    let
+        rows =
+            (model.questions
+                |> List.sortBy .nods
+                |> List.reverse
+                |> List.map Question.view
+                |> List.map (Html.map QuestionAction)
+            )
+
+        attrs =
+            if List.length rows == 0 then
+                [ style [ ( "display", "none" ) ] ]
+            else
+                [ class "content card" ]
+    in
+      div attrs
+          [ table [ class "question-list" ]
+              [ thead [] []
+              , tbody [] rows
+              ]
+          ]
 
 
 viewAskQuestion : Html Msg
 viewAskQuestion =
-    div []
-        [ textarea
-            [ placeholder "Ask your question here"
-            , onInput QuestionTextReceived
+    div [ class "content card" ]
+        [ div [ class "card-main" ]
+            [ h2 [] [ text "Ask a question" ]
+            , textarea
+                [ onInput QuestionTextReceived
+                ]
+                []
             ]
-            []
-        , button [ onClick QuestionAsked ] [ text "Ask" ]
+        , div [ class "hrule" ] []
+        , div [ class "card-actions" ]
+            [ a [ href "#", class "button", onClick QuestionAsked ] [ text "Ask" ]
+            ]
         ]

@@ -9213,45 +9213,107 @@ var _user$project$Question$QuestionNoddedTo = function (a) {
 };
 var _user$project$Question$view = function (question) {
 	return A2(
-		_elm_lang$html$Html$li,
-		{ctor: '[]'},
+		_elm_lang$html$Html$tr,
 		{
 			ctor: '::',
-			_0: _elm_lang$html$Html$text(
-				_elm_lang$core$Basics$toString(question.nods)),
-			_1: {
-				ctor: '::',
-				_0: _elm_lang$html$Html$text(' | '),
-				_1: {
+			_0: _elm_lang$html$Html_Attributes$class('question-item'),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$td,
+				{
 					ctor: '::',
-					_0: _elm_lang$html$Html$text(
-						_user$project$Question$cleanDate(question.timeAsked)),
-					_1: {
-						ctor: '::',
-						_0: _elm_lang$html$Html$text(' | '),
-						_1: {
+					_0: _elm_lang$html$Html_Attributes$class('question-nods'),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$a,
+						{
 							ctor: '::',
-							_0: _elm_lang$html$Html$text(question.text),
+							_0: _elm_lang$html$Html_Attributes$href('#'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('button'),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Events$onClick(
+										_user$project$Question$QuestionNoddedTo(question)),
+									_1: {ctor: '[]'}
+								}
+							}
+						},
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$i,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('fas fa-heart fa-2x'),
+									_1: {ctor: '[]'}
+								},
+								{ctor: '[]'}),
 							_1: {
 								ctor: '::',
 								_0: A2(
-									_elm_lang$html$Html$button,
+									_elm_lang$html$Html$div,
+									{ctor: '[]'},
 									{
 										ctor: '::',
-										_0: _elm_lang$html$Html_Events$onClick(
-											_user$project$Question$QuestionNoddedTo(question)),
-										_1: {ctor: '[]'}
-									},
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html$text('Nod'),
+										_0: _elm_lang$html$Html$text(
+											_elm_lang$core$Basics$toString(question.nods)),
 										_1: {ctor: '[]'}
 									}),
 								_1: {ctor: '[]'}
 							}
+						}),
+					_1: {ctor: '[]'}
+				}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$td,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('question-content'),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$p,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('question-date'),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text(
+									_user$project$Question$cleanDate(question.timeAsked)),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$p,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('question-text'),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text(question.text),
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
 						}
-					}
-				}
+					}),
+				_1: {ctor: '[]'}
 			}
 		});
 };
@@ -9307,6 +9369,34 @@ var _user$project$Question$update = F2(
 		}
 	});
 
+var _user$project$Main$viewNav = function (model) {
+	return A2(
+		_elm_lang$html$Html$nav,
+		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$ul,
+				{ctor: '[]'},
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$li,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$id('logo'),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text('AsQ'),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				}),
+			_1: {ctor: '[]'}
+		});
+};
 var _user$project$Main$subscriptions = function (_p0) {
 	return _elm_lang$core$Platform_Sub$none;
 };
@@ -9523,22 +9613,64 @@ var _user$project$Main$QuestionAction = function (a) {
 	return {ctor: 'QuestionAction', _0: a};
 };
 var _user$project$Main$viewQuestionList = function (model) {
-	return A2(
-		_elm_lang$html$Html$ul,
-		{ctor: '[]'},
+	var rows = A2(
+		_elm_lang$core$List$map,
+		_elm_lang$html$Html$map(_user$project$Main$QuestionAction),
 		A2(
 			_elm_lang$core$List$map,
-			_elm_lang$html$Html$map(_user$project$Main$QuestionAction),
-			A2(
-				_elm_lang$core$List$map,
-				_user$project$Question$view,
-				_elm_lang$core$List$reverse(
-					A2(
-						_elm_lang$core$List$sortBy,
-						function (_) {
-							return _.nods;
-						},
-						model.questions)))));
+			_user$project$Question$view,
+			_elm_lang$core$List$reverse(
+				A2(
+					_elm_lang$core$List$sortBy,
+					function (_) {
+						return _.nods;
+					},
+					model.questions))));
+	var attrs = _elm_lang$core$Native_Utils.eq(
+		_elm_lang$core$List$length(rows),
+		0) ? {
+		ctor: '::',
+		_0: _elm_lang$html$Html_Attributes$style(
+			{
+				ctor: '::',
+				_0: {ctor: '_Tuple2', _0: 'display', _1: 'none'},
+				_1: {ctor: '[]'}
+			}),
+		_1: {ctor: '[]'}
+	} : {
+		ctor: '::',
+		_0: _elm_lang$html$Html_Attributes$class('content card'),
+		_1: {ctor: '[]'}
+	};
+	return A2(
+		_elm_lang$html$Html$div,
+		attrs,
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$table,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('question-list'),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$thead,
+						{ctor: '[]'},
+						{ctor: '[]'}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$tbody,
+							{ctor: '[]'},
+							rows),
+						_1: {ctor: '[]'}
+					}
+				}),
+			_1: {ctor: '[]'}
+		});
 };
 var _user$project$Main$QuestionAsked = {ctor: 'QuestionAsked'};
 var _user$project$Main$QuestionTextReceived = function (a) {
@@ -9546,36 +9678,88 @@ var _user$project$Main$QuestionTextReceived = function (a) {
 };
 var _user$project$Main$viewAskQuestion = A2(
 	_elm_lang$html$Html$div,
-	{ctor: '[]'},
+	{
+		ctor: '::',
+		_0: _elm_lang$html$Html_Attributes$class('content card'),
+		_1: {ctor: '[]'}
+	},
 	{
 		ctor: '::',
 		_0: A2(
-			_elm_lang$html$Html$textarea,
+			_elm_lang$html$Html$div,
 			{
 				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$placeholder('Ask your question here'),
+				_0: _elm_lang$html$Html_Attributes$class('card-main'),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$h2,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text('Ask a question'),
+						_1: {ctor: '[]'}
+					}),
 				_1: {
 					ctor: '::',
-					_0: _elm_lang$html$Html_Events$onInput(_user$project$Main$QuestionTextReceived),
+					_0: A2(
+						_elm_lang$html$Html$textarea,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Events$onInput(_user$project$Main$QuestionTextReceived),
+							_1: {ctor: '[]'}
+						},
+						{ctor: '[]'}),
 					_1: {ctor: '[]'}
 				}
-			},
-			{ctor: '[]'}),
+			}),
 		_1: {
 			ctor: '::',
 			_0: A2(
-				_elm_lang$html$Html$button,
+				_elm_lang$html$Html$div,
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$QuestionAsked),
+					_0: _elm_lang$html$Html_Attributes$class('hrule'),
 					_1: {ctor: '[]'}
 				},
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html$text('Ask'),
-					_1: {ctor: '[]'}
-				}),
-			_1: {ctor: '[]'}
+				{ctor: '[]'}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$div,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('card-actions'),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$a,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$href('#'),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('button'),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$QuestionAsked),
+										_1: {ctor: '[]'}
+									}
+								}
+							},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('Ask'),
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			}
 		}
 	});
 var _user$project$Main$PresentationIDSubmitted = {ctor: 'PresentationIDSubmitted'};
@@ -9620,22 +9804,55 @@ var _user$project$Main$viewLanding = A2(
 			_1: {ctor: '[]'}
 		}
 	});
+var _user$project$Main$view = function (model) {
+	var content = function () {
+		var _p9 = model.mode;
+		if (_p9.ctor === 'LandingPage') {
+			return {
+				ctor: '::',
+				_0: _user$project$Main$viewLanding,
+				_1: {ctor: '[]'}
+			};
+		} else {
+			return {
+				ctor: '::',
+				_0: _user$project$Main$viewNav(model),
+				_1: {
+					ctor: '::',
+					_0: _user$project$Main$viewError(model),
+					_1: {
+						ctor: '::',
+						_0: _user$project$Main$viewAskQuestion,
+						_1: {
+							ctor: '::',
+							_0: _user$project$Main$viewQuestionList(model),
+							_1: {ctor: '[]'}
+						}
+					}
+				}
+			};
+		}
+	}();
+	return A2(
+		_elm_lang$html$Html$div,
+		{ctor: '[]'},
+		content);
+};
 var _user$project$Main$SwitchMode = function (a) {
 	return {ctor: 'SwitchMode', _0: a};
 };
-var _user$project$Main$AskQuestion = {ctor: 'AskQuestion'};
 var _user$project$Main$QuestionList = {ctor: 'QuestionList'};
 var _user$project$Main$update = F2(
 	function (msg, model) {
-		var _p9 = msg;
-		switch (_p9.ctor) {
+		var _p10 = msg;
+		switch (_p10.ctor) {
 			case 'SwitchMode':
-				if (_p9._0.ctor === 'QuestionList') {
+				if (_p10._0.ctor === 'QuestionList') {
 					var command = A2(
 						_elm_lang$http$Http$send,
-						function (_p10) {
+						function (_p11) {
 							return _user$project$Main$FromAPI(
-								_user$project$Main$APIReceivedQuestions(_p10));
+								_user$project$Main$APIReceivedQuestions(_p11));
 						},
 						_user$project$Question$presentationQuestions(model.presentation));
 					var newModel = _elm_lang$core$Native_Utils.update(
@@ -9647,7 +9864,7 @@ var _user$project$Main$update = F2(
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
 							model,
-							{mode: _p9._0}),
+							{mode: _p10._0}),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				}
@@ -9656,7 +9873,7 @@ var _user$project$Main$update = F2(
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{presentation: _p9._0}),
+						{presentation: _p10._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'PresentationIDSubmitted':
@@ -9667,9 +9884,9 @@ var _user$project$Main$update = F2(
 						{mode: _user$project$Main$QuestionList}),
 					_1: A2(
 						_elm_lang$http$Http$send,
-						function (_p11) {
+						function (_p12) {
 							return _user$project$Main$FromAPI(
-								_user$project$Main$APIReceivedQuestions(_p11));
+								_user$project$Main$APIReceivedQuestions(_p12));
 						},
 						_user$project$Question$presentationQuestions(model.presentation))
 				};
@@ -9678,7 +9895,7 @@ var _user$project$Main$update = F2(
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{question: _p9._0}),
+						{question: _p10._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'QuestionAsked':
@@ -9689,29 +9906,29 @@ var _user$project$Main$update = F2(
 						{mode: _user$project$Main$QuestionList, question: ''}),
 					_1: A2(
 						_elm_lang$http$Http$send,
-						function (_p12) {
+						function (_p13) {
 							return _user$project$Main$FromAPI(
-								_user$project$Main$APIQuestionAsked(_p12));
+								_user$project$Main$APIQuestionAsked(_p13));
 						},
 						A2(_user$project$Question$ask, model.presentation, model.question))
 				};
 			case 'QuestionAction':
-				if (_p9._0.ctor === 'BubblingError') {
+				if (_p10._0.ctor === 'BubblingError') {
 					return {
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
 							model,
 							{
-								error: _elm_lang$core$Maybe$Just(_p9._0._0)
+								error: _elm_lang$core$Maybe$Just(_p10._0._0)
 							}),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				} else {
-					var updateQuestion = _user$project$Question$update(_p9._0);
-					var _p13 = _elm_lang$core$List$unzip(
+					var updateQuestion = _user$project$Question$update(_p10._0);
+					var _p14 = _elm_lang$core$List$unzip(
 						A2(_elm_lang$core$List$map, updateQuestion, model.questions));
-					var questions = _p13._0;
-					var commands = _p13._1;
+					var questions = _p14._0;
+					var commands = _p14._1;
 					var topLevelCommands = A2(
 						_elm_lang$core$List$map,
 						_elm_lang$core$Platform_Cmd$map(_user$project$Main$QuestionAction),
@@ -9733,128 +9950,16 @@ var _user$project$Main$update = F2(
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			default:
-				switch (_p9._0.ctor) {
+				switch (_p10._0.ctor) {
 					case 'APIReceivedQuestions':
-						return A2(_user$project$Main$updateQuestionsReceived, _p9._0._0, model);
+						return A2(_user$project$Main$updateQuestionsReceived, _p10._0._0, model);
 					case 'APIQuestionAsked':
-						return A2(_user$project$Main$updateQuestionAsked, _p9._0._0, model);
+						return A2(_user$project$Main$updateQuestionAsked, _p10._0._0, model);
 					default:
-						return A2(_user$project$Main$updateQuestionUpdated, _p9._0._0, model);
+						return A2(_user$project$Main$updateQuestionUpdated, _p10._0._0, model);
 				}
 		}
 	});
-var _user$project$Main$viewNav = function (model) {
-	return A2(
-		_elm_lang$html$Html$nav,
-		{ctor: '[]'},
-		{
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$ul,
-				{ctor: '[]'},
-				{
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$li,
-						{ctor: '[]'},
-						{
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$a,
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html_Events$onClick(
-										_user$project$Main$SwitchMode(_user$project$Main$QuestionList)),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$href('#'),
-										_1: {ctor: '[]'}
-									}
-								},
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html$text('Questions'),
-									_1: {ctor: '[]'}
-								}),
-							_1: {ctor: '[]'}
-						}),
-					_1: {
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$li,
-							{ctor: '[]'},
-							{
-								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$a,
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html_Events$onClick(
-											_user$project$Main$SwitchMode(_user$project$Main$AskQuestion)),
-										_1: {
-											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$href('#'),
-											_1: {ctor: '[]'}
-										}
-									},
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html$text('Ask'),
-										_1: {ctor: '[]'}
-									}),
-								_1: {ctor: '[]'}
-							}),
-						_1: {ctor: '[]'}
-					}
-				}),
-			_1: {ctor: '[]'}
-		});
-};
-var _user$project$Main$view = function (model) {
-	var content = function () {
-		var _p14 = model.mode;
-		switch (_p14.ctor) {
-			case 'LandingPage':
-				return {
-					ctor: '::',
-					_0: _user$project$Main$viewLanding,
-					_1: {ctor: '[]'}
-				};
-			case 'QuestionList':
-				return {
-					ctor: '::',
-					_0: _user$project$Main$viewNav(model),
-					_1: {
-						ctor: '::',
-						_0: _user$project$Main$viewError(model),
-						_1: {
-							ctor: '::',
-							_0: _user$project$Main$viewQuestionList(model),
-							_1: {ctor: '[]'}
-						}
-					}
-				};
-			default:
-				return {
-					ctor: '::',
-					_0: _user$project$Main$viewNav(model),
-					_1: {
-						ctor: '::',
-						_0: _user$project$Main$viewError(model),
-						_1: {
-							ctor: '::',
-							_0: _user$project$Main$viewAskQuestion,
-							_1: {ctor: '[]'}
-						}
-					}
-				};
-		}
-	}();
-	return A2(
-		_elm_lang$html$Html$div,
-		{ctor: '[]'},
-		content);
-};
 var _user$project$Main$LandingPage = {ctor: 'LandingPage'};
 var _user$project$Main$init = function () {
 	var model = {

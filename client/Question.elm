@@ -17,6 +17,7 @@ module Question
 
 import Html exposing (..)
 import Html.Events exposing (onClick)
+import Html.Attributes exposing (class, href)
 import Http exposing (Request)
 import Json.Decode exposing (Decoder, field, string, int, bool, list, maybe)
 import Json.Encode as Encode
@@ -124,13 +125,17 @@ update msg question =
 -}
 view : Question -> Html Msg
 view question =
-    li []
-        [ text <| toString question.nods
-        , text " | "
-        , text <| cleanDate question.timeAsked
-        , text " | "
-        , text question.text
-        , button [ onClick (QuestionNoddedTo question) ] [ text "Nod" ]
+    tr [ class "question-item" ]
+        [ td [ class "question-nods" ]
+            [ a [ href "#", class "button", onClick (QuestionNoddedTo question) ]
+                [ i [ class "fas fa-heart fa-2x" ] []
+                , div [] [ text <| toString question.nods ]
+                ]
+            ]
+        , td [ class "question-content" ]
+            [ p [ class "question-date" ] [ text <| cleanDate question.timeAsked ]
+            , p [ class "question-text" ] [ text <| question.text ]
+            ]
         ]
 
 
