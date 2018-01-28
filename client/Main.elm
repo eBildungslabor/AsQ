@@ -217,7 +217,7 @@ view model =
                 QuestionList ->
                     [ viewNav model
                     , viewError model
-                    , viewAskQuestion
+                    , viewAskQuestion model
                     , viewQuestionList model
                     ]
     in
@@ -292,13 +292,14 @@ viewQuestionList model =
           ]
 
 
-viewAskQuestion : Html Msg
-viewAskQuestion =
+viewAskQuestion : Model -> Html Msg
+viewAskQuestion model =
     div [ class "content card" ]
         [ div [ class "card-main" ]
             [ h2 [] [ text "Ask a question" ]
             , textarea
                 [ onInput QuestionTextReceived
+                , value model.question
                 ]
                 []
             ]
