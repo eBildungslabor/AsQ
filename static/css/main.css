@@ -40,6 +40,10 @@ h2 {
     margin: 8px 0 16px 0;
 }
 
+a {
+    outline: 0;
+}
+
 a.button {
     color: #9b86be;
     font-size: 1.2em;
