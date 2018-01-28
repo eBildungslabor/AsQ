@@ -9,6 +9,12 @@ import Question exposing (Question)
 import Ports exposing (scrollTop)
 
 
+constMaxQuestionLength = 500
+constGreenText = "text-green"
+constYellowText = "text-yellow"
+constOrangeText = "text-orange"
+constRedText = "text-red"
+
 main : Program Never Model Msg
 main =
     Html.program
@@ -99,7 +105,10 @@ update msg model =
             ( { model | showQuestionInput = newState }, scrollTop 0 )
 
         QuestionTextReceived questionText ->
-            ( { model | question = questionText }, Cmd.none )
+            if String.length questionText <= constMaxQuestionLength then
+                ( { model | question = questionText }, Cmd.none )
+            else
+                ( model, Cmd.none )
 
         QuestionAsked ->
             ( { model | mode = QuestionList, question = "", showQuestionInput = False }
@@ -302,23 +311,72 @@ viewQuestionList model =
 
 viewAskQuestion : Model -> Html Msg
 viewAskQuestion model =
-    if model.showQuestionInput then
-        div [ class "content card" ]
-            [ div [ class "card-main" ]
-                [ h2 [] [ text "Ask a question" ]
-                , textarea
-                    [ onInput QuestionTextReceived
-                    , value model.question
+    let
+        charactersUsed =
+            String.length model.question
+
+        limitPercentUsed =
+            charactersUsed
+                |> toFloat
+                |> \x -> x / constMaxQuestionLength
+                |> (*) 100.0
+                |> ceiling
+
+        lowRange =
+            List.range 1 24
+
+        lowMedRange =
+            List.range 25 49
+
+        medHighRange =
+            List.range 50 74
+
+        highRange =
+            List.range 74 101
+
+        countColor =
+            case List.map (List.member limitPercentUsed) [lowRange, lowMedRange, medHighRange, highRange] of
+                [True, _, _, _] ->
+                    constGreenText
+
+                [_, True, _, _] ->
+                    constYellowText
+
+                [_, _, True, _] ->
+                    constOrangeText
+
+                [_, _, _, True] ->
+                    constRedText
+
+                _ ->
+                    ""
+
+        _ =
+            Debug.log "Characters: " (charactersUsed, limitPercentUsed, countColor)
+    in
+        if model.showQuestionInput then
+            div [ class "content card" ]
+                [ div [ class "card-main" ]
+                    [ h2 [] [ text "Ask a question" ]
+                    , textarea
+                        [ onInput QuestionTextReceived
+                        , value model.question
+                        ]
+                        []
+                    , div []
+                        [ span [] [ text "Characters used:  " ]
+                        , span [ class countColor ]
+                            [ text <| (toString charactersUsed) ++ " / " ++ (toString constMaxQuestionLength)
+                            ]
+                        ]
                     ]
-                    []
+                , div [ class "hrule" ] []
+                , div [ class "card-actions" ]
+                    [ a [ href "#", class "button", onClick QuestionAsked ] [ text "Ask" ]
+                    ]
                 ]
-            , div [ class "hrule" ] []
-            , div [ class "card-actions" ]
-                [ a [ href "#", class "button", onClick QuestionAsked ] [ text "Ask" ]
-                ]
-            ]
-     else
-         div [ style [  ( "display", "none" ) ] ] []
+        else
+            div [ style [  ( "display", "none" ) ] ] []
 
 viewAskQuestionButton : Html Msg
 viewAskQuestionButton =

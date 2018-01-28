@@ -102,11 +102,13 @@ a.button svg path {
 
 .card textarea {
     width: 98.5%;
-    height: 60%;
+    height: 6em;
     display: block;
     padding: 8px;
     border: 1px solid rgba(224, 224, 224, 0.9);
     border-radius: 4px;
+    resize: none;
+    margin-bottom: 16px;
 }
 
 .card .card-actions {
@@ -154,4 +156,20 @@ a.button svg path {
 
 .question-item:last-child .question-content {
     border: none;
+}
+
+.text-green {
+    color: #66bb6a;
+}
+
+.text-yellow {
+    color: #fdd835;
+}
+
+.text-orange {
+    color: #ffa726;
+}
+
+.text-red {
+    color: #e53935;
 }
