@@ -9,8 +9,13 @@
         </div>
         <script src="/js/main.js"></script>
         <script>
+            let scroll = window.pageYOffset || document.body.scrollTop;
             const node = document.getElementById('main')
             const elm = Elm.Main.embed(node)
+
+            elm.ports.scrollTop.subscribe(function (y) {
+                window.scrollTo(0, y)
+            })
         </script>
         <script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
     </body>

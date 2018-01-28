@@ -9370,6 +9370,12 @@ var _user$project$Question$update = F2(
 		}
 	});
 
+var _user$project$Ports$scrollTop = _elm_lang$core$Native_Platform.outgoingPort(
+	'scrollTop',
+	function (v) {
+		return v;
+	});
+
 var _user$project$Main$viewNav = function (model) {
 	return A2(
 		_elm_lang$html$Html$nav,
@@ -9552,9 +9558,9 @@ var _user$project$Main$updateQuestionsReceived = F2(
 			}
 		}
 	});
-var _user$project$Main$Model = F5(
-	function (a, b, c, d, e) {
-		return {error: a, mode: b, presentation: c, questions: d, question: e};
+var _user$project$Main$Model = F6(
+	function (a, b, c, d, e, f) {
+		return {error: a, mode: b, presentation: c, questions: d, question: e, showQuestionInput: f};
 	});
 var _user$project$Main$APIQuestionUpdated = function (a) {
 	return {ctor: 'APIQuestionUpdated', _0: a};
@@ -9673,12 +9679,44 @@ var _user$project$Main$viewQuestionList = function (model) {
 			_1: {ctor: '[]'}
 		});
 };
+var _user$project$Main$ShowQuestionInput = {ctor: 'ShowQuestionInput'};
+var _user$project$Main$viewAskQuestionButton = A2(
+	_elm_lang$html$Html$div,
+	{
+		ctor: '::',
+		_0: _elm_lang$html$Html_Attributes$class('action-button'),
+		_1: {
+			ctor: '::',
+			_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$ShowQuestionInput),
+			_1: {ctor: '[]'}
+		}
+	},
+	{
+		ctor: '::',
+		_0: A2(
+			_elm_lang$html$Html$a,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$href('#'),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('button'),
+					_1: {ctor: '[]'}
+				}
+			},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text('?'),
+				_1: {ctor: '[]'}
+			}),
+		_1: {ctor: '[]'}
+	});
 var _user$project$Main$QuestionAsked = {ctor: 'QuestionAsked'};
 var _user$project$Main$QuestionTextReceived = function (a) {
 	return {ctor: 'QuestionTextReceived', _0: a};
 };
 var _user$project$Main$viewAskQuestion = function (model) {
-	return A2(
+	return model.showQuestionInput ? A2(
 		_elm_lang$html$Html$div,
 		{
 			ctor: '::',
@@ -9767,7 +9805,19 @@ var _user$project$Main$viewAskQuestion = function (model) {
 					_1: {ctor: '[]'}
 				}
 			}
-		});
+		}) : A2(
+		_elm_lang$html$Html$div,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$style(
+				{
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: 'display', _1: 'none'},
+					_1: {ctor: '[]'}
+				}),
+			_1: {ctor: '[]'}
+		},
+		{ctor: '[]'});
 };
 var _user$project$Main$PresentationIDSubmitted = {ctor: 'PresentationIDSubmitted'};
 var _user$project$Main$PresentationIDReceived = function (a) {
@@ -9900,7 +9950,11 @@ var _user$project$Main$view = function (model) {
 						_1: {
 							ctor: '::',
 							_0: _user$project$Main$viewQuestionList(model),
-							_1: {ctor: '[]'}
+							_1: {
+								ctor: '::',
+								_0: _user$project$Main$viewAskQuestionButton,
+								_1: {ctor: '[]'}
+							}
 						}
 					}
 				}
@@ -9964,6 +10018,14 @@ var _user$project$Main$update = F2(
 						},
 						_user$project$Question$presentationQuestions(model.presentation))
 				};
+			case 'ShowQuestionInput':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{showQuestionInput: true}),
+					_1: _user$project$Ports$scrollTop(0)
+				};
 			case 'QuestionTextReceived':
 				return {
 					ctor: '_Tuple2',
@@ -9977,7 +10039,7 @@ var _user$project$Main$update = F2(
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{mode: _user$project$Main$QuestionList, question: ''}),
+						{mode: _user$project$Main$QuestionList, question: '', showQuestionInput: false}),
 					_1: A2(
 						_elm_lang$http$Http$send,
 						function (_p13) {
@@ -10041,7 +10103,8 @@ var _user$project$Main$init = function () {
 		mode: _user$project$Main$LandingPage,
 		presentation: '',
 		questions: {ctor: '[]'},
-		question: ''
+		question: '',
+		showQuestionInput: false
 	};
 	return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 }();

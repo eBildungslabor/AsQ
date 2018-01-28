@@ -6,6 +6,7 @@ import Html.Attributes exposing (..)
 import Http
 import Error exposing (Error)
 import Question exposing (Question)
+import Ports exposing (scrollTop)
 
 
 main : Program Never Model Msg
@@ -30,6 +31,7 @@ type Msg
     | PresentationIDSubmitted
     | QuestionTextReceived String
     | QuestionAsked
+    | ShowQuestionInput
     | QuestionAction Question.Msg
     | FromAPI APIResponse
     | HideError
@@ -46,6 +48,7 @@ type alias Model =
     , presentation : String
     , questions : List Question
     , question : String
+    , showQuestionInput : Bool
     }
 
 
@@ -58,6 +61,7 @@ init =
             , presentation = ""
             , questions = []
             , question = ""
+            , showQuestionInput = False
             }
     in
         ( model, Cmd.none )
@@ -91,11 +95,14 @@ update msg model =
                 |> Http.send (APIReceivedQuestions >> FromAPI)
             )
 
+        ShowQuestionInput ->
+            ( { model | showQuestionInput = True }, scrollTop 0 )
+
         QuestionTextReceived questionText ->
             ( { model | question = questionText }, Cmd.none )
 
         QuestionAsked ->
-            ( { model | mode = QuestionList, question = "" }
+            ( { model | mode = QuestionList, question = "", showQuestionInput = False }
             , Question.ask model.presentation model.question
                 |> Http.send (APIQuestionAsked >> FromAPI)
             )
@@ -219,6 +226,7 @@ view model =
                     , viewError model
                     , viewAskQuestion model
                     , viewQuestionList model
+                    , viewAskQuestionButton
                     ]
     in
         div [] content
@@ -294,17 +302,28 @@ viewQuestionList model =
 
 viewAskQuestion : Model -> Html Msg
 viewAskQuestion model =
-    div [ class "content card" ]
-        [ div [ class "card-main" ]
-            [ h2 [] [ text "Ask a question" ]
-            , textarea
-                [ onInput QuestionTextReceived
-                , value model.question
+    if model.showQuestionInput then
+        div [ class "content card" ]
+            [ div [ class "card-main" ]
+                [ h2 [] [ text "Ask a question" ]
+                , textarea
+                    [ onInput QuestionTextReceived
+                    , value model.question
+                    ]
+                    []
                 ]
-                []
+            , div [ class "hrule" ] []
+            , div [ class "card-actions" ]
+                [ a [ href "#", class "button", onClick QuestionAsked ] [ text "Ask" ]
+                ]
             ]
-        , div [ class "hrule" ] []
-        , div [ class "card-actions" ]
-            [ a [ href "#", class "button", onClick QuestionAsked ] [ text "Ask" ]
+     else
+         div [ style [  ( "display", "none" ) ] ] []
+
+viewAskQuestionButton : Html Msg
+viewAskQuestionButton =
+    div [ class "action-button", onClick ShowQuestionInput ]
+        [ a [ href "#", class "button" ]
+            [ text "?"
             ]
         ]
