@@ -31,7 +31,7 @@ type Msg
     | PresentationIDSubmitted
     | QuestionTextReceived String
     | QuestionAsked
-    | ShowQuestionInput
+    | ShowQuestionInput Bool
     | QuestionAction Question.Msg
     | FromAPI APIResponse
     | HideError
@@ -95,8 +95,8 @@ update msg model =
                 |> Http.send (APIReceivedQuestions >> FromAPI)
             )
 
-        ShowQuestionInput ->
-            ( { model | showQuestionInput = True }, scrollTop 0 )
+        ShowQuestionInput newState ->
+            ( { model | showQuestionInput = newState }, scrollTop 0 )
 
         QuestionTextReceived questionText ->
             ( { model | question = questionText }, Cmd.none )
@@ -322,7 +322,7 @@ viewAskQuestion model =
 
 viewAskQuestionButton : Html Msg
 viewAskQuestionButton =
-    div [ class "action-button", onClick ShowQuestionInput ]
+    div [ class "action-button", onClick (ShowQuestionInput True) ]
         [ a [ href "#", class "button" ]
             [ text "?"
             ]
