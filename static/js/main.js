@@ -9190,6 +9190,7 @@ var _user$project$Question$nod = function (question) {
 		_elm_lang$core$Basics_ops['++'],
 		'http://',
 		A2(_elm_lang$core$Basics_ops['++'], _user$project$Config$apiServerAddress, '/api/questions/nod'));
+	var _p5 = A2(_elm_lang$core$Debug$log, 'Nodding to', question);
 	return _elm_lang$http$Http$request(
 		{
 			method: 'PUT',
@@ -9322,41 +9323,41 @@ var _user$project$Question$BubblingError = function (a) {
 };
 var _user$project$Question$update = F2(
 	function (msg, question) {
-		var _p5 = msg;
-		switch (_p5.ctor) {
+		var _p6 = msg;
+		switch (_p6.ctor) {
 			case 'BubblingError':
 				return {ctor: '_Tuple2', _0: question, _1: _elm_lang$core$Platform_Cmd$none};
 			case 'QuestionNoddedTo':
-				var _p6 = _p5._0;
-				return _elm_lang$core$Native_Utils.eq(_p6.id, question.id) ? {
+				var _p7 = _p6._0;
+				return _elm_lang$core$Native_Utils.eq(_p7.id, question.id) ? {
 					ctor: '_Tuple2',
 					_0: question,
 					_1: A2(
 						_elm_lang$http$Http$send,
 						_user$project$Question$GotNodResponse,
-						_user$project$Question$nod(_p6))
+						_user$project$Question$nod(_p7))
 				} : {ctor: '_Tuple2', _0: question, _1: _elm_lang$core$Platform_Cmd$none};
 			default:
-				var _p7 = _p5._0;
-				if (_p7.ctor === 'Err') {
+				var _p8 = _p6._0;
+				if (_p8.ctor === 'Err') {
 					return {
 						ctor: '_Tuple2',
 						_0: question,
 						_1: A2(_user$project$Error$bubble, _user$project$Question$BubblingError, 'Failed to make request.')
 					};
 				} else {
-					var _p10 = _p7._0;
-					var _p8 = {ctor: '_Tuple2', _0: _p10.error, _1: _p10.question};
-					if (_p8._0.ctor === 'Just') {
+					var _p11 = _p8._0;
+					var _p9 = {ctor: '_Tuple2', _0: _p11.error, _1: _p11.question};
+					if (_p9._0.ctor === 'Just') {
 						return {
 							ctor: '_Tuple2',
 							_0: question,
-							_1: A2(_user$project$Error$bubble, _user$project$Question$BubblingError, _p8._0._0)
+							_1: A2(_user$project$Error$bubble, _user$project$Question$BubblingError, _p9._0._0)
 						};
 					} else {
-						if (_p8._1.ctor === 'Just') {
-							var _p9 = _p8._1._0;
-							return _elm_lang$core$Native_Utils.eq(_p9.id, question.id) ? {ctor: '_Tuple2', _0: _p9, _1: _elm_lang$core$Platform_Cmd$none} : {ctor: '_Tuple2', _0: question, _1: _elm_lang$core$Platform_Cmd$none};
+						if (_p9._1.ctor === 'Just') {
+							var _p10 = _p9._1._0;
+							return _elm_lang$core$Native_Utils.eq(_p10.id, question.id) ? {ctor: '_Tuple2', _0: _p10, _1: _elm_lang$core$Platform_Cmd$none} : {ctor: '_Tuple2', _0: question, _1: _elm_lang$core$Platform_Cmd$none};
 						} else {
 							return {
 								ctor: '_Tuple2',
@@ -9768,40 +9769,103 @@ var _user$project$Main$PresentationIDReceived = function (a) {
 };
 var _user$project$Main$viewLanding = A2(
 	_elm_lang$html$Html$div,
-	{ctor: '[]'},
+	{
+		ctor: '::',
+		_0: _elm_lang$html$Html_Attributes$class('content card'),
+		_1: {ctor: '[]'}
+	},
 	{
 		ctor: '::',
 		_0: A2(
-			_elm_lang$html$Html$input,
+			_elm_lang$html$Html$div,
 			{
 				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$type_('text'),
+				_0: _elm_lang$html$Html_Attributes$class('card-main'),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$h2,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text('Join an audience'),
+						_1: {ctor: '[]'}
+					}),
 				_1: {
 					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$placeholder('Presentation ID'),
+					_0: A2(
+						_elm_lang$html$Html$p,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text('Enter the ID code for the presentation you\'re watching.'),
+							_1: {ctor: '[]'}
+						}),
 					_1: {
 						ctor: '::',
-						_0: _elm_lang$html$Html_Events$onInput(_user$project$Main$PresentationIDReceived),
+						_0: A2(
+							_elm_lang$html$Html$input,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$type_('text'),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Events$onInput(_user$project$Main$PresentationIDReceived),
+									_1: {ctor: '[]'}
+								}
+							},
+							{ctor: '[]'}),
 						_1: {ctor: '[]'}
 					}
 				}
-			},
-			{ctor: '[]'}),
+			}),
 		_1: {
 			ctor: '::',
 			_0: A2(
-				_elm_lang$html$Html$button,
+				_elm_lang$html$Html$div,
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$PresentationIDSubmitted),
+					_0: _elm_lang$html$Html_Attributes$class('hrule'),
 					_1: {ctor: '[]'}
 				},
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html$text('Go'),
-					_1: {ctor: '[]'}
-				}),
-			_1: {ctor: '[]'}
+				{ctor: '[]'}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$div,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('card-actions'),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$a,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$href('#'),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('button'),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$PresentationIDSubmitted),
+										_1: {ctor: '[]'}
+									}
+								}
+							},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('Join'),
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			}
 		}
 	});
 var _user$project$Main$view = function (model) {
@@ -9810,8 +9874,12 @@ var _user$project$Main$view = function (model) {
 		if (_p9.ctor === 'LandingPage') {
 			return {
 				ctor: '::',
-				_0: _user$project$Main$viewLanding,
-				_1: {ctor: '[]'}
+				_0: _user$project$Main$viewNav(model),
+				_1: {
+					ctor: '::',
+					_0: _user$project$Main$viewLanding,
+					_1: {ctor: '[]'}
+				}
 			};
 		} else {
 			return {

@@ -210,7 +210,9 @@ view model =
         content =
             case model.mode of
                 LandingPage ->
-                    [ viewLanding ]
+                    [ viewNav model
+                    , viewLanding
+                    ]
 
                 QuestionList ->
                     [ viewNav model
@@ -233,14 +235,20 @@ viewNav model =
 
 viewLanding : Html Msg
 viewLanding =
-    div []
-        [ input
-            [ type_ "text"
-            , placeholder "Presentation ID"
-            , onInput PresentationIDReceived
+    div [ class "content card" ]
+        [ div [ class "card-main" ]
+            [ h2 [] [ text "Join an audience" ]
+            , p [] [ text "Enter the ID code for the presentation you're watching." ]
+            , input
+                [ type_ "text"
+                , onInput PresentationIDReceived
+                ]
+                []
             ]
-            []
-        , button [ onClick PresentationIDSubmitted ] [ text "Go" ]
+        , div [ class "hrule" ] []
+        , div [ class "card-actions" ]
+            [ a [ href "#", class "button", onClick PresentationIDSubmitted ] [ text "Join" ]
+            ]
         ]
 
 
@@ -264,12 +272,11 @@ viewQuestionList : Model -> Html Msg
 viewQuestionList model =
     let
         rows =
-            (model.questions
+            model.questions
                 |> List.sortBy .nods
                 |> List.reverse
                 |> List.map Question.view
                 |> List.map (Html.map QuestionAction)
-            )
 
         attrs =
             if List.length rows == 0 then
