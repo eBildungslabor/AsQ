@@ -7,13 +7,28 @@ import Http
 import Error exposing (Error)
 import Question exposing (Question)
 import Ports exposing (scrollTop)
+import Resource exposing (Resource)
 
 
-constMaxQuestionLength = 500
-constGreenText = "text-green"
-constYellowText = "text-yellow"
-constOrangeText = "text-orange"
-constRedText = "text-red"
+constMaxQuestionLength =
+    500
+
+
+constGreenText =
+    "text-green"
+
+
+constYellowText =
+    "text-yellow"
+
+
+constOrangeText =
+    "text-orange"
+
+
+constRedText =
+    "text-red"
+
 
 main : Program Never Model Msg
 main =
@@ -52,7 +67,7 @@ type alias Model =
     { error : Maybe Error
     , mode : ViewMode
     , presentation : String
-    , questions : List Question
+    , questions : Resource (List Question) String
     , question : String
     , showQuestionInput : Bool
     }
@@ -65,7 +80,7 @@ init =
             { error = Nothing
             , mode = LandingPage
             , presentation = ""
-            , questions = []
+            , questions = Resource.NotFetched
             , question = ""
             , showQuestionInput = False
             }
@@ -126,13 +141,15 @@ update msg model =
 
                 ( questions, commands ) =
                     model.questions
-                        |> List.map updateQuestion
-                        |> List.unzip
+                        |> Resource.map (List.map updateQuestion)
+                        |> Resource.map List.unzip
+                        |> Resource.loaded
+                        |> Maybe.withDefault ( [], [] )
 
                 topLevelCommands =
                     List.map (Cmd.map QuestionAction) commands
             in
-                ( { model | questions = questions }, Cmd.batch topLevelCommands )
+                ( { model | questions = Resource.Loaded questions }, Cmd.batch topLevelCommands )
 
         HideError ->
             ( { model | error = Nothing }, Cmd.none )
@@ -161,7 +178,7 @@ updateQuestionsReceived result model =
                     ( { model | error = Just errorMessage }, Cmd.none )
 
                 Nothing ->
-                    ( { model | questions = questions }, Cmd.none )
+                    ( { model | questions = Resource.Loaded questions }, Cmd.none )
 
 
 {-| Apply an update to the application model when a response to a question being asked is received rom the API.
@@ -178,7 +195,7 @@ updateQuestionAsked result model =
                     ( { model | error = Just errorMessage }, Cmd.none )
 
                 ( Nothing, Just question ) ->
-                    ( { model | questions = question :: model.questions }, Cmd.none )
+                    ( { model | questions = Resource.map ((::) question) model.questions }, Cmd.none )
 
                 ( Nothing, Nothing ) ->
                     ( { model | error = Just "Got an unexpected response from the API server. " }, Cmd.none )
@@ -206,10 +223,10 @@ updateQuestionUpdated result model =
                         foldQuestions nextQuestion ls =
                             (pickUpdated nextQuestion) :: ls
 
-                        updatedQuestions =
-                            List.foldl foldQuestions [] model.questions
+                        updateQuestions =
+                            List.foldl foldQuestions []
                     in
-                        ( { model | questions = updatedQuestions }, Cmd.none )
+                        ( { model | questions = Resource.map updateQuestions model.questions }, Cmd.none )
 
                 ( Nothing, Nothing ) ->
                     ( { model | error = Just "Got an unexpected response from the API server. " }, Cmd.none )
@@ -288,25 +305,37 @@ viewError model =
 viewQuestionList : Model -> Html Msg
 viewQuestionList model =
     let
-        rows =
-            model.questions
-                |> List.sortBy .nods
-                |> List.reverse
-                |> List.map Question.view
-                |> List.map (Html.map QuestionAction)
+        questionTransform =
+            List.map (Question.view >> Html.map QuestionAction)
 
-        attrs =
-            if List.length rows == 0 then
-                [ style [ ( "display", "none" ) ] ]
-            else
-                [ class "content card" ]
+        children =
+            case Resource.map questionTransform model.questions of
+                Resource.Loaded [] ->
+                    [ div [ class "card-main" ]
+                        [ h2 [] [ text "No questions yet" ]
+                        , p [] [ text "Be the first to ask a question!" ]
+                        ]
+                    , div [ class "hrule" ] []
+                    , div [ class "card-actions" ]
+                        [ a [ href "#", class "button", onClick (ShowQuestionInput True) ] [ text "Ask" ]
+                        ]
+                    ]
+
+                Resource.Loaded questions ->
+                    [ table [ class "question-list" ]
+                        [ thead [] []
+                        , tbody [] questions
+                        ]
+                    ]
+
+                _ ->
+                    [ div [ class "card-main" ]
+                        [ h2 [] [ text "Loading..." ]
+                        , p [] [ text "Plase wait while we fetch the questions for this presentation." ]
+                        ]
+                    ]
     in
-      div attrs
-          [ table [ class "question-list" ]
-              [ thead [] []
-              , tbody [] rows
-              ]
-          ]
+        div [ class "content card" ] children
 
 
 viewAskQuestion : Model -> Html Msg
@@ -318,9 +347,11 @@ viewAskQuestion model =
         limitPercentUsed =
             charactersUsed
                 |> toFloat
-                |> \x -> x / constMaxQuestionLength
-                |> (*) 100.0
-                |> ceiling
+                |> \x ->
+                    x
+                        / constMaxQuestionLength
+                        |> (*) 100.0
+                        |> ceiling
 
         lowRange =
             List.range 1 24
@@ -335,24 +366,24 @@ viewAskQuestion model =
             List.range 74 101
 
         countColor =
-            case List.map (List.member limitPercentUsed) [lowRange, lowMedRange, medHighRange, highRange] of
-                [True, _, _, _] ->
+            case List.map (List.member limitPercentUsed) [ lowRange, lowMedRange, medHighRange, highRange ] of
+                [ True, _, _, _ ] ->
                     constGreenText
 
-                [_, True, _, _] ->
+                [ _, True, _, _ ] ->
                     constYellowText
 
-                [_, _, True, _] ->
+                [ _, _, True, _ ] ->
                     constOrangeText
 
-                [_, _, _, True] ->
+                [ _, _, _, True ] ->
                     constRedText
 
                 _ ->
                     ""
 
         _ =
-            Debug.log "Characters: " (charactersUsed, limitPercentUsed, countColor)
+            Debug.log "Characters: " ( charactersUsed, limitPercentUsed, countColor )
     in
         if model.showQuestionInput then
             div [ class "content card" ]
@@ -364,8 +395,7 @@ viewAskQuestion model =
                         ]
                         []
                     , div []
-                        [ span [] [ text "Characters used:  " ]
-                        , span [ class countColor ]
+                        [ span [ class countColor ]
                             [ text <| (toString charactersUsed) ++ " / " ++ (toString constMaxQuestionLength)
                             ]
                         ]
@@ -376,7 +406,8 @@ viewAskQuestion model =
                     ]
                 ]
         else
-            div [ style [  ( "display", "none" ) ] ] []
+            div [ style [ ( "display", "none" ) ] ] []
+
 
 viewAskQuestionButton : Html Msg
 viewAskQuestionButton =
