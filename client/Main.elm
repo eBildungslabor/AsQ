@@ -288,18 +288,21 @@ viewLanding =
 
 viewError : Model -> Html Msg
 viewError model =
-    let
-        content =
-            case model.error of
-                Just errorMessage ->
-                    [ text errorMessage
-                    , a [ href "#", onClick HideError ] [ text "hide" ]
+    case model.error of
+        Just errorMessage ->
+            div [ class "content card error" ]
+                [ div [ class "card-main" ]
+                    [ h2 [] [ text "An error has occurred" ]
+                    , p [] [ text errorMessage ]
                     ]
+                , div [ class "hrule" ] []
+                , div [ class "card-actions" ]
+                    [ a [ href "#", class "button", onClick HideError ] [ text "Dismiss" ]
+                    ]
+                ]
 
-                Nothing ->
-                    []
-    in
-        div [ class "error" ] content
+        Nothing ->
+            div [ style [ ( "display", "none" ) ] ] []
 
 
 viewQuestionList : Model -> Html Msg

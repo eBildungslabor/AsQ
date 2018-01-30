@@ -9619,45 +9619,109 @@ var _user$project$Main$APIReceivedQuestions = function (a) {
 };
 var _user$project$Main$HideError = {ctor: 'HideError'};
 var _user$project$Main$viewError = function (model) {
-	var content = function () {
-		var _p8 = model.error;
-		if (_p8.ctor === 'Just') {
-			return {
+	var _p8 = model.error;
+	if (_p8.ctor === 'Just') {
+		return A2(
+			_elm_lang$html$Html$div,
+			{
 				ctor: '::',
-				_0: _elm_lang$html$Html$text(_p8._0),
+				_0: _elm_lang$html$Html_Attributes$class('content card error'),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$div,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('card-main'),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$h2,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('An error has occurred'),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$p,
+								{ctor: '[]'},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text(_p8._0),
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						}
+					}),
 				_1: {
 					ctor: '::',
 					_0: A2(
-						_elm_lang$html$Html$a,
+						_elm_lang$html$Html$div,
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$href('#'),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$HideError),
-								_1: {ctor: '[]'}
-							}
-						},
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html$text('hide'),
+							_0: _elm_lang$html$Html_Attributes$class('hrule'),
 							_1: {ctor: '[]'}
-						}),
-					_1: {ctor: '[]'}
+						},
+						{ctor: '[]'}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$div,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('card-actions'),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$a,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$href('#'),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$class('button'),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$HideError),
+												_1: {ctor: '[]'}
+											}
+										}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text('Dismiss'),
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					}
 				}
-			};
-		} else {
-			return {ctor: '[]'};
-		}
-	}();
-	return A2(
-		_elm_lang$html$Html$div,
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$class('error'),
-			_1: {ctor: '[]'}
-		},
-		content);
+			});
+	} else {
+		return A2(
+			_elm_lang$html$Html$div,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$style(
+					{
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'display', _1: 'none'},
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			},
+			{ctor: '[]'});
+	}
 };
 var _user$project$Main$FromAPI = function (a) {
 	return {ctor: 'FromAPI', _0: a};
@@ -10367,7 +10431,14 @@ var _user$project$Main$update = F2(
 	});
 var _user$project$Main$LandingPage = {ctor: 'LandingPage'};
 var _user$project$Main$init = function () {
-	var model = {error: _elm_lang$core$Maybe$Nothing, mode: _user$project$Main$LandingPage, presentation: '', questions: _user$project$Resource$NotFetched, question: '', showQuestionInput: false};
+	var model = {
+		error: _elm_lang$core$Maybe$Just('oh no! Something has gone terribly wrong and the world is going to end now.'),
+		mode: _user$project$Main$LandingPage,
+		presentation: '',
+		questions: _user$project$Resource$NotFetched,
+		question: '',
+		showQuestionInput: false
+	};
 	return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 }();
 var _user$project$Main$main = _elm_lang$html$Html$program(
