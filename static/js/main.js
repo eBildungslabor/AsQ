@@ -9035,6 +9035,136 @@ var _elm_lang$http$Http$stringPart = _elm_lang$http$Http$StringPart;
 
 var _user$project$Config$apiServerAddress = '127.0.0.1:9001';
 
+var _user$project$Authentication$logoutRequest = function (token) {
+	return _elm_lang$core$Json_Encode$object(
+		{
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'sessionToken',
+				_1: _elm_lang$core$Json_Encode$string(token)
+			},
+			_1: {ctor: '[]'}
+		});
+};
+var _user$project$Authentication$registerRequest = function (_p0) {
+	var _p1 = _p0;
+	return _elm_lang$core$Json_Encode$object(
+		{
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'username',
+				_1: _elm_lang$core$Json_Encode$string(_p1.username)
+			},
+			_1: {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'password',
+					_1: _elm_lang$core$Json_Encode$string(_p1.password)
+				},
+				_1: {ctor: '[]'}
+			}
+		});
+};
+var _user$project$Authentication$loginRequest = function (_p2) {
+	var _p3 = _p2;
+	return _elm_lang$core$Json_Encode$object(
+		{
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'username',
+				_1: _elm_lang$core$Json_Encode$string(_p3.username)
+			},
+			_1: {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'password',
+					_1: _elm_lang$core$Json_Encode$string(_p3.password)
+				},
+				_1: {ctor: '[]'}
+			}
+		});
+};
+var _user$project$Authentication$LoginCredentials = F2(
+	function (a, b) {
+		return {username: a, password: b};
+	});
+var _user$project$Authentication$RegistrationInfo = F3(
+	function (a, b, c) {
+		return {username: a, password: b, passwordRepeat: c};
+	});
+var _user$project$Authentication$LoginResponse = F2(
+	function (a, b) {
+		return {error: a, token: b};
+	});
+var _user$project$Authentication$loginResponse = A3(
+	_elm_lang$core$Json_Decode$map2,
+	_user$project$Authentication$LoginResponse,
+	A2(
+		_elm_lang$core$Json_Decode$field,
+		'error',
+		_elm_lang$core$Json_Decode$maybe(_elm_lang$core$Json_Decode$string)),
+	A2(
+		_elm_lang$core$Json_Decode$field,
+		'sessionToken',
+		_elm_lang$core$Json_Decode$maybe(_elm_lang$core$Json_Decode$string)));
+var _user$project$Authentication$login = function (credentials) {
+	var body = _elm_lang$http$Http$jsonBody(
+		_user$project$Authentication$loginRequest(credentials));
+	var url = A2(
+		_elm_lang$core$Basics_ops['++'],
+		'http://',
+		A2(_elm_lang$core$Basics_ops['++'], _user$project$Config$apiServerAddress, '/api/presenters/login'));
+	return A3(_elm_lang$http$Http$post, url, body, _user$project$Authentication$loginResponse);
+};
+var _user$project$Authentication$RegisterResponse = F2(
+	function (a, b) {
+		return {error: a, token: b};
+	});
+var _user$project$Authentication$registerResponse = A3(
+	_elm_lang$core$Json_Decode$map2,
+	_user$project$Authentication$RegisterResponse,
+	A2(
+		_elm_lang$core$Json_Decode$field,
+		'error',
+		_elm_lang$core$Json_Decode$maybe(_elm_lang$core$Json_Decode$string)),
+	A2(
+		_elm_lang$core$Json_Decode$field,
+		'sessionToken',
+		_elm_lang$core$Json_Decode$maybe(_elm_lang$core$Json_Decode$string)));
+var _user$project$Authentication$register = function (info) {
+	var body = _elm_lang$http$Http$jsonBody(
+		_user$project$Authentication$registerRequest(info));
+	var url = A2(
+		_elm_lang$core$Basics_ops['++'],
+		'http://',
+		A2(_elm_lang$core$Basics_ops['++'], _user$project$Config$apiServerAddress, '/api/presenters/register'));
+	return A3(_elm_lang$http$Http$post, url, body, _user$project$Authentication$registerResponse);
+};
+var _user$project$Authentication$LogoutResponse = function (a) {
+	return {error: a};
+};
+var _user$project$Authentication$logoutResponse = A2(
+	_elm_lang$core$Json_Decode$map,
+	_user$project$Authentication$LogoutResponse,
+	A2(
+		_elm_lang$core$Json_Decode$field,
+		'error',
+		_elm_lang$core$Json_Decode$maybe(_elm_lang$core$Json_Decode$string)));
+var _user$project$Authentication$logout = function (token) {
+	var body = _elm_lang$http$Http$jsonBody(
+		_user$project$Authentication$logoutRequest(token));
+	var url = A2(
+		_elm_lang$core$Basics_ops['++'],
+		'http://',
+		A2(_elm_lang$core$Basics_ops['++'], _user$project$Config$apiServerAddress, '/api/presenters/logout'));
+	return A3(_elm_lang$http$Http$post, url, body, _user$project$Authentication$logoutResponse);
+};
+
 var _user$project$Error$bubble = F2(
 	function (toMsg, err) {
 		return A2(
@@ -10742,6 +10872,62 @@ var _user$project$Mode_Landing$view = function (model) {
 		});
 };
 
+var _user$project$Presentation$Presentation = F3(
+	function (a, b, c) {
+		return {id: a, title: b, description: c};
+	});
+
+var _user$project$Mode_Presenter$viewPresentationList = function (model) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{ctor: '[]'},
+		{ctor: '[]'});
+};
+var _user$project$Mode_Presenter$viewCreatePresentation = A2(
+	_elm_lang$html$Html$div,
+	{ctor: '[]'},
+	{ctor: '[]'});
+var _user$project$Mode_Presenter$view = function (model) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: _user$project$Mode_Presenter$viewCreatePresentation,
+			_1: {
+				ctor: '::',
+				_0: _user$project$Mode_Presenter$viewPresentationList(model),
+				_1: {ctor: '[]'}
+			}
+		});
+};
+var _user$project$Mode_Presenter$update = F2(
+	function (msg, model) {
+		return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+	});
+var _user$project$Mode_Presenter$init = function (token) {
+	var command = _elm_lang$core$Platform_Cmd$none;
+	var model = {sessionToken: token, presentations: _user$project$Resource$NotFetched, expanded: _elm_lang$core$Maybe$Nothing, newPresentationTitle: '', newPresentationDescription: ''};
+	return {ctor: '_Tuple2', _0: model, _1: command};
+};
+var _user$project$Mode_Presenter$Model = F5(
+	function (a, b, c, d, e) {
+		return {sessionToken: a, presentations: b, expanded: c, newPresentationTitle: d, newPresentationDescription: e};
+	});
+var _user$project$Mode_Presenter$BubblingError = function (a) {
+	return {ctor: 'BubblingError', _0: a};
+};
+var _user$project$Mode_Presenter$CreatePresentation = {ctor: 'CreatePresentation'};
+var _user$project$Mode_Presenter$DescriptionInput = function (a) {
+	return {ctor: 'DescriptionInput', _0: a};
+};
+var _user$project$Mode_Presenter$TitleInput = function (a) {
+	return {ctor: 'TitleInput', _0: a};
+};
+var _user$project$Mode_Presenter$Expanded = function (a) {
+	return {ctor: 'Expanded', _0: a};
+};
+
 var _user$project$Ports$scrollTop = _elm_lang$core$Native_Platform.outgoingPort(
 	'scrollTop',
 	function (v) {
@@ -10889,6 +11075,9 @@ var _user$project$Main$viewError = function (model) {
 			{ctor: '[]'});
 	}
 };
+var _user$project$Main$PresenterModeMsg = function (a) {
+	return {ctor: 'PresenterModeMsg', _0: a};
+};
 var _user$project$Main$LandingModeMsg = function (a) {
 	return {ctor: 'LandingModeMsg', _0: a};
 };
@@ -10901,38 +11090,59 @@ var _user$project$Main$view = function (model) {
 		{ctor: '[]'},
 		function () {
 			var _p2 = model.mode;
-			if (_p2.ctor === 'Landing') {
-				return {
-					ctor: '::',
-					_0: _user$project$Main$viewNav(model),
-					_1: {
+			switch (_p2.ctor) {
+				case 'Landing':
+					return {
 						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$map,
-							_user$project$Main$LandingModeMsg,
-							_user$project$Mode_Landing$view(_p2._0)),
-						_1: {ctor: '[]'}
-					}
-				};
-			} else {
-				return {
-					ctor: '::',
-					_0: _user$project$Main$viewNav(model),
-					_1: {
-						ctor: '::',
-						_0: _user$project$Main$viewError(model),
+						_0: _user$project$Main$viewNav(model),
 						_1: {
 							ctor: '::',
 							_0: A2(
 								_elm_lang$html$Html$map,
-								_user$project$Main$AudienceModeMsg,
-								_user$project$Mode_Audience$view(_p2._0)),
+								_user$project$Main$LandingModeMsg,
+								_user$project$Mode_Landing$view(_p2._0)),
 							_1: {ctor: '[]'}
 						}
-					}
-				};
+					};
+				case 'Audience':
+					return {
+						ctor: '::',
+						_0: _user$project$Main$viewNav(model),
+						_1: {
+							ctor: '::',
+							_0: _user$project$Main$viewError(model),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$map,
+									_user$project$Main$AudienceModeMsg,
+									_user$project$Mode_Audience$view(_p2._0)),
+								_1: {ctor: '[]'}
+							}
+						}
+					};
+				default:
+					return {
+						ctor: '::',
+						_0: _user$project$Main$viewNav(model),
+						_1: {
+							ctor: '::',
+							_0: _user$project$Main$viewError(model),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$map,
+									_user$project$Main$PresenterModeMsg,
+									_user$project$Mode_Presenter$view(_p2._0)),
+								_1: {ctor: '[]'}
+							}
+						}
+					};
 			}
 		}());
+};
+var _user$project$Main$Presenter = function (a) {
+	return {ctor: 'Presenter', _0: a};
 };
 var _user$project$Main$Audience = function (a) {
 	return {ctor: 'Audience', _0: a};
@@ -11015,14 +11225,36 @@ var _user$project$Main$update = F2(
 								_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$AudienceModeMsg, audCmd)
 							};
 						case 'Login':
-							return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+							var _p7 = _user$project$Mode_Presenter$init('sessionToken');
+							var presModel = _p7._0;
+							var presCmd = _p7._1;
+							return {
+								ctor: '_Tuple2',
+								_0: _elm_lang$core$Native_Utils.update(
+									model,
+									{
+										mode: _user$project$Main$Presenter(presModel)
+									}),
+								_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$PresenterModeMsg, presCmd)
+							};
 						case 'Register':
-							return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+							var _p8 = _user$project$Mode_Presenter$init('sessionToken');
+							var presModel = _p8._0;
+							var presCmd = _p8._1;
+							return {
+								ctor: '_Tuple2',
+								_0: _elm_lang$core$Native_Utils.update(
+									model,
+									{
+										mode: _user$project$Main$Presenter(presModel)
+									}),
+								_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$PresenterModeMsg, presCmd)
+							};
 						default:
 							if (_p4._1.ctor === 'Landing') {
-								var _p7 = A2(_user$project$Mode_Landing$update, _p4._0._0, _p4._1._0);
-								var newLandModel = _p7._0;
-								var landCmd = _p7._1;
+								var _p9 = A2(_user$project$Mode_Landing$update, _p4._0._0, _p4._1._0);
+								var newLandModel = _p9._0;
+								var landCmd = _p9._1;
 								return {
 									ctor: '_Tuple2',
 									_0: _elm_lang$core$Native_Utils.update(
@@ -11036,7 +11268,7 @@ var _user$project$Main$update = F2(
 								break _v2_8;
 							}
 					}
-				default:
+				case 'HideError':
 					return {
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
@@ -11044,6 +11276,8 @@ var _user$project$Main$update = F2(
 							{error: _elm_lang$core$Maybe$Nothing}),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
+				default:
+					break _v2_8;
 			}
 		} while(false);
 		return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};

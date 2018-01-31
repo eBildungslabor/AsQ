@@ -6,6 +6,7 @@ import Html.Attributes exposing (..)
 import Http
 import Mode.Audience
 import Mode.Landing
+import Mode.Presenter
 import Error exposing (Error)
 import Question exposing (Question)
 import Ports exposing (scrollTop)
@@ -25,12 +26,14 @@ main =
 type Msg
     = AudienceModeMsg Mode.Audience.Msg
     | LandingModeMsg Mode.Landing.Msg
+    | PresenterModeMsg Mode.Presenter.Msg
     | HideError
 
 
 type ViewMode
     = Landing Mode.Landing.Model
     | Audience Mode.Audience.Model
+    | Presenter Mode.Presenter.Model
 
 
 type alias Model =
@@ -78,11 +81,19 @@ update msg model =
 
         ( LandingModeMsg (Mode.Landing.Login credentials), _ ) ->
             -- TODO - Login to the server
-            ( model, Cmd.none )
+            let
+                ( presModel, presCmd ) =
+                    Mode.Presenter.init "sessionToken"
+            in
+                ( { model | mode = Presenter presModel }, Cmd.map PresenterModeMsg presCmd )
 
         ( LandingModeMsg (Mode.Landing.Register info), _ ) ->
             -- TODO - Register new presenter
-            ( model, Cmd.none )
+            let
+                ( presModel, presCmd ) =
+                    Mode.Presenter.init "sessionToken"
+            in
+                ( { model | mode = Presenter presModel }, Cmd.map PresenterModeMsg presCmd )
 
         ( LandingModeMsg landMsg, Landing landModel ) ->
             let
@@ -118,6 +129,12 @@ view model =
                 [ viewNav model
                 , viewError model
                 , Html.map AudienceModeMsg <| Mode.Audience.view audienceModel
+                ]
+
+            Presenter presenterModel ->
+                [ viewNav model
+                , viewError model
+                , Html.map PresenterModeMsg <| Mode.Presenter.view presenterModel
                 ]
 
 

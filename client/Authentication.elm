@@ -1,6 +1,7 @@
 module Authentication
     exposing
-        ( LoginCredentials
+        ( SessionToken
+        , LoginCredentials
         , RegistrationInfo
         , LoginResponse
         , RegisterResponse
@@ -13,7 +14,7 @@ module Authentication
 {-| Types and API functions for handling presenter authentication and registration.
 -}
 
-import Http
+import Http exposing (Request)
 import Json.Decode exposing (Decoder, field, string, maybe)
 import Json.Encode as Encode
 import Config
@@ -106,7 +107,7 @@ logout token =
             "http://" ++ Config.apiServerAddress ++ "/api/presenters/logout"
 
         body =
-            { sessionToken = token }
+            token
                 |> logoutRequest
                 |> Http.jsonBody
     in
