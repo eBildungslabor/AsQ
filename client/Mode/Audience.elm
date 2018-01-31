@@ -264,9 +264,6 @@ viewAskQuestion model =
 
                 _ ->
                     ""
-
-        _ =
-            Debug.log "Characters: " ( charactersUsed, limitPercentUsed, countColor )
     in
         if model.showQuestionInput then
             div [ class "content card" ]

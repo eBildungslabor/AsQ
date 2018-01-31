@@ -5,6 +5,7 @@ import Html.Events exposing (onClick, onInput)
 import Html.Attributes exposing (..)
 import Http
 import Mode.Audience
+import Mode.Landing
 import Error exposing (Error)
 import Question exposing (Question)
 import Ports exposing (scrollTop)
@@ -23,33 +24,33 @@ main =
 
 type Msg
     = AudienceModeMsg Mode.Audience.Msg
-    | PresentationIDReceived String
-    | PresentationIDSubmitted
+    | LandingModeMsg Mode.Landing.Msg
     | HideError
 
 
 type ViewMode
-    = Landing
+    = Landing Mode.Landing.Model
     | Audience Mode.Audience.Model
 
 
 type alias Model =
     { error : Maybe Error
     , mode : ViewMode
-    , presentation : String
     }
 
 
 init : ( Model, Cmd Msg )
 init =
     let
+        ( landingModel, command ) =
+            Mode.Landing.init
+
         model =
             { error = Nothing
-            , mode = Landing
-            , presentation = ""
+            , mode = Landing landingModel
             }
     in
-        ( model, Cmd.none )
+        ( model, Cmd.map LandingModeMsg command )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -62,22 +63,27 @@ update msg model =
             let
                 ( newAudModel, command ) =
                     Mode.Audience.update audMsg audModel
-
-                newModel =
-                    { model | mode = Audience newAudModel }
             in
-                ( newModel, Cmd.map AudienceModeMsg command )
+                ( { model | mode = Audience newAudModel }, Cmd.map AudienceModeMsg command )
 
-        ( PresentationIDReceived presID, _ ) ->
-            ( { model | presentation = presID }, Cmd.none )
+        ( LandingModeMsg (Mode.Landing.BubblingError error), _ ) ->
+            ( { model | error = Just error }, Cmd.none )
 
-        ( PresentationIDSubmitted, _ ) ->
+        ( LandingModeMsg (Mode.Landing.JoinAudience { presentation }), _ ) ->
             let
-                ( state, command ) =
-                    Mode.Audience.init model.presentation
+                ( audModel, audCmd ) =
+                    Mode.Audience.init presentation
             in
-                ( { model | mode = Audience state }, Cmd.map AudienceModeMsg command )
+                ( { model | mode = Audience audModel }, Cmd.map AudienceModeMsg audCmd )
 
+        ( LandingModeMsg landMsg, Landing landModel ) ->
+            let
+                ( newLandModel, landCmd ) =
+                    Mode.Landing.update landMsg landModel
+            in
+                ( { model | mode = Landing newLandModel }, Cmd.map LandingModeMsg landCmd )
+
+        -- TODO : Handle login and register
         ( HideError, _ ) ->
             ( { model | error = Nothing }, Cmd.none )
 
@@ -94,11 +100,11 @@ subscriptions _ =
 
 view : Model -> Html Msg
 view model =
-    div []
-        (case model.mode of
-            Landing ->
+    div [] <|
+        case model.mode of
+            Landing landingModel ->
                 [ viewNav model
-                , viewLanding
+                , Html.map LandingModeMsg <| Mode.Landing.view landingModel
                 ]
 
             Audience audienceModel ->
@@ -106,7 +112,6 @@ view model =
                 , viewError model
                 , Html.map AudienceModeMsg <| Mode.Audience.view audienceModel
                 ]
-        )
 
 
 viewNav : Model -> Html Msg
@@ -114,25 +119,6 @@ viewNav model =
     nav []
         [ ul []
             [ li [ id "logo" ] [ text "AsQ" ]
-            ]
-        ]
-
-
-viewLanding : Html Msg
-viewLanding =
-    div [ class "content card" ]
-        [ div [ class "card-main" ]
-            [ h2 [] [ text "Join an audience" ]
-            , p [] [ text "Enter the ID code for the presentation you're watching." ]
-            , input
-                [ type_ "text"
-                , onInput PresentationIDReceived
-                ]
-                []
-            ]
-        , div [ class "hrule" ] []
-        , div [ class "card-actions" ]
-            [ a [ href "#", class "button", onClick PresentationIDSubmitted ] [ text "Join" ]
             ]
         ]
 

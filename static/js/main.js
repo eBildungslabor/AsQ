@@ -9817,10 +9817,6 @@ var _user$project$Mode_Audience$viewAskQuestion = function (model) {
 		} while(false);
 		return '';
 	}();
-	var _p10 = A2(
-		_elm_lang$core$Debug$log,
-		'Characters: ',
-		{ctor: '_Tuple3', _0: charactersUsed, _1: limitPercentUsed, _2: countColor});
 	return model.showQuestionInput ? A2(
 		_elm_lang$html$Html$div,
 		{
@@ -9979,27 +9975,27 @@ var _user$project$Mode_Audience$APIQuestionAsked = function (a) {
 };
 var _user$project$Mode_Audience$update = F2(
 	function (msg, model) {
-		var _p11 = msg;
-		switch (_p11.ctor) {
+		var _p10 = msg;
+		switch (_p10.ctor) {
 			case 'BubblingError':
 				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 			case 'QuestionTextReceived':
-				var _p12 = _p11._0;
+				var _p11 = _p10._0;
 				return (_elm_lang$core$Native_Utils.cmp(
-					_elm_lang$core$String$length(_p12),
+					_elm_lang$core$String$length(_p11),
 					_user$project$Mode_Audience$constMaxQuestionLength) < 1) ? {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{question: _p12}),
+						{question: _p11}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				} : {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 			case 'QuestionAsked':
 				var command = A2(
 					_elm_lang$http$Http$send,
-					function (_p13) {
+					function (_p12) {
 						return _user$project$Mode_Audience$FromAPI(
-							_user$project$Mode_Audience$APIQuestionAsked(_p13));
+							_user$project$Mode_Audience$APIQuestionAsked(_p12));
 					},
 					A2(_user$project$Question$ask, model.presentation, model.question));
 				var newModel = _elm_lang$core$Native_Utils.update(
@@ -10011,19 +10007,19 @@ var _user$project$Mode_Audience$update = F2(
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{showQuestionInput: _p11._0}),
+						{showQuestionInput: _p10._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'QuestionAction':
-				if (_p11._0.ctor === 'BubblingError') {
+				if (_p10._0.ctor === 'BubblingError') {
 					return {
 						ctor: '_Tuple2',
 						_0: model,
-						_1: A2(_user$project$Error$bubble, _user$project$Mode_Audience$BubblingError, _p11._0._0)
+						_1: A2(_user$project$Error$bubble, _user$project$Mode_Audience$BubblingError, _p10._0._0)
 					};
 				} else {
-					var updateQuestion = _user$project$Question$update(_p11._0);
-					var _p14 = A2(
+					var updateQuestion = _user$project$Question$update(_p10._0);
+					var _p13 = A2(
 						_elm_lang$core$Maybe$withDefault,
 						{
 							ctor: '_Tuple2',
@@ -10038,8 +10034,8 @@ var _user$project$Mode_Audience$update = F2(
 									_user$project$Resource$map,
 									_elm_lang$core$List$map(updateQuestion),
 									model.questions))));
-					var questions = _p14._0;
-					var commands = _p14._1;
+					var questions = _p13._0;
+					var commands = _p13._1;
 					var topLevelCommands = A2(
 						_elm_lang$core$List$map,
 						_elm_lang$core$Platform_Cmd$map(_user$project$Mode_Audience$QuestionAction),
@@ -10055,13 +10051,13 @@ var _user$project$Mode_Audience$update = F2(
 					};
 				}
 			default:
-				switch (_p11._0.ctor) {
+				switch (_p10._0.ctor) {
 					case 'APIReceivedQuestions':
-						return A2(_user$project$Mode_Audience$updateQuestionsReceived, _p11._0._0, model);
+						return A2(_user$project$Mode_Audience$updateQuestionsReceived, _p10._0._0, model);
 					case 'APIQuestionAsked':
-						return A2(_user$project$Mode_Audience$updateQuestionAsked, _p11._0._0, model);
+						return A2(_user$project$Mode_Audience$updateQuestionAsked, _p10._0._0, model);
 					default:
-						return A2(_user$project$Mode_Audience$updateQuestionUpdated, _p11._0._0, model);
+						return A2(_user$project$Mode_Audience$updateQuestionUpdated, _p10._0._0, model);
 				}
 		}
 	});
@@ -10071,13 +10067,248 @@ var _user$project$Mode_Audience$APIReceivedQuestions = function (a) {
 var _user$project$Mode_Audience$init = function (presentationID) {
 	var command = A2(
 		_elm_lang$http$Http$send,
-		function (_p15) {
+		function (_p14) {
 			return _user$project$Mode_Audience$FromAPI(
-				_user$project$Mode_Audience$APIReceivedQuestions(_p15));
+				_user$project$Mode_Audience$APIReceivedQuestions(_p14));
 		},
 		_user$project$Question$presentationQuestions(presentationID));
 	var model = {presentation: presentationID, questions: _user$project$Resource$NotFetched, question: '', showQuestionInput: false};
 	return {ctor: '_Tuple2', _0: model, _1: command};
+};
+
+var _user$project$Mode_Landing$viewPresenterAuth = function (model) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('content card'),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$div,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('card-main'),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$h2,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text('Presenters'),
+							_1: {ctor: '[]'}
+						}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$p,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('Start your own or manage existing presentations.'),
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					}
+				}),
+			_1: {ctor: '[]'}
+		});
+};
+var _user$project$Mode_Landing$update = F2(
+	function (msg, model) {
+		var _p0 = msg;
+		switch (_p0.ctor) {
+			case 'PresentationIDInput':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{presentationToJoin: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'UsernameInput':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{username: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'PasswordInput':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{password: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'PasswordRepeatInput':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{passwordRepeat: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			default:
+				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+		}
+	});
+var _user$project$Mode_Landing$init = function () {
+	var model = {presentationToJoin: '', username: '', password: '', passwordRepeat: ''};
+	return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+}();
+var _user$project$Mode_Landing$Model = F4(
+	function (a, b, c, d) {
+		return {presentationToJoin: a, username: b, password: c, passwordRepeat: d};
+	});
+var _user$project$Mode_Landing$BubblingError = function (a) {
+	return {ctor: 'BubblingError', _0: a};
+};
+var _user$project$Mode_Landing$Register = function (a) {
+	return {ctor: 'Register', _0: a};
+};
+var _user$project$Mode_Landing$Login = function (a) {
+	return {ctor: 'Login', _0: a};
+};
+var _user$project$Mode_Landing$JoinAudience = function (a) {
+	return {ctor: 'JoinAudience', _0: a};
+};
+var _user$project$Mode_Landing$PasswordRepeatInput = function (a) {
+	return {ctor: 'PasswordRepeatInput', _0: a};
+};
+var _user$project$Mode_Landing$PasswordInput = function (a) {
+	return {ctor: 'PasswordInput', _0: a};
+};
+var _user$project$Mode_Landing$UsernameInput = function (a) {
+	return {ctor: 'UsernameInput', _0: a};
+};
+var _user$project$Mode_Landing$PresentationIDInput = function (a) {
+	return {ctor: 'PresentationIDInput', _0: a};
+};
+var _user$project$Mode_Landing$viewJoinAudience = function (model) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('content card'),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$div,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('card-main'),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$h2,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text('Join an audience'),
+							_1: {ctor: '[]'}
+						}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$p,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('Enter the ID code for the presentation you\'re watching.'),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$input,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$type_('text'),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Events$onInput(_user$project$Mode_Landing$PresentationIDInput),
+										_1: {ctor: '[]'}
+									}
+								},
+								{ctor: '[]'}),
+							_1: {ctor: '[]'}
+						}
+					}
+				}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$div,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('hrule'),
+						_1: {ctor: '[]'}
+					},
+					{ctor: '[]'}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$div,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('card-actions'),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$a,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$href('#'),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$class('button'),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Events$onClick(
+												_user$project$Mode_Landing$JoinAudience(
+													{presentation: model.presentationToJoin})),
+											_1: {ctor: '[]'}
+										}
+									}
+								},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text('Join'),
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				}
+			}
+		});
+};
+var _user$project$Mode_Landing$view = function (model) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: _user$project$Mode_Landing$viewJoinAudience(model),
+			_1: {
+				ctor: '::',
+				_0: _user$project$Mode_Landing$viewPresenterAuth(model),
+				_1: {ctor: '[]'}
+			}
+		});
 };
 
 var _user$project$Ports$scrollTop = _elm_lang$core$Native_Platform.outgoingPort(
@@ -10117,9 +10348,9 @@ var _user$project$Main$viewNav = function (model) {
 var _user$project$Main$subscriptions = function (_p0) {
 	return _elm_lang$core$Platform_Sub$none;
 };
-var _user$project$Main$Model = F3(
-	function (a, b, c) {
-		return {error: a, mode: b, presentation: c};
+var _user$project$Main$Model = F2(
+	function (a, b) {
+		return {error: a, mode: b};
 	});
 var _user$project$Main$HideError = {ctor: 'HideError'};
 var _user$project$Main$viewError = function (model) {
@@ -10227,111 +10458,9 @@ var _user$project$Main$viewError = function (model) {
 			{ctor: '[]'});
 	}
 };
-var _user$project$Main$PresentationIDSubmitted = {ctor: 'PresentationIDSubmitted'};
-var _user$project$Main$PresentationIDReceived = function (a) {
-	return {ctor: 'PresentationIDReceived', _0: a};
+var _user$project$Main$LandingModeMsg = function (a) {
+	return {ctor: 'LandingModeMsg', _0: a};
 };
-var _user$project$Main$viewLanding = A2(
-	_elm_lang$html$Html$div,
-	{
-		ctor: '::',
-		_0: _elm_lang$html$Html_Attributes$class('content card'),
-		_1: {ctor: '[]'}
-	},
-	{
-		ctor: '::',
-		_0: A2(
-			_elm_lang$html$Html$div,
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$class('card-main'),
-				_1: {ctor: '[]'}
-			},
-			{
-				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$h2,
-					{ctor: '[]'},
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html$text('Join an audience'),
-						_1: {ctor: '[]'}
-					}),
-				_1: {
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$p,
-						{ctor: '[]'},
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html$text('Enter the ID code for the presentation you\'re watching.'),
-							_1: {ctor: '[]'}
-						}),
-					_1: {
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$input,
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$type_('text'),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$html$Html_Events$onInput(_user$project$Main$PresentationIDReceived),
-									_1: {ctor: '[]'}
-								}
-							},
-							{ctor: '[]'}),
-						_1: {ctor: '[]'}
-					}
-				}
-			}),
-		_1: {
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$div,
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$class('hrule'),
-					_1: {ctor: '[]'}
-				},
-				{ctor: '[]'}),
-			_1: {
-				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$div,
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('card-actions'),
-						_1: {ctor: '[]'}
-					},
-					{
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$a,
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$href('#'),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$class('button'),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$PresentationIDSubmitted),
-										_1: {ctor: '[]'}
-									}
-								}
-							},
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html$text('Join'),
-								_1: {ctor: '[]'}
-							}),
-						_1: {ctor: '[]'}
-					}),
-				_1: {ctor: '[]'}
-			}
-		}
-	});
 var _user$project$Main$AudienceModeMsg = function (a) {
 	return {ctor: 'AudienceModeMsg', _0: a};
 };
@@ -10347,7 +10476,10 @@ var _user$project$Main$view = function (model) {
 					_0: _user$project$Main$viewNav(model),
 					_1: {
 						ctor: '::',
-						_0: _user$project$Main$viewLanding,
+						_0: A2(
+							_elm_lang$html$Html$map,
+							_user$project$Main$LandingModeMsg,
+							_user$project$Mode_Landing$view(_p2._0)),
 						_1: {ctor: '[]'}
 					}
 				};
@@ -10374,76 +10506,113 @@ var _user$project$Main$view = function (model) {
 var _user$project$Main$Audience = function (a) {
 	return {ctor: 'Audience', _0: a};
 };
+var _user$project$Main$Landing = function (a) {
+	return {ctor: 'Landing', _0: a};
+};
+var _user$project$Main$init = function () {
+	var _p3 = _user$project$Mode_Landing$init;
+	var landingModel = _p3._0;
+	var command = _p3._1;
+	var model = {
+		error: _elm_lang$core$Maybe$Nothing,
+		mode: _user$project$Main$Landing(landingModel)
+	};
+	return {
+		ctor: '_Tuple2',
+		_0: model,
+		_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$LandingModeMsg, command)
+	};
+}();
 var _user$project$Main$update = F2(
 	function (msg, model) {
-		var _p3 = {ctor: '_Tuple2', _0: msg, _1: model.mode};
-		switch (_p3._0.ctor) {
-			case 'AudienceModeMsg':
-				if (_p3._0._0.ctor === 'BubblingError') {
+		var _p4 = {ctor: '_Tuple2', _0: msg, _1: model.mode};
+		_v2_6:
+		do {
+			switch (_p4._0.ctor) {
+				case 'AudienceModeMsg':
+					if (_p4._0._0.ctor === 'BubblingError') {
+						return {
+							ctor: '_Tuple2',
+							_0: _elm_lang$core$Native_Utils.update(
+								model,
+								{
+									error: _elm_lang$core$Maybe$Just(_p4._0._0._0)
+								}),
+							_1: _elm_lang$core$Platform_Cmd$none
+						};
+					} else {
+						if (_p4._1.ctor === 'Audience') {
+							var _p5 = A2(_user$project$Mode_Audience$update, _p4._0._0, _p4._1._0);
+							var newAudModel = _p5._0;
+							var command = _p5._1;
+							return {
+								ctor: '_Tuple2',
+								_0: _elm_lang$core$Native_Utils.update(
+									model,
+									{
+										mode: _user$project$Main$Audience(newAudModel)
+									}),
+								_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$AudienceModeMsg, command)
+							};
+						} else {
+							break _v2_6;
+						}
+					}
+				case 'LandingModeMsg':
+					switch (_p4._0._0.ctor) {
+						case 'BubblingError':
+							return {
+								ctor: '_Tuple2',
+								_0: _elm_lang$core$Native_Utils.update(
+									model,
+									{
+										error: _elm_lang$core$Maybe$Just(_p4._0._0._0)
+									}),
+								_1: _elm_lang$core$Platform_Cmd$none
+							};
+						case 'JoinAudience':
+							var _p6 = _user$project$Mode_Audience$init(_p4._0._0._0.presentation);
+							var audModel = _p6._0;
+							var audCmd = _p6._1;
+							return {
+								ctor: '_Tuple2',
+								_0: _elm_lang$core$Native_Utils.update(
+									model,
+									{
+										mode: _user$project$Main$Audience(audModel)
+									}),
+								_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$AudienceModeMsg, audCmd)
+							};
+						default:
+							if (_p4._1.ctor === 'Landing') {
+								var _p7 = A2(_user$project$Mode_Landing$update, _p4._0._0, _p4._1._0);
+								var newLandModel = _p7._0;
+								var landCmd = _p7._1;
+								return {
+									ctor: '_Tuple2',
+									_0: _elm_lang$core$Native_Utils.update(
+										model,
+										{
+											mode: _user$project$Main$Landing(newLandModel)
+										}),
+									_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$LandingModeMsg, landCmd)
+								};
+							} else {
+								break _v2_6;
+							}
+					}
+				default:
 					return {
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
 							model,
-							{
-								error: _elm_lang$core$Maybe$Just(_p3._0._0._0)
-							}),
+							{error: _elm_lang$core$Maybe$Nothing}),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
-				} else {
-					if (_p3._1.ctor === 'Audience') {
-						var _p4 = A2(_user$project$Mode_Audience$update, _p3._0._0, _p3._1._0);
-						var newAudModel = _p4._0;
-						var command = _p4._1;
-						var newModel = _elm_lang$core$Native_Utils.update(
-							model,
-							{
-								mode: _user$project$Main$Audience(newAudModel)
-							});
-						return {
-							ctor: '_Tuple2',
-							_0: newModel,
-							_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$AudienceModeMsg, command)
-						};
-					} else {
-						return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
-					}
-				}
-			case 'PresentationIDReceived':
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{presentation: _p3._0._0}),
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
-			case 'PresentationIDSubmitted':
-				var _p5 = _user$project$Mode_Audience$init(model.presentation);
-				var state = _p5._0;
-				var command = _p5._1;
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{
-							mode: _user$project$Main$Audience(state)
-						}),
-					_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$AudienceModeMsg, command)
-				};
-			default:
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{error: _elm_lang$core$Maybe$Nothing}),
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
-		}
+			}
+		} while(false);
+		return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 	});
-var _user$project$Main$Landing = {ctor: 'Landing'};
-var _user$project$Main$init = function () {
-	var model = {error: _elm_lang$core$Maybe$Nothing, mode: _user$project$Main$Landing, presentation: ''};
-	return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
-}();
 var _user$project$Main$main = _elm_lang$html$Html$program(
 	{init: _user$project$Main$init, update: _user$project$Main$update, view: _user$project$Main$view, subscriptions: _user$project$Main$subscriptions})();
 
