@@ -2,6 +2,7 @@ module Mode.Landing
     exposing
         ( Model
         , Msg(JoinAudience, Login, Register, BubblingError)
+        , AuthenticationAction(..)
         , init
         , update
         , view
@@ -16,6 +17,14 @@ import Html.Events exposing (onClick, onInput)
 import Error exposing (Error)
 
 
+{-| An authentication-related action selected by the user to perform.
+-}
+type AuthenticationAction
+    = NoneSelected
+    | LoginAction
+    | RegisterAction
+
+
 {-| The model representing the state of the landing page.
 -}
 type alias Model =
@@ -23,6 +32,7 @@ type alias Model =
     , username : String
     , password : String
     , passwordRepeat : String
+    , authMode : AuthenticationAction
     }
 
 
@@ -33,6 +43,7 @@ type Msg
     | UsernameInput String
     | PasswordInput String
     | PasswordRepeatInput String
+    | AuthActionSelected AuthenticationAction
     | JoinAudience
         { presentation : String
         }
@@ -58,6 +69,7 @@ init =
             , username = ""
             , password = ""
             , passwordRepeat = ""
+            , authMode = NoneSelected
             }
     in
         ( model, Cmd.none )
@@ -79,6 +91,9 @@ update msg model =
 
         PasswordRepeatInput pwdRepeat ->
             ( { model | passwordRepeat = pwdRepeat }, Cmd.none )
+
+        AuthActionSelected action ->
+            ( { model | authMode = action }, Cmd.none )
 
         _ ->
             -- We don't respond to the JoinAudience, Login, Register, or BubblingError messages here.
@@ -122,9 +137,92 @@ viewJoinAudience model =
 
 viewPresenterAuth : Model -> Html Msg
 viewPresenterAuth model =
-    div [ class "content card" ]
-        [ div [ class "card-main" ]
-            [ h2 [] [ text "Presenters" ]
-            , p [] [ text "Start your own or manage existing presentations." ]
+    let
+        ( cardBody, actions ) =
+            case model.authMode of
+                NoneSelected ->
+                    ( div [] []
+                    , [ a [ href "#", class "button", onClick (AuthActionSelected LoginAction) ] [ text "Login" ]
+                      , a [ href "#", class "button", onClick (AuthActionSelected RegisterAction) ] [ text "Register" ]
+                      ]
+                    )
+
+                LoginAction ->
+                    ( viewLoginForm
+                    , [ a
+                            [ href "#"
+                            , class "button"
+                            , onClick
+                                (Login
+                                    { username = model.username
+                                    , password = model.password
+                                    }
+                                )
+                            ]
+                            [ text "Login" ]
+                      , a [ href "#", class "button", onClick (AuthActionSelected NoneSelected) ] [ text "Back" ]
+                      ]
+                    )
+
+                RegisterAction ->
+                    ( viewRegisterForm
+                    , [ a
+                            [ href "#"
+                            , class "button"
+                            , onClick
+                                (Register
+                                    { username = model.username
+                                    , password = model.password
+                                    , passwordRepeat = model.passwordRepeat
+                                    }
+                                )
+                            ]
+                            [ text "Register" ]
+                      , a [ href "#", class "button", onClick (AuthActionSelected NoneSelected) ] [ text "Back" ]
+                      ]
+                    )
+
+        body =
+            List.append
+                [ h2 [] [ text "Presenters" ]
+                , p [] [ text "Start your own or manage existing presentations." ]
+                ]
+                [ cardBody ]
+    in
+        div [ class "content card" ]
+            [ div [ class "card-main" ] body
+            , div [ class "hrule" ] []
+            , div [ class "card-actions" ] actions
+            ]
+
+
+viewLoginForm : Html Msg
+viewLoginForm =
+    div []
+        [ div []
+            [ label [ for "username" ] [ text "Username" ]
+            , input [ type_ "text", name "username", onInput UsernameInput ] []
+            ]
+        , div []
+            [ label [ for "password" ] [ text "Password" ]
+            , input [ type_ "password", name "password", onInput PasswordInput ] []
+            ]
+        ]
+
+
+viewRegisterForm : Html Msg
+viewRegisterForm =
+    div []
+        [ div []
+            [ label [ for "username" ] [ text "Username" ]
+            , input [ type_ "text", name "username", onInput UsernameInput ] []
+            ]
+        , div []
+            [ label [ for "password" ] [ text "Password" ]
+            , input [ type_ "password", name "password", onInput PasswordInput ] []
+            ]
+        , div []
+            [ label [ for "passwordRepeat" ] [ text "Repeat password" ]
+            , input [ type_ "password", name "passwordRepeat", onInput PasswordRepeatInput ] []
             ]
         ]
