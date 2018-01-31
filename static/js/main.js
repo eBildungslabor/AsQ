@@ -10957,7 +10957,7 @@ var _user$project$Main$init = function () {
 var _user$project$Main$update = F2(
 	function (msg, model) {
 		var _p4 = {ctor: '_Tuple2', _0: msg, _1: model.mode};
-		_v2_6:
+		_v2_8:
 		do {
 			switch (_p4._0.ctor) {
 				case 'AudienceModeMsg':
@@ -10986,7 +10986,7 @@ var _user$project$Main$update = F2(
 								_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$AudienceModeMsg, command)
 							};
 						} else {
-							break _v2_6;
+							break _v2_8;
 						}
 					}
 				case 'LandingModeMsg':
@@ -11014,6 +11014,10 @@ var _user$project$Main$update = F2(
 									}),
 								_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$AudienceModeMsg, audCmd)
 							};
+						case 'Login':
+							return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+						case 'Register':
+							return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 						default:
 							if (_p4._1.ctor === 'Landing') {
 								var _p7 = A2(_user$project$Mode_Landing$update, _p4._0._0, _p4._1._0);
@@ -11029,7 +11033,7 @@ var _user$project$Main$update = F2(
 									_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$LandingModeMsg, landCmd)
 								};
 							} else {
-								break _v2_6;
+								break _v2_8;
 							}
 					}
 				default:

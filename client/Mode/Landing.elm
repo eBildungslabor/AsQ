@@ -14,6 +14,7 @@ module Mode.Landing
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
+import Authentication
 import Error exposing (Error)
 
 
@@ -44,18 +45,9 @@ type Msg
     | PasswordInput String
     | PasswordRepeatInput String
     | AuthActionSelected AuthenticationAction
-    | JoinAudience
-        { presentation : String
-        }
-    | Login
-        { username : String
-        , password : String
-        }
-    | Register
-        { username : String
-        , password : String
-        , passwordRepeat : String
-        }
+    | JoinAudience { presentation : String }
+    | Login Authentication.LoginCredentials
+    | Register Authentication.RegistrationInfo
     | BubblingError Error
 
 

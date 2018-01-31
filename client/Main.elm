@@ -76,6 +76,14 @@ update msg model =
             in
                 ( { model | mode = Audience audModel }, Cmd.map AudienceModeMsg audCmd )
 
+        ( LandingModeMsg (Mode.Landing.Login credentials), _ ) ->
+            -- TODO - Login to the server
+            ( model, Cmd.none )
+
+        ( LandingModeMsg (Mode.Landing.Register info), _ ) ->
+            -- TODO - Register new presenter
+            ( model, Cmd.none )
+
         ( LandingModeMsg landMsg, Landing landModel ) ->
             let
                 ( newLandModel, landCmd ) =
@@ -83,7 +91,6 @@ update msg model =
             in
                 ( { model | mode = Landing newLandModel }, Cmd.map LandingModeMsg landCmd )
 
-        -- TODO : Handle login and register
         ( HideError, _ ) ->
             ( { model | error = Nothing }, Cmd.none )
 
