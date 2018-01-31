@@ -11,6 +11,8 @@ module Mode.Presenter
 -}
 
 import Html exposing (..)
+import Html.Attributes exposing (..)
+import Html.Events exposing (onClick, onInput)
 import Authentication exposing (SessionToken)
 import Error exposing (Error)
 import Presentation exposing (Presentation)
@@ -35,6 +37,7 @@ type Msg
     | TitleInput String
     | DescriptionInput String
     | CreatePresentation
+    | ShowNewPresentationForm Bool
     | BubblingError Error
 
 
@@ -43,9 +46,15 @@ type Msg
 init : SessionToken -> ( Model, Cmd Msg )
 init token =
     let
+        presentations =
+            [ { id = "first", title = "Using Capabilities to design APIs", description = "", questions = Resource.NotFetched }
+            , { id = "second", title = "A critical evaluation of Golang", description = "", questions = Resource.NotFetched }
+            , { id = "third", title = "This is my third presentation ever!", description = "", questions = Resource.NotFetched }
+            ]
+
         model =
             { sessionToken = token
-            , presentations = Resource.NotFetched
+            , presentations = Resource.Loaded presentations
             , expanded = Nothing
             , newPresentationTitle = ""
             , newPresentationDescription = ""
@@ -79,9 +88,54 @@ view model =
 
 viewCreatePresentation : Html Msg
 viewCreatePresentation =
-    div [] []
+    div [ class "content card" ]
+        [ div [ class "card-main" ]
+            [ h2 [] [ text "Create a new presentation" ]
+            , div []
+                [ label [ for "title" ] [ text "Title" ]
+                , input [ type_ "text", name "title", onInput TitleInput ] []
+                ]
+            , div []
+                [ label [ for "description" ] [ text "Description" ]
+                , textarea [ name "description", onInput DescriptionInput ] []
+                ]
+            ]
+        , div [ class "hrule" ] []
+        , div [ class "card-actions" ]
+            [ a [ href "#", class "button", onClick CreatePresentation ] [ text "Create" ]
+            ]
+        ]
 
 
 viewPresentationList : Model -> Html Msg
 viewPresentationList model =
-    div [] []
+    div [ class "content card" ] <|
+        case Resource.map (List.map viewPresentation) model.presentations of
+            Resource.Loaded [] ->
+                [ div [ class "card-main" ]
+                    [ h2 [] [ text "No presentations yet" ]
+                    , p [] [ text "Create your first presentation!" ]
+                    ]
+                , div [ class "hrule" ] []
+                , div [ class "card-actions" ]
+                    [ a [ href "#", class "button", onClick (ShowNewPresentationForm True) ] [ text "Create" ]
+                    ]
+                ]
+
+            Resource.Loaded presentations ->
+                [ ul [] presentations
+                ]
+
+            _ ->
+                [ div [ class "card-main" ]
+                    [ h2 [] [ text "Loading..." ]
+                    , p [] [ text "Please wait while we fetch your presentations." ]
+                    ]
+                ]
+
+
+viewPresentation : Presentation -> Html Msg
+viewPresentation presentation =
+    li [ class "card-item" ]
+        [ a [ href "#", class "button", onClick (Expanded presentation) ] [ text presentation.title ]
+        ]

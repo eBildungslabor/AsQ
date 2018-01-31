@@ -22,18 +22,27 @@ nav {
     box-shadow: 0 2px 2px 0 #54496E;
 }
 
-nav ul {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-}
-
 nav ul li#logo {
     text-align: center;
     font-weight: bold;
     font-size: 2.0em;
     color: white;
     line-height: 2.0em;
+}
+
+ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+ul li.card-item {
+    border-bottom: 1px solid rgba(225, 225, 225, 0.88);
+    padding: 32px;
+}
+
+ul li.card-item:last-child {
+    border-bottom: none;
 }
 
 h2 {
