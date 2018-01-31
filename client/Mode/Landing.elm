@@ -152,12 +152,11 @@ viewPresenterAuth model =
                     , [ a
                             [ href "#"
                             , class "button"
-                            , onClick
-                                (Login
+                            , onClick <|
+                                Login
                                     { username = model.username
                                     , password = model.password
                                     }
-                                )
                             ]
                             [ text "Login" ]
                       , a [ href "#", class "button", onClick (AuthActionSelected NoneSelected) ] [ text "Back" ]
@@ -169,13 +168,12 @@ viewPresenterAuth model =
                     , [ a
                             [ href "#"
                             , class "button"
-                            , onClick
-                                (Register
+                            , onClick <|
+                                Register
                                     { username = model.username
                                     , password = model.password
                                     , passwordRepeat = model.passwordRepeat
                                     }
-                                )
                             ]
                             [ text "Register" ]
                       , a [ href "#", class "button", onClick (AuthActionSelected NoneSelected) ] [ text "Back" ]
