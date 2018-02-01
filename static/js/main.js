@@ -9205,58 +9205,35 @@ var _user$project$Resource$map = F2(
 		}
 	});
 
-var _user$project$Question$cleanDate = function (dateStr) {
-	var nth = F2(
-		function (i, ls) {
-			return _elm_lang$core$List$head(
-				A2(_elm_lang$core$List$drop, i, ls));
-		});
-	var parsed = A2(
-		_elm_lang$core$Maybe$andThen,
-		nth(0),
-		A2(
-			_elm_lang$core$Maybe$map,
-			_elm_lang$core$String$split('.'),
-			A2(
-				nth,
-				1,
-				A2(_elm_lang$core$String$split, 'T', dateStr))));
-	var _p0 = parsed;
-	if (_p0.ctor === 'Just') {
-		return _p0._0;
-	} else {
-		return '???';
-	}
-};
-var _user$project$Question$nodToQuestionRequest = function (_p1) {
-	var _p2 = _p1;
+var _user$project$Question$nodToQuestionRequest = function (_p0) {
+	var _p1 = _p0;
 	return _elm_lang$core$Json_Encode$object(
 		{
 			ctor: '::',
 			_0: {
 				ctor: '_Tuple2',
 				_0: 'question',
-				_1: _elm_lang$core$Json_Encode$string(_p2.question)
+				_1: _elm_lang$core$Json_Encode$string(_p1.question)
 			},
 			_1: {ctor: '[]'}
 		});
 };
-var _user$project$Question$askQuestionRequest = function (_p3) {
-	var _p4 = _p3;
+var _user$project$Question$askQuestionRequest = function (_p2) {
+	var _p3 = _p2;
 	return _elm_lang$core$Json_Encode$object(
 		{
 			ctor: '::',
 			_0: {
 				ctor: '_Tuple2',
 				_0: 'presentation',
-				_1: _elm_lang$core$Json_Encode$string(_p4.presentation)
+				_1: _elm_lang$core$Json_Encode$string(_p3.presentation)
 			},
 			_1: {
 				ctor: '::',
 				_0: {
 					ctor: '_Tuple2',
 					_0: 'question',
-					_1: _elm_lang$core$Json_Encode$string(_p4.question)
+					_1: _elm_lang$core$Json_Encode$string(_p3.question)
 				},
 				_1: {ctor: '[]'}
 			}
@@ -9275,13 +9252,13 @@ var _user$project$Question$question = A7(
 	A2(_elm_lang$core$Json_Decode$field, 'nods', _elm_lang$core$Json_Decode$int),
 	A2(_elm_lang$core$Json_Decode$field, 'answered', _elm_lang$core$Json_Decode$bool),
 	A2(_elm_lang$core$Json_Decode$field, 'timeAsked', _elm_lang$core$Json_Decode$string));
-var _user$project$Question$GetQuestionsResponse = F2(
+var _user$project$Question$ListQuestionsResponse = F2(
 	function (a, b) {
 		return {error: a, questions: b};
 	});
-var _user$project$Question$getQuestionResponse = A3(
+var _user$project$Question$listQuestionsResponse = A3(
 	_elm_lang$core$Json_Decode$map2,
-	_user$project$Question$GetQuestionsResponse,
+	_user$project$Question$ListQuestionsResponse,
 	A2(
 		_elm_lang$core$Json_Decode$field,
 		'error',
@@ -9290,7 +9267,7 @@ var _user$project$Question$getQuestionResponse = A3(
 		_elm_lang$core$Json_Decode$field,
 		'questions',
 		_elm_lang$core$Json_Decode$list(_user$project$Question$question)));
-var _user$project$Question$presentationQuestions = function (presentationID) {
+var _user$project$Question$list = function (presentationID) {
 	var url = A2(
 		_elm_lang$core$Basics_ops['++'],
 		'http://',
@@ -9298,7 +9275,7 @@ var _user$project$Question$presentationQuestions = function (presentationID) {
 			_elm_lang$core$Basics_ops['++'],
 			_user$project$Config$apiServerAddress,
 			A2(_elm_lang$core$Basics_ops['++'], '/api/questions?presentation=', presentationID)));
-	return A2(_elm_lang$http$Http$get, url, _user$project$Question$getQuestionResponse);
+	return A2(_elm_lang$http$Http$get, url, _user$project$Question$listQuestionsResponse);
 };
 var _user$project$Question$AskQuestionRequest = F2(
 	function (a, b) {
@@ -9352,7 +9329,7 @@ var _user$project$Question$nod = function (question) {
 		_elm_lang$core$Basics_ops['++'],
 		'http://',
 		A2(_elm_lang$core$Basics_ops['++'], _user$project$Config$apiServerAddress, '/api/questions/nod'));
-	var _p5 = A2(_elm_lang$core$Debug$log, 'Nodding to', question);
+	var _p4 = A2(_elm_lang$core$Debug$log, 'Nodding to', question);
 	return _elm_lang$http$Http$request(
 		{
 			method: 'PUT',
@@ -9368,13 +9345,212 @@ var _user$project$Question$QuestionUpdateResponse = F2(
 	function (a, b) {
 		return {error: a, question: b};
 	});
-var _user$project$Question$GotNodResponse = function (a) {
-	return {ctor: 'GotNodResponse', _0: a};
+
+var _user$project$Mode_Audience$cleanDate = function (dateStr) {
+	var nth = F2(
+		function (i, ls) {
+			return _elm_lang$core$List$head(
+				A2(_elm_lang$core$List$drop, i, ls));
+		});
+	var parsed = A2(
+		_elm_lang$core$Maybe$andThen,
+		nth(0),
+		A2(
+			_elm_lang$core$Maybe$map,
+			_elm_lang$core$String$split('.'),
+			A2(
+				nth,
+				1,
+				A2(_elm_lang$core$String$split, 'T', dateStr))));
+	var _p0 = parsed;
+	if (_p0.ctor === 'Just') {
+		return _p0._0;
+	} else {
+		return '???';
+	}
 };
-var _user$project$Question$QuestionNoddedTo = function (a) {
+var _user$project$Mode_Audience$constRedText = 'text-red';
+var _user$project$Mode_Audience$constOrangeText = 'text-orange';
+var _user$project$Mode_Audience$constYellowText = 'text-yellow';
+var _user$project$Mode_Audience$constGreenText = 'text-green';
+var _user$project$Mode_Audience$constMaxQuestionLength = 500;
+var _user$project$Mode_Audience$Model = F4(
+	function (a, b, c, d) {
+		return {presentation: a, questions: b, question: c, showQuestionInput: d};
+	});
+var _user$project$Mode_Audience$BubblingError = function (a) {
+	return {ctor: 'BubblingError', _0: a};
+};
+var _user$project$Mode_Audience$updateQuestionsReceived = F2(
+	function (result, model) {
+		var _p1 = result;
+		if (_p1.ctor === 'Err') {
+			return {
+				ctor: '_Tuple2',
+				_0: model,
+				_1: A2(_user$project$Error$bubble, _user$project$Mode_Audience$BubblingError, 'Failed to make request.')
+			};
+		} else {
+			var _p2 = _p1._0.error;
+			if (_p2.ctor === 'Just') {
+				return {
+					ctor: '_Tuple2',
+					_0: model,
+					_1: A2(_user$project$Error$bubble, _user$project$Mode_Audience$BubblingError, _p2._0)
+				};
+			} else {
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							questions: _user$project$Resource$Loaded(_p1._0.questions)
+						}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			}
+		}
+	});
+var _user$project$Mode_Audience$updateQuestionAsked = F2(
+	function (result, model) {
+		var _p3 = result;
+		if (_p3.ctor === 'Err') {
+			return {
+				ctor: '_Tuple2',
+				_0: model,
+				_1: A2(_user$project$Error$bubble, _user$project$Mode_Audience$BubblingError, 'Failed to make request.')
+			};
+		} else {
+			var _p4 = {ctor: '_Tuple2', _0: _p3._0.error, _1: _p3._0.question};
+			if (_p4._0.ctor === 'Just') {
+				return {
+					ctor: '_Tuple2',
+					_0: model,
+					_1: A2(_user$project$Error$bubble, _user$project$Mode_Audience$BubblingError, _p4._0._0)
+				};
+			} else {
+				if (_p4._1.ctor === 'Just') {
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{
+								questions: A2(
+									_user$project$Resource$map,
+									F2(
+										function (x, y) {
+											return {ctor: '::', _0: x, _1: y};
+										})(_p4._1._0),
+									model.questions)
+							}),
+						_1: _elm_lang$core$Platform_Cmd$none
+					};
+				} else {
+					return {
+						ctor: '_Tuple2',
+						_0: model,
+						_1: A2(_user$project$Error$bubble, _user$project$Mode_Audience$BubblingError, 'Got an unexpected response from the API server. ')
+					};
+				}
+			}
+		}
+	});
+var _user$project$Mode_Audience$updateQuestionUpdated = F2(
+	function (result, model) {
+		var _p5 = result;
+		if (_p5.ctor === 'Err') {
+			return {
+				ctor: '_Tuple2',
+				_0: model,
+				_1: A2(_user$project$Error$bubble, _user$project$Mode_Audience$BubblingError, 'Failed to make request.')
+			};
+		} else {
+			var _p6 = {ctor: '_Tuple2', _0: _p5._0.error, _1: _p5._0.question};
+			if (_p6._0.ctor === 'Just') {
+				return {
+					ctor: '_Tuple2',
+					_0: model,
+					_1: A2(_user$project$Error$bubble, _user$project$Mode_Audience$BubblingError, _p6._0._0)
+				};
+			} else {
+				if (_p6._1.ctor === 'Just') {
+					var _p7 = _p6._1._0;
+					var pickUpdated = function (newQuestion) {
+						return _elm_lang$core$Native_Utils.eq(_p7.id, newQuestion.id) ? _p7 : newQuestion;
+					};
+					var foldQuestions = F2(
+						function (nextQuestion, ls) {
+							return {
+								ctor: '::',
+								_0: pickUpdated(nextQuestion),
+								_1: ls
+							};
+						});
+					var updateQuestions = A2(
+						_elm_lang$core$List$foldl,
+						foldQuestions,
+						{ctor: '[]'});
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{
+								questions: A2(_user$project$Resource$map, updateQuestions, model.questions)
+							}),
+						_1: _elm_lang$core$Platform_Cmd$none
+					};
+				} else {
+					return {
+						ctor: '_Tuple2',
+						_0: model,
+						_1: A2(_user$project$Error$bubble, _user$project$Mode_Audience$BubblingError, 'Got an unexpected response from the API server. ')
+					};
+				}
+			}
+		}
+	});
+var _user$project$Mode_Audience$FromAPI = function (a) {
+	return {ctor: 'FromAPI', _0: a};
+};
+var _user$project$Mode_Audience$ShowQuestionInput = function (a) {
+	return {ctor: 'ShowQuestionInput', _0: a};
+};
+var _user$project$Mode_Audience$viewAskQuestionButton = A2(
+	_elm_lang$html$Html$div,
+	{
+		ctor: '::',
+		_0: _elm_lang$html$Html_Attributes$class('action-button'),
+		_1: {
+			ctor: '::',
+			_0: _elm_lang$html$Html_Events$onClick(
+				_user$project$Mode_Audience$ShowQuestionInput(true)),
+			_1: {ctor: '[]'}
+		}
+	},
+	{
+		ctor: '::',
+		_0: A2(
+			_elm_lang$html$Html$a,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$href('#'),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('button'),
+					_1: {ctor: '[]'}
+				}
+			},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text('?'),
+				_1: {ctor: '[]'}
+			}),
+		_1: {ctor: '[]'}
+	});
+var _user$project$Mode_Audience$QuestionNoddedTo = function (a) {
 	return {ctor: 'QuestionNoddedTo', _0: a};
 };
-var _user$project$Question$view = function (question) {
+var _user$project$Mode_Audience$viewQuestion = function (question) {
 	return A2(
 		_elm_lang$html$Html$tr,
 		{
@@ -9404,7 +9580,7 @@ var _user$project$Question$view = function (question) {
 								_1: {
 									ctor: '::',
 									_0: _elm_lang$html$Html_Events$onClick(
-										_user$project$Question$QuestionNoddedTo(question)),
+										_user$project$Mode_Audience$QuestionNoddedTo(question)),
 									_1: {ctor: '[]'}
 								}
 							}
@@ -9456,7 +9632,7 @@ var _user$project$Question$view = function (question) {
 							{
 								ctor: '::',
 								_0: _elm_lang$html$Html$text(
-									_user$project$Question$cleanDate(question.timeAsked)),
+									_user$project$Mode_Audience$cleanDate(question.timeAsked)),
 								_1: {ctor: '[]'}
 							}),
 						_1: {
@@ -9480,219 +9656,130 @@ var _user$project$Question$view = function (question) {
 			}
 		});
 };
-var _user$project$Question$BubblingError = function (a) {
-	return {ctor: 'BubblingError', _0: a};
-};
-var _user$project$Question$update = F2(
-	function (msg, question) {
-		var _p6 = msg;
-		switch (_p6.ctor) {
-			case 'BubblingError':
-				return {ctor: '_Tuple2', _0: question, _1: _elm_lang$core$Platform_Cmd$none};
-			case 'QuestionNoddedTo':
-				var _p7 = _p6._0;
-				return _elm_lang$core$Native_Utils.eq(_p7.id, question.id) ? {
-					ctor: '_Tuple2',
-					_0: question,
-					_1: A2(
-						_elm_lang$http$Http$send,
-						_user$project$Question$GotNodResponse,
-						_user$project$Question$nod(_p7))
-				} : {ctor: '_Tuple2', _0: question, _1: _elm_lang$core$Platform_Cmd$none};
-			default:
-				var _p8 = _p6._0;
-				if (_p8.ctor === 'Err') {
-					return {
-						ctor: '_Tuple2',
-						_0: question,
-						_1: A2(_user$project$Error$bubble, _user$project$Question$BubblingError, 'Failed to make request.')
-					};
-				} else {
-					var _p11 = _p8._0;
-					var _p9 = {ctor: '_Tuple2', _0: _p11.error, _1: _p11.question};
-					if (_p9._0.ctor === 'Just') {
-						return {
-							ctor: '_Tuple2',
-							_0: question,
-							_1: A2(_user$project$Error$bubble, _user$project$Question$BubblingError, _p9._0._0)
-						};
-					} else {
-						if (_p9._1.ctor === 'Just') {
-							var _p10 = _p9._1._0;
-							return _elm_lang$core$Native_Utils.eq(_p10.id, question.id) ? {ctor: '_Tuple2', _0: _p10, _1: _elm_lang$core$Platform_Cmd$none} : {ctor: '_Tuple2', _0: question, _1: _elm_lang$core$Platform_Cmd$none};
-						} else {
-							return {
-								ctor: '_Tuple2',
-								_0: question,
-								_1: A2(_user$project$Error$bubble, _user$project$Question$BubblingError, 'Got unexpected response from API server.')
-							};
-						}
-					}
-				}
-		}
-	});
-
-var _user$project$Mode_Audience$constRedText = 'text-red';
-var _user$project$Mode_Audience$constOrangeText = 'text-orange';
-var _user$project$Mode_Audience$constYellowText = 'text-yellow';
-var _user$project$Mode_Audience$constGreenText = 'text-green';
-var _user$project$Mode_Audience$constMaxQuestionLength = 500;
-var _user$project$Mode_Audience$Model = F4(
-	function (a, b, c, d) {
-		return {presentation: a, questions: b, question: c, showQuestionInput: d};
-	});
-var _user$project$Mode_Audience$BubblingError = function (a) {
-	return {ctor: 'BubblingError', _0: a};
-};
-var _user$project$Mode_Audience$updateQuestionsReceived = F2(
-	function (result, model) {
-		var _p0 = result;
-		if (_p0.ctor === 'Err') {
-			return {
-				ctor: '_Tuple2',
-				_0: model,
-				_1: A2(_user$project$Error$bubble, _user$project$Mode_Audience$BubblingError, 'Failed to make request.')
-			};
-		} else {
-			var _p1 = _p0._0.error;
-			if (_p1.ctor === 'Just') {
-				return {
-					ctor: '_Tuple2',
-					_0: model,
-					_1: A2(_user$project$Error$bubble, _user$project$Mode_Audience$BubblingError, _p1._0)
-				};
-			} else {
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{
-							questions: _user$project$Resource$Loaded(_p0._0.questions)
-						}),
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
-			}
-		}
-	});
-var _user$project$Mode_Audience$updateQuestionAsked = F2(
-	function (result, model) {
-		var _p2 = result;
-		if (_p2.ctor === 'Err') {
-			return {
-				ctor: '_Tuple2',
-				_0: model,
-				_1: A2(_user$project$Error$bubble, _user$project$Mode_Audience$BubblingError, 'Failed to make request.')
-			};
-		} else {
-			var _p3 = {ctor: '_Tuple2', _0: _p2._0.error, _1: _p2._0.question};
-			if (_p3._0.ctor === 'Just') {
-				return {
-					ctor: '_Tuple2',
-					_0: model,
-					_1: A2(_user$project$Error$bubble, _user$project$Mode_Audience$BubblingError, _p3._0._0)
-				};
-			} else {
-				if (_p3._1.ctor === 'Just') {
-					return {
-						ctor: '_Tuple2',
-						_0: _elm_lang$core$Native_Utils.update(
-							model,
-							{
-								questions: A2(
-									_user$project$Resource$map,
-									F2(
-										function (x, y) {
-											return {ctor: '::', _0: x, _1: y};
-										})(_p3._1._0),
-									model.questions)
-							}),
-						_1: _elm_lang$core$Platform_Cmd$none
-					};
-				} else {
-					return {
-						ctor: '_Tuple2',
-						_0: model,
-						_1: A2(_user$project$Error$bubble, _user$project$Mode_Audience$BubblingError, 'Got an unexpected response from the API server. ')
-					};
-				}
-			}
-		}
-	});
-var _user$project$Mode_Audience$updateQuestionUpdated = F2(
-	function (result, model) {
-		var _p4 = result;
-		if (_p4.ctor === 'Err') {
-			return {
-				ctor: '_Tuple2',
-				_0: model,
-				_1: A2(_user$project$Error$bubble, _user$project$Mode_Audience$BubblingError, 'Failed to make request.')
-			};
-		} else {
-			var _p5 = {ctor: '_Tuple2', _0: _p4._0.error, _1: _p4._0.question};
-			if (_p5._0.ctor === 'Just') {
-				return {
-					ctor: '_Tuple2',
-					_0: model,
-					_1: A2(_user$project$Error$bubble, _user$project$Mode_Audience$BubblingError, _p5._0._0)
-				};
-			} else {
-				if (_p5._1.ctor === 'Just') {
-					var _p6 = _p5._1._0;
-					var pickUpdated = function (newQuestion) {
-						return _elm_lang$core$Native_Utils.eq(_p6.id, newQuestion.id) ? _p6 : newQuestion;
-					};
-					var foldQuestions = F2(
-						function (nextQuestion, ls) {
-							return {
-								ctor: '::',
-								_0: pickUpdated(nextQuestion),
-								_1: ls
-							};
-						});
-					var updateQuestions = A2(
-						_elm_lang$core$List$foldl,
-						foldQuestions,
-						{ctor: '[]'});
-					return {
-						ctor: '_Tuple2',
-						_0: _elm_lang$core$Native_Utils.update(
-							model,
-							{
-								questions: A2(_user$project$Resource$map, updateQuestions, model.questions)
-							}),
-						_1: _elm_lang$core$Platform_Cmd$none
-					};
-				} else {
-					return {
-						ctor: '_Tuple2',
-						_0: model,
-						_1: A2(_user$project$Error$bubble, _user$project$Mode_Audience$BubblingError, 'Got an unexpected response from the API server. ')
-					};
-				}
-			}
-		}
-	});
-var _user$project$Mode_Audience$FromAPI = function (a) {
-	return {ctor: 'FromAPI', _0: a};
-};
-var _user$project$Mode_Audience$QuestionAction = function (a) {
-	return {ctor: 'QuestionAction', _0: a};
-};
-var _user$project$Mode_Audience$ShowQuestionInput = function (a) {
-	return {ctor: 'ShowQuestionInput', _0: a};
-};
 var _user$project$Mode_Audience$viewQuestionList = function (model) {
-	var questionTransform = _elm_lang$core$List$map(
-		function (_p7) {
-			return A2(
-				_elm_lang$html$Html$map,
-				_user$project$Mode_Audience$QuestionAction,
-				_user$project$Question$view(_p7));
-		});
-	var children = function () {
-		var _p8 = A2(_user$project$Resource$map, questionTransform, model.questions);
-		if (_p8.ctor === 'Loaded') {
-			if (_p8._0.ctor === '[]') {
+	return A2(
+		_elm_lang$html$Html$div,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('content card'),
+			_1: {ctor: '[]'}
+		},
+		function () {
+			var _p8 = A2(
+				_user$project$Resource$map,
+				_elm_lang$core$List$map(_user$project$Mode_Audience$viewQuestion),
+				model.questions);
+			if (_p8.ctor === 'Loaded') {
+				if (_p8._0.ctor === '[]') {
+					return {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$div,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('card-main'),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$h2,
+									{ctor: '[]'},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text('No questions yet'),
+										_1: {ctor: '[]'}
+									}),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$p,
+										{ctor: '[]'},
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html$text('Be the first to ask a question!'),
+											_1: {ctor: '[]'}
+										}),
+									_1: {ctor: '[]'}
+								}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$div,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('hrule'),
+									_1: {ctor: '[]'}
+								},
+								{ctor: '[]'}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$div,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$class('card-actions'),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$a,
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$href('#'),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$class('button'),
+													_1: {
+														ctor: '::',
+														_0: _elm_lang$html$Html_Events$onClick(
+															_user$project$Mode_Audience$ShowQuestionInput(true)),
+														_1: {ctor: '[]'}
+													}
+												}
+											},
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html$text('Ask'),
+												_1: {ctor: '[]'}
+											}),
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							}
+						}
+					};
+				} else {
+					return {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$table,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('question-list'),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$thead,
+									{ctor: '[]'},
+									{ctor: '[]'}),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$tbody,
+										{ctor: '[]'},
+										_p8._0),
+									_1: {ctor: '[]'}
+								}
+							}),
+						_1: {ctor: '[]'}
+					};
+				}
+			} else {
 				return {
 					ctor: '::',
 					_0: A2(
@@ -9709,7 +9796,7 @@ var _user$project$Mode_Audience$viewQuestionList = function (model) {
 								{ctor: '[]'},
 								{
 									ctor: '::',
-									_0: _elm_lang$html$Html$text('No questions yet'),
+									_0: _elm_lang$html$Html$text('Loading...'),
 									_1: {ctor: '[]'}
 								}),
 							_1: {
@@ -9719,166 +9806,17 @@ var _user$project$Mode_Audience$viewQuestionList = function (model) {
 									{ctor: '[]'},
 									{
 										ctor: '::',
-										_0: _elm_lang$html$Html$text('Be the first to ask a question!'),
+										_0: _elm_lang$html$Html$text('Plase wait while we fetch the questions for this presentation.'),
 										_1: {ctor: '[]'}
 									}),
-								_1: {ctor: '[]'}
-							}
-						}),
-					_1: {
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$div,
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$class('hrule'),
-								_1: {ctor: '[]'}
-							},
-							{ctor: '[]'}),
-						_1: {
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$div,
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$class('card-actions'),
-									_1: {ctor: '[]'}
-								},
-								{
-									ctor: '::',
-									_0: A2(
-										_elm_lang$html$Html$a,
-										{
-											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$href('#'),
-											_1: {
-												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$class('button'),
-												_1: {
-													ctor: '::',
-													_0: _elm_lang$html$Html_Events$onClick(
-														_user$project$Mode_Audience$ShowQuestionInput(true)),
-													_1: {ctor: '[]'}
-												}
-											}
-										},
-										{
-											ctor: '::',
-											_0: _elm_lang$html$Html$text('Ask'),
-											_1: {ctor: '[]'}
-										}),
-									_1: {ctor: '[]'}
-								}),
-							_1: {ctor: '[]'}
-						}
-					}
-				};
-			} else {
-				return {
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$table,
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$class('question-list'),
-							_1: {ctor: '[]'}
-						},
-						{
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$thead,
-								{ctor: '[]'},
-								{ctor: '[]'}),
-							_1: {
-								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$tbody,
-									{ctor: '[]'},
-									_p8._0),
 								_1: {ctor: '[]'}
 							}
 						}),
 					_1: {ctor: '[]'}
 				};
 			}
-		} else {
-			return {
-				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$div,
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('card-main'),
-						_1: {ctor: '[]'}
-					},
-					{
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$h2,
-							{ctor: '[]'},
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html$text('Loading...'),
-								_1: {ctor: '[]'}
-							}),
-						_1: {
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$p,
-								{ctor: '[]'},
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html$text('Plase wait while we fetch the questions for this presentation.'),
-									_1: {ctor: '[]'}
-								}),
-							_1: {ctor: '[]'}
-						}
-					}),
-				_1: {ctor: '[]'}
-			};
-		}
-	}();
-	return A2(
-		_elm_lang$html$Html$div,
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$class('content card'),
-			_1: {ctor: '[]'}
-		},
-		children);
+		}());
 };
-var _user$project$Mode_Audience$viewAskQuestionButton = A2(
-	_elm_lang$html$Html$div,
-	{
-		ctor: '::',
-		_0: _elm_lang$html$Html_Attributes$class('action-button'),
-		_1: {
-			ctor: '::',
-			_0: _elm_lang$html$Html_Events$onClick(
-				_user$project$Mode_Audience$ShowQuestionInput(true)),
-			_1: {ctor: '[]'}
-		}
-	},
-	{
-		ctor: '::',
-		_0: A2(
-			_elm_lang$html$Html$a,
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$href('#'),
-				_1: {
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$class('button'),
-					_1: {ctor: '[]'}
-				}
-			},
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html$text('?'),
-				_1: {ctor: '[]'}
-			}),
-		_1: {ctor: '[]'}
-	});
 var _user$project$Mode_Audience$QuestionAsked = {ctor: 'QuestionAsked'};
 var _user$project$Mode_Audience$QuestionTextReceived = function (a) {
 	return {ctor: 'QuestionTextReceived', _0: a};
@@ -9921,7 +9859,7 @@ var _user$project$Mode_Audience$viewAskQuestion = function (model) {
 					}
 				}
 			});
-		_v7_4:
+		_v8_4:
 		do {
 			if (((((_p9.ctor === '::') && (_p9._1.ctor === '::')) && (_p9._1._1.ctor === '::')) && (_p9._1._1._1.ctor === '::')) && (_p9._1._1._1._1.ctor === '[]')) {
 				if (_p9._0 === true) {
@@ -9936,13 +9874,13 @@ var _user$project$Mode_Audience$viewAskQuestion = function (model) {
 							if (_p9._1._1._1._0 === true) {
 								return _user$project$Mode_Audience$constRedText;
 							} else {
-								break _v7_4;
+								break _v8_4;
 							}
 						}
 					}
 				}
 			} else {
-				break _v7_4;
+				break _v8_4;
 			}
 		} while(false);
 		return '';
@@ -10132,6 +10070,15 @@ var _user$project$Mode_Audience$update = F2(
 					model,
 					{question: '', showQuestionInput: false});
 				return {ctor: '_Tuple2', _0: newModel, _1: command};
+			case 'QuestionNoddedTo':
+				var command = A2(
+					_elm_lang$http$Http$send,
+					function (_p13) {
+						return _user$project$Mode_Audience$FromAPI(
+							_user$project$Mode_Audience$APIQuestionUpdated(_p13));
+					},
+					_user$project$Question$nod(_p10._0));
+				return {ctor: '_Tuple2', _0: model, _1: command};
 			case 'ShowQuestionInput':
 				return {
 					ctor: '_Tuple2',
@@ -10140,46 +10087,6 @@ var _user$project$Mode_Audience$update = F2(
 						{showQuestionInput: _p10._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
-			case 'QuestionAction':
-				if (_p10._0.ctor === 'BubblingError') {
-					return {
-						ctor: '_Tuple2',
-						_0: model,
-						_1: A2(_user$project$Error$bubble, _user$project$Mode_Audience$BubblingError, _p10._0._0)
-					};
-				} else {
-					var updateQuestion = _user$project$Question$update(_p10._0);
-					var _p13 = A2(
-						_elm_lang$core$Maybe$withDefault,
-						{
-							ctor: '_Tuple2',
-							_0: {ctor: '[]'},
-							_1: {ctor: '[]'}
-						},
-						_user$project$Resource$loaded(
-							A2(
-								_user$project$Resource$map,
-								_elm_lang$core$List$unzip,
-								A2(
-									_user$project$Resource$map,
-									_elm_lang$core$List$map(updateQuestion),
-									model.questions))));
-					var questions = _p13._0;
-					var commands = _p13._1;
-					var topLevelCommands = A2(
-						_elm_lang$core$List$map,
-						_elm_lang$core$Platform_Cmd$map(_user$project$Mode_Audience$QuestionAction),
-						commands);
-					return {
-						ctor: '_Tuple2',
-						_0: _elm_lang$core$Native_Utils.update(
-							model,
-							{
-								questions: _user$project$Resource$Loaded(questions)
-							}),
-						_1: _elm_lang$core$Platform_Cmd$batch(topLevelCommands)
-					};
-				}
 			default:
 				switch (_p10._0.ctor) {
 					case 'APIReceivedQuestions':
@@ -10201,7 +10108,7 @@ var _user$project$Mode_Audience$init = function (presentationID) {
 			return _user$project$Mode_Audience$FromAPI(
 				_user$project$Mode_Audience$APIReceivedQuestions(_p14));
 		},
-		_user$project$Question$presentationQuestions(presentationID));
+		_user$project$Question$list(presentationID));
 	var model = {presentation: presentationID, questions: _user$project$Resource$NotFetched, question: '', showQuestionInput: false};
 	return {ctor: '_Tuple2', _0: model, _1: command};
 };
@@ -10880,16 +10787,27 @@ var _user$project$Presentation$Presentation = F4(
 var _user$project$Mode_Presenter$update = F2(
 	function (msg, model) {
 		var _p0 = msg;
-		if (_p0.ctor === 'ShowNewPresentationForm') {
-			return {
-				ctor: '_Tuple2',
-				_0: _elm_lang$core$Native_Utils.update(
-					model,
-					{showPresentationForm: _p0._0}),
-				_1: _elm_lang$core$Platform_Cmd$none
-			};
-		} else {
-			return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+		switch (_p0.ctor) {
+			case 'ShowNewPresentationForm':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{showPresentationForm: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'Expanded':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							expanded: _elm_lang$core$Maybe$Just(_p0._0)
+						}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			default:
+				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 		}
 	});
 var _user$project$Mode_Presenter$init = function (token) {
@@ -11191,7 +11109,7 @@ var _user$project$Mode_Presenter$viewPresentation = function (presentation) {
 					_0: _elm_lang$html$Html_Attributes$href('#'),
 					_1: {
 						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('button'),
+						_0: _elm_lang$html$Html_Attributes$class('text-medium'),
 						_1: {
 							ctor: '::',
 							_0: _elm_lang$html$Html_Events$onClick(

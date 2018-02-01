@@ -198,6 +198,10 @@ svg path {
     font-size: 0.8em;
 }
 
+.text-medium {
+    font-size: 1.2em;
+}
+
 .text-green {
     color: #66bb6a;
 }

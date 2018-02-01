@@ -14,6 +14,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Http
+import Json.Decode exposing (Decoder, maybe, string)
 import Error exposing (Error)
 import Resource exposing (Resource)
 import Question exposing (Question)
@@ -54,14 +55,14 @@ type alias Model =
 type Msg
     = QuestionTextReceived String
     | QuestionAsked
+    | QuestionNoddedTo Question
     | ShowQuestionInput Bool
-    | QuestionAction Question.Msg
     | FromAPI APIResponse
     | BubblingError Error
 
 
 type APIResponse
-    = APIReceivedQuestions (Result Http.Error Question.GetQuestionsResponse)
+    = APIReceivedQuestions (Result Http.Error Question.ListQuestionsResponse)
     | APIQuestionAsked (Result Http.Error Question.QuestionAskedResponse)
     | APIQuestionUpdated (Result Http.Error Question.QuestionUpdateResponse)
 
@@ -80,7 +81,7 @@ init presentationID =
 
         command =
             presentationID
-                |> Question.presentationQuestions
+                |> Question.list
                 |> Http.send (APIReceivedQuestions >> FromAPI)
     in
         ( model, command )
@@ -115,28 +116,17 @@ update msg model =
             in
                 ( newModel, command )
 
+        QuestionNoddedTo question ->
+            let
+                command =
+                    question
+                        |> Question.nod
+                        |> Http.send (APIQuestionUpdated >> FromAPI)
+            in
+                ( model, command )
+
         ShowQuestionInput shouldBeOn ->
             ( { model | showQuestionInput = shouldBeOn }, Cmd.none )
-
-        QuestionAction (Question.BubblingError error) ->
-            ( model, Error.bubble BubblingError error )
-
-        QuestionAction questionMsg ->
-            let
-                updateQuestion =
-                    Question.update questionMsg
-
-                ( questions, commands ) =
-                    model.questions
-                        |> Resource.map (List.map updateQuestion)
-                        |> Resource.map List.unzip
-                        |> Resource.loaded
-                        |> Maybe.withDefault ( [], [] )
-
-                topLevelCommands =
-                    List.map (Cmd.map QuestionAction) commands
-            in
-                ( { model | questions = Resource.Loaded questions }, Cmd.batch topLevelCommands )
 
         FromAPI (APIReceivedQuestions result) ->
             updateQuestionsReceived result model
@@ -148,7 +138,7 @@ update msg model =
             updateQuestionUpdated result model
 
 
-updateQuestionsReceived : Result Http.Error Question.GetQuestionsResponse -> Model -> ( Model, Cmd Msg )
+updateQuestionsReceived : Result Http.Error Question.ListQuestionsResponse -> Model -> ( Model, Cmd Msg )
 updateQuestionsReceived result model =
     case result of
         Err _ ->
@@ -291,38 +281,48 @@ viewAskQuestion model =
 
 viewQuestionList : Model -> Html Msg
 viewQuestionList model =
-    let
-        questionTransform =
-            List.map (Question.view >> Html.map QuestionAction)
-
-        children =
-            case Resource.map questionTransform model.questions of
-                Resource.Loaded [] ->
-                    [ div [ class "card-main" ]
-                        [ h2 [] [ text "No questions yet" ]
-                        , p [] [ text "Be the first to ask a question!" ]
-                        ]
-                    , div [ class "hrule" ] []
-                    , div [ class "card-actions" ]
-                        [ a [ href "#", class "button", onClick (ShowQuestionInput True) ] [ text "Ask" ]
-                        ]
+    div [ class "content card" ] <|
+        case Resource.map (List.map viewQuestion) model.questions of
+            Resource.Loaded [] ->
+                [ div [ class "card-main" ]
+                    [ h2 [] [ text "No questions yet" ]
+                    , p [] [ text "Be the first to ask a question!" ]
                     ]
-
-                Resource.Loaded questions ->
-                    [ table [ class "question-list" ]
-                        [ thead [] []
-                        , tbody [] questions
-                        ]
+                , div [ class "hrule" ] []
+                , div [ class "card-actions" ]
+                    [ a [ href "#", class "button", onClick (ShowQuestionInput True) ] [ text "Ask" ]
                     ]
+                ]
 
-                _ ->
-                    [ div [ class "card-main" ]
-                        [ h2 [] [ text "Loading..." ]
-                        , p [] [ text "Plase wait while we fetch the questions for this presentation." ]
-                        ]
+            Resource.Loaded questions ->
+                [ table [ class "question-list" ]
+                    [ thead [] []
+                    , tbody [] questions
                     ]
-    in
-        div [ class "content card" ] children
+                ]
+
+            _ ->
+                [ div [ class "card-main" ]
+                    [ h2 [] [ text "Loading..." ]
+                    , p [] [ text "Plase wait while we fetch the questions for this presentation." ]
+                    ]
+                ]
+
+
+viewQuestion : Question -> Html Msg
+viewQuestion question =
+    tr [ class "question-item" ]
+        [ td [ class "question-nods" ]
+            [ a [ href "#", class "button", onClick (QuestionNoddedTo question) ]
+                [ i [ class "fas fa-heart fa-2x" ] []
+                , div [] [ text <| toString question.nods ]
+                ]
+            ]
+        , td [ class "question-content" ]
+            [ p [ class "question-date" ] [ text <| cleanDate question.timeAsked ]
+            , p [ class "question-text" ] [ text <| question.text ]
+            ]
+        ]
 
 
 viewAskQuestionButton : Html Msg
@@ -332,3 +332,24 @@ viewAskQuestionButton =
             [ text "?"
             ]
         ]
+
+
+cleanDate : String -> String
+cleanDate dateStr =
+    let
+        nth i ls =
+            List.head (List.drop i ls)
+
+        parsed =
+            dateStr
+                |> String.split "T"
+                |> nth 1
+                |> Maybe.map (String.split ".")
+                |> Maybe.andThen (nth 0)
+    in
+        case parsed of
+            Just time ->
+                time
+
+            Nothing ->
+                "???"

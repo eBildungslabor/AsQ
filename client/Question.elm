@@ -1,13 +1,10 @@
 module Question
     exposing
         ( Question
-        , Msg(..)
-        , GetQuestionsResponse
+        , ListQuestionsResponse
         , QuestionAskedResponse
         , QuestionUpdateResponse
-        , update
-        , view
-        , presentationQuestions
+        , list
         , ask
         , nod
         )
@@ -19,7 +16,7 @@ import Html exposing (..)
 import Html.Events exposing (onClick)
 import Html.Attributes exposing (class, href)
 import Http exposing (Request)
-import Json.Decode exposing (Decoder, field, string, int, bool, list, maybe)
+import Json.Decode exposing (Decoder, field, string, int, bool, maybe)
 import Json.Encode as Encode
 import Config
 import Error exposing (Error)
@@ -37,17 +34,9 @@ type alias Question =
     }
 
 
-{-| Local message type for events that can be emitted by the related view.
--}
-type Msg
-    = BubblingError Error
-    | QuestionNoddedTo Question
-    | GotNodResponse (Result Http.Error QuestionUpdateResponse)
-
-
 {-| Response type produced by a request to get a list of questions asked during a presentation.
 -}
-type alias GetQuestionsResponse =
+type alias ListQuestionsResponse =
     { error : Maybe String
     , questions : List Question
     }
@@ -74,7 +63,7 @@ type alias QuestionAskedResponse =
     }
 
 
-{-| Response type produced by a request to update a question.
+{-| Response type produced by a request to nod to a question.
 -}
 type alias QuestionUpdateResponse =
     { error : Maybe String
@@ -82,74 +71,15 @@ type alias QuestionUpdateResponse =
     }
 
 
-{-| Apply updates to a message in response to a message.
--}
-update : Msg -> Question -> ( Question, Cmd Msg )
-update msg question =
-    case msg of
-        BubblingError _ ->
-            -- We don't handle these; they are meant for Main.
-            ( question, Cmd.none )
-
-        QuestionNoddedTo noddedQuestion ->
-            if noddedQuestion.id == question.id then
-                ( question
-                , Http.send GotNodResponse <| nod noddedQuestion
-                )
-            else
-                ( question, Cmd.none )
-
-        GotNodResponse result ->
-            case result of
-                Err error ->
-                    ( question
-                    , Error.bubble BubblingError "Failed to make request."
-                    )
-
-                Ok response ->
-                    case ( response.error, response.question ) of
-                        ( Just errorMessage, _ ) ->
-                            ( question, Error.bubble BubblingError errorMessage )
-
-                        ( _, Just updatedQuestion ) ->
-                            if updatedQuestion.id == question.id then
-                                ( updatedQuestion, Cmd.none )
-                            else
-                                ( question, Cmd.none )
-
-                        ( Nothing, Nothing ) ->
-                            ( question
-                            , Error.bubble BubblingError "Got unexpected response from API server."
-                            )
-
-
-{-| Render a question as a list item, displaying the number of nods (upvotes) it has.
--}
-view : Question -> Html Msg
-view question =
-    tr [ class "question-item" ]
-        [ td [ class "question-nods" ]
-            [ a [ href "#", class "button", onClick (QuestionNoddedTo question) ]
-                [ i [ class "fas fa-heart fa-2x" ] []
-                , div [] [ text <| toString question.nods ]
-                ]
-            ]
-        , td [ class "question-content" ]
-            [ p [ class "question-date" ] [ text <| cleanDate question.timeAsked ]
-            , p [ class "question-text" ] [ text <| question.text ]
-            ]
-        ]
-
-
 {-| Produce an HTTP request that will attempt to decode a list of questions for a presentation.
 -}
-presentationQuestions : String -> Request GetQuestionsResponse
-presentationQuestions presentationID =
+list : String -> Request ListQuestionsResponse
+list presentationID =
     let
         url =
             "http://" ++ Config.apiServerAddress ++ "/api/questions?presentation=" ++ presentationID
     in
-        Http.get url getQuestionResponse
+        Http.get url listQuestionsResponse
 
 
 {-| Produces an HTTP request that will POST a new question for a presentation.
@@ -206,11 +136,11 @@ question =
         (field "timeAsked" string)
 
 
-getQuestionResponse : Decoder GetQuestionsResponse
-getQuestionResponse =
-    Json.Decode.map2 GetQuestionsResponse
+listQuestionsResponse : Decoder ListQuestionsResponse
+listQuestionsResponse =
+    Json.Decode.map2 ListQuestionsResponse
         (field "error" (maybe string))
-        (field "questions" (list question))
+        (field "questions" (Json.Decode.list question))
 
 
 askQuestionRequest : AskQuestionRequest -> Encode.Value
@@ -239,24 +169,3 @@ questionUpdateResponse =
     Json.Decode.map2 QuestionAskedResponse
         (field "error" (maybe string))
         (field "question" (maybe question))
-
-
-cleanDate : String -> String
-cleanDate dateStr =
-    let
-        nth i ls =
-            List.head (List.drop i ls)
-
-        parsed =
-            dateStr
-                |> String.split "T"
-                |> nth 1
-                |> Maybe.map (String.split ".")
-                |> Maybe.andThen (nth 0)
-    in
-        case parsed of
-            Just time ->
-                time
-
-            Nothing ->
-                "???"

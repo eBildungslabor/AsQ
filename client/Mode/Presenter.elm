@@ -107,6 +107,9 @@ update msg model =
         ShowNewPresentationForm on ->
             ( { model | showPresentationForm = on }, Cmd.none )
 
+        Expanded presentation ->
+            ( { model | expanded = Just presentation }, Cmd.none )
+
         _ ->
             ( model, Cmd.none )
 
@@ -194,7 +197,7 @@ viewPresentation presentation =
                     "Questions not available"
     in
         li [ class "card-item" ]
-            [ a [ href "#", class "button", onClick (Expanded presentation) ] [ text presentation.title ]
+            [ a [ href "#", class "text-medium", onClick (Expanded presentation) ] [ text presentation.title ]
             , p [ class "text-small" ] [ text numQuestionsInfo ]
             ]
 
