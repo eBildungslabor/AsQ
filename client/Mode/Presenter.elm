@@ -27,6 +27,7 @@ type alias Model =
     , expanded : Maybe Presentation
     , newPresentationTitle : String
     , newPresentationDescription : String
+    , showPresentationForm : Bool
     }
 
 
@@ -47,9 +48,37 @@ init : SessionToken -> ( Model, Cmd Msg )
 init token =
     let
         presentations =
-            [ { id = "first", title = "Using Capabilities to design APIs", description = "", questions = Resource.NotFetched }
-            , { id = "second", title = "A critical evaluation of Golang", description = "", questions = Resource.NotFetched }
-            , { id = "third", title = "This is my third presentation ever!", description = "", questions = Resource.NotFetched }
+            [ { id = "first"
+              , title = "Using Capabilities to design APIs"
+              , description = ""
+              , questions =
+                    Resource.Loaded
+                        [ { id = "firstq"
+                          , presentation = "first"
+                          , text = "What good are they?"
+                          , nods = 32
+                          , answered = True
+                          , timeAsked = "some time ago"
+                          }
+                        , { id = "secondq"
+                          , presentation = "first"
+                          , text = "Where do capabilities come from?"
+                          , nods = 50
+                          , answered = False
+                          , timeAsked = "two minutes ago"
+                          }
+                        ]
+              }
+            , { id = "second"
+              , title = "A critical evaluation of Golang"
+              , description = ""
+              , questions = Resource.NotFetched
+              }
+            , { id = "third"
+              , title = "This is my third presentation ever!"
+              , description = ""
+              , questions = Resource.NotFetched
+              }
             ]
 
         model =
@@ -58,6 +87,7 @@ init token =
             , expanded = Nothing
             , newPresentationTitle = ""
             , newPresentationDescription = ""
+            , showPresentationForm = False
             }
 
         command =
@@ -73,7 +103,12 @@ init token =
 -}
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    ( model, Cmd.none )
+    case msg of
+        ShowNewPresentationForm on ->
+            ( { model | showPresentationForm = on }, Cmd.none )
+
+        _ ->
+            ( model, Cmd.none )
 
 
 {-| The top-level view function used to present elements that presenters interact with.
@@ -81,30 +116,34 @@ update msg model =
 view : Model -> Html Msg
 view model =
     div []
-        [ viewCreatePresentation
+        [ viewCreatePresentation model
         , viewPresentationList model
+        , viewCreatePresentationButton
         ]
 
 
-viewCreatePresentation : Html Msg
-viewCreatePresentation =
-    div [ class "content card" ]
-        [ div [ class "card-main" ]
-            [ h2 [] [ text "Create a new presentation" ]
-            , div []
-                [ label [ for "title" ] [ text "Title" ]
-                , input [ type_ "text", name "title", onInput TitleInput ] []
+viewCreatePresentation : Model -> Html Msg
+viewCreatePresentation model =
+    if model.showPresentationForm then
+        div [ class "content card" ]
+            [ div [ class "card-main" ]
+                [ h2 [] [ text "Create a new presentation" ]
+                , div []
+                    [ label [ for "title" ] [ text "Title" ]
+                    , input [ type_ "text", name "title", onInput TitleInput ] []
+                    ]
+                , div []
+                    [ label [ for "description" ] [ text "Description" ]
+                    , textarea [ name "description", onInput DescriptionInput ] []
+                    ]
                 ]
-            , div []
-                [ label [ for "description" ] [ text "Description" ]
-                , textarea [ name "description", onInput DescriptionInput ] []
+            , div [ class "hrule" ] []
+            , div [ class "card-actions" ]
+                [ a [ href "#", class "button", onClick CreatePresentation ] [ text "Create" ]
                 ]
             ]
-        , div [ class "hrule" ] []
-        , div [ class "card-actions" ]
-            [ a [ href "#", class "button", onClick CreatePresentation ] [ text "Create" ]
-            ]
-        ]
+    else
+        div [ style [ ( "display", "none" ) ] ] []
 
 
 viewPresentationList : Model -> Html Msg
@@ -136,6 +175,32 @@ viewPresentationList model =
 
 viewPresentation : Presentation -> Html Msg
 viewPresentation presentation =
-    li [ class "card-item" ]
-        [ a [ href "#", class "button", onClick (Expanded presentation) ] [ text presentation.title ]
+    let
+        numQuestionsInfo =
+            case presentation.questions of
+                Resource.Loaded questions ->
+                    questions
+                        |> List.length
+                        |> toString
+                        |> (\s -> s ++ " questions")
+
+                Resource.Loading ->
+                    "Loading questions..."
+
+                Resource.NotFetched ->
+                    "Loading questions..."
+
+                _ ->
+                    "Questions not available"
+    in
+        li [ class "card-item" ]
+            [ a [ href "#", class "button", onClick (Expanded presentation) ] [ text presentation.title ]
+            , p [ class "text-small" ] [ text numQuestionsInfo ]
+            ]
+
+
+viewCreatePresentationButton : Html Msg
+viewCreatePresentationButton =
+    div [ class "action-button", onClick (ShowNewPresentationForm True) ]
+        [ a [ href "#", class "button" ] [ i [ class "fas fa-plus" ] [] ]
         ]

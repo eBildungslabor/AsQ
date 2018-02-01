@@ -45,6 +45,14 @@ ul li.card-item:last-child {
     border-bottom: none;
 }
 
+ul li.card-item > a {
+    color: #e96a63;
+}
+
+ul li.card-item p:last-child {
+    margin: 10px 0 0 0;
+}
+
 h2 {
     margin: 8px 0 16px 0;
 }
@@ -96,7 +104,11 @@ div.action-button a.button {
     font-size: 1.6em;
 }
 
-a.button svg path {
+div.action-button a.button svg path {
+    color: white;
+}
+
+svg path {
     color: #e96187;
     display: block;
 }
@@ -180,6 +192,10 @@ a.button svg path {
 
 .question-item:last-child .question-content {
     border: none;
+}
+
+.text-small {
+    font-size: 0.8em;
 }
 
 .text-green {

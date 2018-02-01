@@ -30,7 +30,7 @@ import Error exposing (Error)
 type alias Question =
     { id : String
     , presentation : String
-    , text: String
+    , text : String
     , nods : Int
     , answered : Bool
     , timeAsked : String
@@ -60,9 +60,11 @@ type alias AskQuestionRequest =
     , question : String
     }
 
+
 type alias NodToQuestionRequest =
     { question : String
     }
+
 
 {-| Response type produced by a request to ask a question.
 -}

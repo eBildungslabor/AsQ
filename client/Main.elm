@@ -102,13 +102,27 @@ update msg model =
             in
                 ( { model | mode = Landing newLandModel }, Cmd.map LandingModeMsg landCmd )
 
+        ( PresenterModeMsg presMsg, Presenter presModel ) ->
+            let
+                ( newPresModel, presCmd ) =
+                    Mode.Presenter.update presMsg presModel
+            in
+                ( { model | mode = Presenter newPresModel }, Cmd.map PresenterModeMsg presCmd )
+
         ( HideError, _ ) ->
             ( { model | error = Nothing }, Cmd.none )
 
         ( _, _ ) ->
             -- TODO : Find a better way to handle the case where we get an unexpected message
             --        in a mode we can't handle it in.
-            ( model, Cmd.none )
+            let
+                _ =
+                    Debug.log "Got message " msg
+
+                _ =
+                    Debug.log "Model is " model
+            in
+                ( model, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
