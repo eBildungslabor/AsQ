@@ -17,6 +17,7 @@ import Authentication exposing (SessionToken)
 import Error exposing (Error)
 import Presentation exposing (Presentation)
 import Resource exposing (Resource)
+import Question exposing (Question)
 
 
 {-| The model representing the state of the presenter page.
@@ -39,6 +40,7 @@ type Msg
     | DescriptionInput String
     | CreatePresentation
     | ShowNewPresentationForm Bool
+    | HideQuestions
     | BubblingError Error
 
 
@@ -107,8 +109,25 @@ update msg model =
         ShowNewPresentationForm on ->
             ( { model | showPresentationForm = on }, Cmd.none )
 
+        HideQuestions ->
+            ( { model | expanded = Nothing }, Cmd.none )
+
         Expanded presentation ->
-            ( { model | expanded = Just presentation }, Cmd.none )
+            let
+                newExpanded =
+                    -- This code will handle toggling the question list if the user clicks the same
+                    -- presentation multiple times.
+                    case model.expanded of
+                        Just expanded ->
+                            if expanded.id == presentation.id then
+                                Nothing
+                            else
+                                Just presentation
+
+                        Nothing ->
+                            Just presentation
+            in
+                ( { model | expanded = newExpanded }, Cmd.none )
 
         _ ->
             ( model, Cmd.none )
@@ -120,6 +139,7 @@ view : Model -> Html Msg
 view model =
     div []
         [ viewCreatePresentation model
+        , viewQuestions model
         , viewPresentationList model
         , viewCreatePresentationButton
         ]
@@ -151,33 +171,44 @@ viewCreatePresentation model =
 
 viewPresentationList : Model -> Html Msg
 viewPresentationList model =
-    div [ class "content card" ] <|
-        case Resource.map (List.map viewPresentation) model.presentations of
-            Resource.Loaded [] ->
-                [ div [ class "card-main" ]
-                    [ h2 [] [ text "No presentations yet" ]
-                    , p [] [ text "Create your first presentation!" ]
+    let
+        expandQuestionsIfSelected =
+            List.map <| viewPresentation model.expanded
+
+        children =
+            case Resource.map expandQuestionsIfSelected model.presentations of
+                Resource.Loaded [] ->
+                    [ div [ class "card-main" ]
+                        [ h2 [] [ text "No presentations yet" ]
+                        , p [] [ text "Create your first presentation!" ]
+                        ]
+                    , div [ class "hrule" ] []
+                    , div [ class "card-actions" ]
+                        [ a
+                            [ href "#"
+                            , class "button"
+                            , onClick (ShowNewPresentationForm True)
+                            ]
+                            [ text "Create" ]
+                        ]
                     ]
-                , div [ class "hrule" ] []
-                , div [ class "card-actions" ]
-                    [ a [ href "#", class "button", onClick (ShowNewPresentationForm True) ] [ text "Create" ]
+
+                Resource.Loaded presentations ->
+                    [ ul [] presentations
                     ]
-                ]
 
-            Resource.Loaded presentations ->
-                [ ul [] presentations
-                ]
-
-            _ ->
-                [ div [ class "card-main" ]
-                    [ h2 [] [ text "Loading..." ]
-                    , p [] [ text "Please wait while we fetch your presentations." ]
+                _ ->
+                    [ div [ class "card-main" ]
+                        [ h2 [] [ text "Loading..." ]
+                        , p [] [ text "Please wait while we fetch your presentations." ]
+                        ]
                     ]
-                ]
+    in
+        div [ class "content card" ] children
 
 
-viewPresentation : Presentation -> Html Msg
-viewPresentation presentation =
+viewPresentation : Maybe Presentation -> Presentation -> Html Msg
+viewPresentation expanded presentation =
     let
         numQuestionsInfo =
             case presentation.questions of
@@ -199,6 +230,66 @@ viewPresentation presentation =
         li [ class "card-item" ]
             [ a [ href "#", class "text-medium", onClick (Expanded presentation) ] [ text presentation.title ]
             , p [ class "text-small" ] [ text numQuestionsInfo ]
+            ]
+
+
+viewQuestions : Model -> Html Msg
+viewQuestions model =
+    let
+        ( title, styles, content ) =
+            case model.expanded of
+                Just presentation ->
+                    case presentation.questions of
+                        Resource.Loaded questions ->
+                            ( presentation.title
+                            , []
+                            , table [ class "question-list" ]
+                                [ thead [] []
+                                , tbody [] <| List.map viewQuestion questions
+                                ]
+                            )
+
+                        _ ->
+                            ( presentation.title
+                            , []
+                            , p [] [ text "Loading questions..." ]
+                            )
+
+                Nothing ->
+                    ( ""
+                    , [ ( "display", "none" ) ]
+                    , div [] []
+                    )
+    in
+        div [ class "content card", style styles ]
+            [ div [ class "card-main" ]
+                [ h2 [] [ text title ]
+                , content
+                ]
+            , div [ class "hrule" ] []
+            , div [ class "card-actions" ]
+                [ a [ href "#", class "button", onClick HideQuestions ] [ text "Close" ]
+                ]
+            ]
+
+
+viewQuestion : Question -> Html Msg
+viewQuestion question =
+    let
+        people =
+            if question.nods == 0 || question.nods > 1 then
+                "people"
+            else
+                "person"
+
+        nodMsg =
+            (toString question.nods) ++ " " ++ people ++ " nodded to this"
+    in
+        tr [ class "question-item" ]
+            [ td [ class "question-text" ]
+                [ p [] [ text question.text ]
+                , p [ class "text-small" ] [ text nodMsg ]
+                ]
             ]
 
 

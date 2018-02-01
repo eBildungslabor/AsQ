@@ -53,6 +53,10 @@ ul li.card-item p:last-child {
     margin: 10px 0 0 0;
 }
 
+.card-item table.question-list {
+    padding: 5px 16px;
+}
+
 h2 {
     margin: 8px 0 16px 0;
 }
@@ -155,7 +159,14 @@ svg path {
     width: 100%;
 }
 
-.question-item {
+tr.question-item td.question-text {
+    border-bottom: 1px solid rgba(225, 225, 225, 0.88);
+    padding-bottom: 24px;
+}
+
+tr.question-item:last-child td.question-text {
+    border-bottom: none;
+    padding-bottom: 0;
 }
 
 .question-nods {

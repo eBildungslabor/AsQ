@@ -10784,6 +10784,61 @@ var _user$project$Presentation$Presentation = F4(
 		return {id: a, title: b, description: c, questions: d};
 	});
 
+var _user$project$Mode_Presenter$viewQuestion = function (question) {
+	var people = (_elm_lang$core$Native_Utils.eq(question.nods, 0) || (_elm_lang$core$Native_Utils.cmp(question.nods, 1) > 0)) ? 'people' : 'person';
+	var nodMsg = A2(
+		_elm_lang$core$Basics_ops['++'],
+		_elm_lang$core$Basics$toString(question.nods),
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			' ',
+			A2(_elm_lang$core$Basics_ops['++'], people, ' nodded to this')));
+	return A2(
+		_elm_lang$html$Html$tr,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('question-item'),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$td,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('question-text'),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$p,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(question.text),
+							_1: {ctor: '[]'}
+						}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$p,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('text-small'),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text(nodMsg),
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					}
+				}),
+			_1: {ctor: '[]'}
+		});
+};
 var _user$project$Mode_Presenter$update = F2(
 	function (msg, model) {
 		var _p0 = msg;
@@ -10796,14 +10851,29 @@ var _user$project$Mode_Presenter$update = F2(
 						{showPresentationForm: _p0._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
-			case 'Expanded':
+			case 'HideQuestions':
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{
-							expanded: _elm_lang$core$Maybe$Just(_p0._0)
-						}),
+						{expanded: _elm_lang$core$Maybe$Nothing}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'Expanded':
+				var _p2 = _p0._0;
+				var newExpanded = function () {
+					var _p1 = model.expanded;
+					if (_p1.ctor === 'Just') {
+						return _elm_lang$core$Native_Utils.eq(_p1._0.id, _p2.id) ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$Maybe$Just(_p2);
+					} else {
+						return _elm_lang$core$Maybe$Just(_p2);
+					}
+				}();
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{expanded: newExpanded}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			default:
@@ -10855,6 +10925,159 @@ var _user$project$Mode_Presenter$Model = F6(
 	});
 var _user$project$Mode_Presenter$BubblingError = function (a) {
 	return {ctor: 'BubblingError', _0: a};
+};
+var _user$project$Mode_Presenter$HideQuestions = {ctor: 'HideQuestions'};
+var _user$project$Mode_Presenter$viewQuestions = function (model) {
+	var _p3 = function () {
+		var _p4 = model.expanded;
+		if (_p4.ctor === 'Just') {
+			var _p6 = _p4._0;
+			var _p5 = _p6.questions;
+			if (_p5.ctor === 'Loaded') {
+				return {
+					ctor: '_Tuple3',
+					_0: _p6.title,
+					_1: {ctor: '[]'},
+					_2: A2(
+						_elm_lang$html$Html$table,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('question-list'),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$thead,
+								{ctor: '[]'},
+								{ctor: '[]'}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$tbody,
+									{ctor: '[]'},
+									A2(_elm_lang$core$List$map, _user$project$Mode_Presenter$viewQuestion, _p5._0)),
+								_1: {ctor: '[]'}
+							}
+						})
+				};
+			} else {
+				return {
+					ctor: '_Tuple3',
+					_0: _p6.title,
+					_1: {ctor: '[]'},
+					_2: A2(
+						_elm_lang$html$Html$p,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text('Loading questions...'),
+							_1: {ctor: '[]'}
+						})
+				};
+			}
+		} else {
+			return {
+				ctor: '_Tuple3',
+				_0: '',
+				_1: {
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: 'display', _1: 'none'},
+					_1: {ctor: '[]'}
+				},
+				_2: A2(
+					_elm_lang$html$Html$div,
+					{ctor: '[]'},
+					{ctor: '[]'})
+			};
+		}
+	}();
+	var title = _p3._0;
+	var styles = _p3._1;
+	var content = _p3._2;
+	return A2(
+		_elm_lang$html$Html$div,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('content card'),
+			_1: {
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$style(styles),
+				_1: {ctor: '[]'}
+			}
+		},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$div,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('card-main'),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$h2,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(title),
+							_1: {ctor: '[]'}
+						}),
+					_1: {
+						ctor: '::',
+						_0: content,
+						_1: {ctor: '[]'}
+					}
+				}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$div,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('hrule'),
+						_1: {ctor: '[]'}
+					},
+					{ctor: '[]'}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$div,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('card-actions'),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$a,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$href('#'),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$class('button'),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Events$onClick(_user$project$Mode_Presenter$HideQuestions),
+											_1: {ctor: '[]'}
+										}
+									}
+								},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text('Close'),
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				}
+			}
+		});
 };
 var _user$project$Mode_Presenter$ShowNewPresentationForm = function (a) {
 	return {ctor: 'ShowNewPresentationForm', _0: a};
@@ -11075,178 +11298,80 @@ var _user$project$Mode_Presenter$viewCreatePresentation = function (model) {
 var _user$project$Mode_Presenter$Expanded = function (a) {
 	return {ctor: 'Expanded', _0: a};
 };
-var _user$project$Mode_Presenter$viewPresentation = function (presentation) {
-	var numQuestionsInfo = function () {
-		var _p1 = presentation.questions;
-		switch (_p1.ctor) {
-			case 'Loaded':
-				return function (s) {
-					return A2(_elm_lang$core$Basics_ops['++'], s, ' questions');
-				}(
-					_elm_lang$core$Basics$toString(
-						_elm_lang$core$List$length(_p1._0)));
-			case 'Loading':
-				return 'Loading questions...';
-			case 'NotFetched':
-				return 'Loading questions...';
-			default:
-				return 'Questions not available';
-		}
-	}();
-	return A2(
-		_elm_lang$html$Html$li,
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$class('card-item'),
-			_1: {ctor: '[]'}
-		},
-		{
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$a,
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$href('#'),
-					_1: {
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('text-medium'),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$html$Html_Events$onClick(
-								_user$project$Mode_Presenter$Expanded(presentation)),
-							_1: {ctor: '[]'}
-						}
-					}
-				},
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html$text(presentation.title),
-					_1: {ctor: '[]'}
-				}),
-			_1: {
+var _user$project$Mode_Presenter$viewPresentation = F2(
+	function (expanded, presentation) {
+		var numQuestionsInfo = function () {
+			var _p7 = presentation.questions;
+			switch (_p7.ctor) {
+				case 'Loaded':
+					return function (s) {
+						return A2(_elm_lang$core$Basics_ops['++'], s, ' questions');
+					}(
+						_elm_lang$core$Basics$toString(
+							_elm_lang$core$List$length(_p7._0)));
+				case 'Loading':
+					return 'Loading questions...';
+				case 'NotFetched':
+					return 'Loading questions...';
+				default:
+					return 'Questions not available';
+			}
+		}();
+		return A2(
+			_elm_lang$html$Html$li,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('card-item'),
+				_1: {ctor: '[]'}
+			},
+			{
 				ctor: '::',
 				_0: A2(
-					_elm_lang$html$Html$p,
+					_elm_lang$html$Html$a,
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('text-small'),
-						_1: {ctor: '[]'}
-					},
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html$text(numQuestionsInfo),
-						_1: {ctor: '[]'}
-					}),
-				_1: {ctor: '[]'}
-			}
-		});
-};
-var _user$project$Mode_Presenter$viewPresentationList = function (model) {
-	return A2(
-		_elm_lang$html$Html$div,
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$class('content card'),
-			_1: {ctor: '[]'}
-		},
-		function () {
-			var _p2 = A2(
-				_user$project$Resource$map,
-				_elm_lang$core$List$map(_user$project$Mode_Presenter$viewPresentation),
-				model.presentations);
-			if (_p2.ctor === 'Loaded') {
-				if (_p2._0.ctor === '[]') {
-					return {
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$div,
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$class('card-main'),
-								_1: {ctor: '[]'}
-							},
-							{
-								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$h2,
-									{ctor: '[]'},
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html$text('No presentations yet'),
-										_1: {ctor: '[]'}
-									}),
-								_1: {
-									ctor: '::',
-									_0: A2(
-										_elm_lang$html$Html$p,
-										{ctor: '[]'},
-										{
-											ctor: '::',
-											_0: _elm_lang$html$Html$text('Create your first presentation!'),
-											_1: {ctor: '[]'}
-										}),
-									_1: {ctor: '[]'}
-								}
-							}),
+						_0: _elm_lang$html$Html_Attributes$href('#'),
 						_1: {
 							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$div,
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$class('hrule'),
-									_1: {ctor: '[]'}
-								},
-								{ctor: '[]'}),
+							_0: _elm_lang$html$Html_Attributes$class('text-medium'),
 							_1: {
 								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$div,
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$class('card-actions'),
-										_1: {ctor: '[]'}
-									},
-									{
-										ctor: '::',
-										_0: A2(
-											_elm_lang$html$Html$a,
-											{
-												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$href('#'),
-												_1: {
-													ctor: '::',
-													_0: _elm_lang$html$Html_Attributes$class('button'),
-													_1: {
-														ctor: '::',
-														_0: _elm_lang$html$Html_Events$onClick(
-															_user$project$Mode_Presenter$ShowNewPresentationForm(true)),
-														_1: {ctor: '[]'}
-													}
-												}
-											},
-											{
-												ctor: '::',
-												_0: _elm_lang$html$Html$text('Create'),
-												_1: {ctor: '[]'}
-											}),
-										_1: {ctor: '[]'}
-									}),
+								_0: _elm_lang$html$Html_Events$onClick(
+									_user$project$Mode_Presenter$Expanded(presentation)),
 								_1: {ctor: '[]'}
 							}
 						}
-					};
-				} else {
-					return {
+					},
+					{
 						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$ul,
-							{ctor: '[]'},
-							_p2._0),
+						_0: _elm_lang$html$Html$text(presentation.title),
 						_1: {ctor: '[]'}
-					};
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$p,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('text-small'),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(numQuestionsInfo),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
 				}
-			} else {
+			});
+	});
+var _user$project$Mode_Presenter$viewPresentationList = function (model) {
+	var expandQuestionsIfSelected = _elm_lang$core$List$map(
+		_user$project$Mode_Presenter$viewPresentation(model.expanded));
+	var children = function () {
+		var _p8 = A2(_user$project$Resource$map, expandQuestionsIfSelected, model.presentations);
+		if (_p8.ctor === 'Loaded') {
+			if (_p8._0.ctor === '[]') {
 				return {
 					ctor: '::',
 					_0: A2(
@@ -11263,7 +11388,7 @@ var _user$project$Mode_Presenter$viewPresentationList = function (model) {
 								{ctor: '[]'},
 								{
 									ctor: '::',
-									_0: _elm_lang$html$Html$text('Loading...'),
+									_0: _elm_lang$html$Html$text('No presentations yet'),
 									_1: {ctor: '[]'}
 								}),
 							_1: {
@@ -11273,16 +11398,115 @@ var _user$project$Mode_Presenter$viewPresentationList = function (model) {
 									{ctor: '[]'},
 									{
 										ctor: '::',
-										_0: _elm_lang$html$Html$text('Please wait while we fetch your presentations.'),
+										_0: _elm_lang$html$Html$text('Create your first presentation!'),
 										_1: {ctor: '[]'}
 									}),
 								_1: {ctor: '[]'}
 							}
 						}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$div,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('hrule'),
+								_1: {ctor: '[]'}
+							},
+							{ctor: '[]'}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$div,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('card-actions'),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$a,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$href('#'),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$class('button'),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$html$Html_Events$onClick(
+														_user$project$Mode_Presenter$ShowNewPresentationForm(true)),
+													_1: {ctor: '[]'}
+												}
+											}
+										},
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html$text('Create'),
+											_1: {ctor: '[]'}
+										}),
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						}
+					}
+				};
+			} else {
+				return {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$ul,
+						{ctor: '[]'},
+						_p8._0),
 					_1: {ctor: '[]'}
 				};
 			}
-		}());
+		} else {
+			return {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$div,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('card-main'),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$h2,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('Loading...'),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$p,
+								{ctor: '[]'},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text('Please wait while we fetch your presentations.'),
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						}
+					}),
+				_1: {ctor: '[]'}
+			};
+		}
+	}();
+	return A2(
+		_elm_lang$html$Html$div,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('content card'),
+			_1: {ctor: '[]'}
+		},
+		children);
 };
 var _user$project$Mode_Presenter$view = function (model) {
 	return A2(
@@ -11293,11 +11517,15 @@ var _user$project$Mode_Presenter$view = function (model) {
 			_0: _user$project$Mode_Presenter$viewCreatePresentation(model),
 			_1: {
 				ctor: '::',
-				_0: _user$project$Mode_Presenter$viewPresentationList(model),
+				_0: _user$project$Mode_Presenter$viewQuestions(model),
 				_1: {
 					ctor: '::',
-					_0: _user$project$Mode_Presenter$viewCreatePresentationButton,
-					_1: {ctor: '[]'}
+					_0: _user$project$Mode_Presenter$viewPresentationList(model),
+					_1: {
+						ctor: '::',
+						_0: _user$project$Mode_Presenter$viewCreatePresentationButton,
+						_1: {ctor: '[]'}
+					}
 				}
 			}
 		});
