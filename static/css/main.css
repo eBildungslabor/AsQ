@@ -36,6 +36,7 @@ ul {
     padding: 0;
 }
 
+
 ul li.card-item {
     border-bottom: 1px solid rgba(225, 225, 225, 0.88);
     padding: 32px;
@@ -46,7 +47,7 @@ ul li.card-item:last-child {
 }
 
 ul li.card-item > a {
-    color: #e96a63;
+    color: #d74061;
 }
 
 ul li.card-item p:last-child {
@@ -76,6 +77,10 @@ a.button:last-child {
     margin-right: 0;
 }
 
+.button.dangerous {
+    color: #d74061;
+}
+
 label {
     display: block;
     margin: 10px 0 5px 0;
@@ -84,6 +89,7 @@ label {
 input[type=text], input[type=password] {
     width: 364px;
     font-size: 1em;
+    margin-bottom: 16px;
 }
 
 div.action-button {
@@ -169,6 +175,27 @@ tr.question-item:last-child td.question-text {
     padding-bottom: 0;
 }
 
+td.question-text a {
+    font-size: 1em;
+    font-weight: 300;
+}
+
+div.answer {
+    /*border-left: 4px solid #e96187;*/
+    border-left: 4px solid #fcb239;
+    padding: 8px 16px;
+    margin-bottom: 16px;
+}
+
+div.answer p {
+    margin: 0;
+}
+
+div.answer p.answer-date {
+    font-size: 0.8em;
+    margin-bottom: 16px;
+}
+
 .question-nods {
     padding: 32px;
     width: 0;
@@ -207,6 +234,10 @@ tr.question-item:last-child td.question-text {
 
 .text-small {
     font-size: 0.8em;
+}
+
+.text-regular {
+    font-size: 1em;
 }
 
 .text-medium {

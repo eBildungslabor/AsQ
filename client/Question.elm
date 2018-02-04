@@ -16,10 +16,12 @@ import Html exposing (..)
 import Html.Events exposing (onClick)
 import Html.Attributes exposing (class, href)
 import Http exposing (Request)
-import Json.Decode exposing (Decoder, field, string, int, bool, maybe)
+import Json.Decode exposing (Decoder, field, string, int, bool, maybe, succeed)
 import Json.Encode as Encode
+import Answer exposing (Answer)
 import Config
 import Error exposing (Error)
+import Resource exposing (Resource)
 
 
 {-| A model of a question asked during a presentation.
@@ -29,8 +31,8 @@ type alias Question =
     , presentation : String
     , text : String
     , nods : Int
-    , answered : Bool
     , timeAsked : String
+    , answer : Resource Answer Error
     }
 
 
@@ -132,8 +134,8 @@ question =
         (field "presentation" string)
         (field "text" string)
         (field "nods" int)
-        (field "answered" bool)
         (field "timeAsked" string)
+        (succeed Resource.NotFetched)
 
 
 listQuestionsResponse : Decoder ListQuestionsResponse

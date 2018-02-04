@@ -72,17 +72,40 @@ type APIResponse
 init : String -> ( Model, Cmd Msg )
 init presentationID =
     let
+        questions =
+            [ { id = "first"
+              , presentation = ""
+              , text = "first question here"
+              , nods = 32
+              , timeAsked = "pretty recently"
+              , answer = Resource.Loading
+              }
+            , { id = "second"
+              , presentation = ""
+              , text = "Another question. This one has been answered."
+              , nods = 100
+              , timeAsked = "an hour ago"
+              , answer =
+                    Resource.Loaded
+                        { id = ""
+                        , text = "This is an answer!"
+                        , timeWritten = "Just now"
+                        }
+              }
+            ]
+
         model =
             { presentation = presentationID
-            , questions = Resource.NotFetched
+            , questions = Resource.Loaded questions
             , question = ""
             , showQuestionInput = False
             }
 
         command =
-            presentationID
-                |> Question.list
-                |> Http.send (APIReceivedQuestions >> FromAPI)
+            -- presentationID
+            --    |> Question.list
+            --    |> Http.send (APIReceivedQuestions >> FromAPI)
+            Cmd.none
     in
         ( model, command )
 
@@ -311,18 +334,31 @@ viewQuestionList model =
 
 viewQuestion : Question -> Html Msg
 viewQuestion question =
-    tr [ class "question-item" ]
-        [ td [ class "question-nods" ]
-            [ a [ href "#", class "button", onClick (QuestionNoddedTo question) ]
-                [ i [ class "fas fa-heart fa-2x" ] []
-                , div [] [ text <| toString question.nods ]
+    let
+        viewAnswer =
+            case question.answer of
+                Resource.Loaded answer ->
+                    div [ class "answer" ]
+                        [ p [ class "answer-date" ] [ text <| "Answered at " ++ answer.timeWritten ]
+                        , p [ class "answer-text" ] [ text answer.text ]
+                        ]
+
+                _ ->
+                    div [ class "answer", style [ ( "display", "none" ) ] ] []
+    in
+        tr [ class "question-item" ]
+            [ td [ class "question-nods" ]
+                [ a [ href "#", class "button", onClick (QuestionNoddedTo question) ]
+                    [ i [ class "fas fa-heart fa-2x" ] []
+                    , div [] [ text <| toString question.nods ]
+                    ]
+                ]
+            , td [ class "question-content" ]
+                [ p [ class "question-date" ] [ text <| cleanDate question.timeAsked ]
+                , p [ class "question-text" ] [ text <| question.text ]
+                , viewAnswer
                 ]
             ]
-        , td [ class "question-content" ]
-            [ p [ class "question-date" ] [ text <| cleanDate question.timeAsked ]
-            , p [ class "question-text" ] [ text <| question.text ]
-            ]
-        ]
 
 
 viewAskQuestionButton : Html Msg

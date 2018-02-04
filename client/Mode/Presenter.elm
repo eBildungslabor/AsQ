@@ -24,7 +24,13 @@ import Question exposing (Question)
 -}
 type alias Model =
     { sessionToken : SessionToken
+    , emailAddress : String
+    , currentPassword : String
+    , newPassword : String
+    , newPasswordRepeat : String
     , presentations : Resource (List Presentation) Error
+    , answeringQuestion : Maybe Question
+    , answer : String
     , expanded : Maybe Presentation
     , newPresentationTitle : String
     , newPresentationDescription : String
@@ -41,13 +47,24 @@ type Msg
     | CreatePresentation
     | ShowNewPresentationForm Bool
     | HideQuestions
+    | AnswerQuestion Question
+    | AnswerInput String
+    | SubmitAnswer Question
+    | RemoveQuestion Question
+    | EmailInput String
+    | CurrentPasswordInput String
+    | NewPasswordInput String
+    | NewPasswordRepeatInput String
+    | ChangeEmail
+    | ChangePassword
+    | DeleteAccount
     | BubblingError Error
 
 
 {-| The initial state and first message sent by this module when a presenter logs in.
 -}
-init : SessionToken -> ( Model, Cmd Msg )
-init token =
+init : SessionToken -> String -> ( Model, Cmd Msg )
+init token emailAddress =
     let
         presentations =
             [ { id = "first"
@@ -59,15 +76,15 @@ init token =
                           , presentation = "first"
                           , text = "What good are they?"
                           , nods = 32
-                          , answered = True
                           , timeAsked = "some time ago"
+                          , answer = Resource.NotFetched
                           }
                         , { id = "secondq"
                           , presentation = "first"
                           , text = "Where do capabilities come from?"
                           , nods = 50
-                          , answered = False
                           , timeAsked = "two minutes ago"
+                          , answer = Resource.NotFetched
                           }
                         ]
               }
@@ -85,7 +102,13 @@ init token =
 
         model =
             { sessionToken = token
+            , emailAddress = emailAddress
+            , currentPassword = ""
+            , newPassword = ""
+            , newPasswordRepeat = ""
             , presentations = Resource.Loaded presentations
+            , answeringQuestion = Nothing
+            , answer = ""
             , expanded = Nothing
             , newPresentationTitle = ""
             , newPresentationDescription = ""
@@ -108,6 +131,32 @@ update msg model =
     case msg of
         ShowNewPresentationForm on ->
             ( { model | showPresentationForm = on }, Cmd.none )
+
+        EmailInput newEmail ->
+            ( { model | emailAddress = newEmail }, Cmd.none )
+
+        CurrentPasswordInput currentPassword ->
+            ( { model | currentPassword = currentPassword }, Cmd.none )
+
+        NewPasswordInput newPassword ->
+            ( { model | newPassword = newPassword }, Cmd.none )
+
+        NewPasswordRepeatInput newPasswordRepeat ->
+            ( { model | newPasswordRepeat = newPasswordRepeat }, Cmd.none )
+
+        AnswerQuestion question ->
+            ( { model | answeringQuestion = Just question }, Cmd.none )
+
+        AnswerInput answer ->
+            ( { model | answer = answer }, Cmd.none )
+
+        SubmitAnswer question ->
+            -- TODO : Implement and call API endpoint for answering questions.
+            ( { model | answeringQuestion = Nothing, answer = "" }, Cmd.none )
+
+        RemoveQuestion question ->
+            -- TODO : Implement and call API endpoint for deleting questions.
+            ( model, Cmd.none )
 
         HideQuestions ->
             ( { model | expanded = Nothing }, Cmd.none )
@@ -139,8 +188,10 @@ view : Model -> Html Msg
 view model =
     div []
         [ viewCreatePresentation model
+        , viewAnswerQuestion model
         , viewQuestions model
         , viewPresentationList model
+        , viewAccountSettings model
         , viewCreatePresentationButton
         ]
 
@@ -163,10 +214,31 @@ viewCreatePresentation model =
             , div [ class "hrule" ] []
             , div [ class "card-actions" ]
                 [ a [ href "#", class "button", onClick CreatePresentation ] [ text "Create" ]
+                , a [ href "#", class "button", onClick (ShowNewPresentationForm False) ] [ text "Hide" ]
                 ]
             ]
     else
         div [ style [ ( "display", "none" ) ] ] []
+
+
+viewAnswerQuestion : Model -> Html Msg
+viewAnswerQuestion model =
+    case model.answeringQuestion of
+        Just question ->
+            div [ class "content card" ]
+                [ div [ class "card-main" ]
+                    [ h2 [] [ text "Answer a question" ]
+                    , p [] [ text question.text ]
+                    , textarea [ onInput AnswerInput ] []
+                    ]
+                , div [ class "hrule" ] []
+                , div [ class "card-actions" ]
+                    [ a [ href "#", class "button", onClick (SubmitAnswer question) ] [ text "Answer" ]
+                    ]
+                ]
+
+        Nothing ->
+            div [ style [ ( "display", "none" ) ] ] []
 
 
 viewPresentationList : Model -> Html Msg
@@ -289,8 +361,56 @@ viewQuestion question =
             [ td [ class "question-text" ]
                 [ p [] [ text question.text ]
                 , p [ class "text-small" ] [ text nodMsg ]
+                , div []
+                    [ a
+                        [ href "#"
+                        , class "button"
+                        , onClick (AnswerQuestion question)
+                        ]
+                        [ text "Answer" ]
+                    , a
+                        [ href "#"
+                        , class "dangerous button"
+                        , onClick (RemoveQuestion question)
+                        ]
+                        [ text "Remove" ]
+                    ]
                 ]
             ]
+
+
+viewAccountSettings : Model -> Html Msg
+viewAccountSettings model =
+    div [ class "content card" ]
+        [ div [ class "card-main" ]
+            [ h2 [] [ text "Account settings" ]
+            , h3 [ class "text-regular" ] [ text "Email address" ]
+            , input [ type_ "text", onInput EmailInput, value model.emailAddress ] []
+            , div []
+                [ a [ href "#", class "button", onClick ChangeEmail ] [ text "Change" ]
+                ]
+            , h3 [ class "text-regular" ] [ text "Password" ]
+            , div []
+                [ label [ for "currentPassword" ] [ text "Current password" ]
+                , input [ type_ "password", name "currentPassword", onInput CurrentPasswordInput ] []
+                ]
+            , div []
+                [ label [ for "password" ] [ text "New password" ]
+                , input [ type_ "password", name "password", onInput NewPasswordInput ] []
+                ]
+            , div []
+                [ label [ for "passwordRepeat" ] [ text "Repeat password" ]
+                , input [ type_ "password", name "passwordRepeat", onInput NewPasswordRepeatInput ] []
+                ]
+            , div []
+                [ a [ href "#", class "button", onClick ChangePassword ] [ text "Change" ]
+                ]
+            ]
+        , div [ class "hrule" ] []
+        , div [ class "card-actions" ]
+            [ a [ href "#", class "dangerous button", onClick DeleteAccount ] [ text "Delete account" ]
+            ]
+        ]
 
 
 viewCreatePresentationButton : Html Msg

@@ -9033,6 +9033,11 @@ var _elm_lang$http$Http$StringPart = F2(
 	});
 var _elm_lang$http$Http$stringPart = _elm_lang$http$Http$StringPart;
 
+var _user$project$Answer$Answer = F3(
+	function (a, b, c) {
+		return {id: a, text: b, timeWritten: c};
+	});
+
 var _user$project$Config$apiServerAddress = '127.0.0.1:9001';
 
 var _user$project$Authentication$logoutRequest = function (token) {
@@ -9241,7 +9246,7 @@ var _user$project$Question$askQuestionRequest = function (_p2) {
 };
 var _user$project$Question$Question = F6(
 	function (a, b, c, d, e, f) {
-		return {id: a, presentation: b, text: c, nods: d, answered: e, timeAsked: f};
+		return {id: a, presentation: b, text: c, nods: d, timeAsked: e, answer: f};
 	});
 var _user$project$Question$question = A7(
 	_elm_lang$core$Json_Decode$map6,
@@ -9250,8 +9255,8 @@ var _user$project$Question$question = A7(
 	A2(_elm_lang$core$Json_Decode$field, 'presentation', _elm_lang$core$Json_Decode$string),
 	A2(_elm_lang$core$Json_Decode$field, 'text', _elm_lang$core$Json_Decode$string),
 	A2(_elm_lang$core$Json_Decode$field, 'nods', _elm_lang$core$Json_Decode$int),
-	A2(_elm_lang$core$Json_Decode$field, 'answered', _elm_lang$core$Json_Decode$bool),
-	A2(_elm_lang$core$Json_Decode$field, 'timeAsked', _elm_lang$core$Json_Decode$string));
+	A2(_elm_lang$core$Json_Decode$field, 'timeAsked', _elm_lang$core$Json_Decode$string),
+	_elm_lang$core$Json_Decode$succeed(_user$project$Resource$NotFetched));
 var _user$project$Question$ListQuestionsResponse = F2(
 	function (a, b) {
 		return {error: a, questions: b};
@@ -9368,6 +9373,33 @@ var _user$project$Mode_Audience$cleanDate = function (dateStr) {
 	} else {
 		return '???';
 	}
+};
+var _user$project$Mode_Audience$init = function (presentationID) {
+	var command = _elm_lang$core$Platform_Cmd$none;
+	var questions = {
+		ctor: '::',
+		_0: {id: 'first', presentation: '', text: 'first question here', nods: 32, timeAsked: 'pretty recently', answer: _user$project$Resource$Loading},
+		_1: {
+			ctor: '::',
+			_0: {
+				id: 'second',
+				presentation: '',
+				text: 'Another question. This one has been answered.',
+				nods: 100,
+				timeAsked: 'an hour ago',
+				answer: _user$project$Resource$Loaded(
+					{id: '', text: 'This is an answer!', timeWritten: 'Just now'})
+			},
+			_1: {ctor: '[]'}
+		}
+	};
+	var model = {
+		presentation: presentationID,
+		questions: _user$project$Resource$Loaded(questions),
+		question: '',
+		showQuestionInput: false
+	};
+	return {ctor: '_Tuple2', _0: model, _1: command};
 };
 var _user$project$Mode_Audience$constRedText = 'text-red';
 var _user$project$Mode_Audience$constOrangeText = 'text-orange';
@@ -9551,6 +9583,69 @@ var _user$project$Mode_Audience$QuestionNoddedTo = function (a) {
 	return {ctor: 'QuestionNoddedTo', _0: a};
 };
 var _user$project$Mode_Audience$viewQuestion = function (question) {
+	var viewAnswer = function () {
+		var _p8 = question.answer;
+		if (_p8.ctor === 'Loaded') {
+			var _p9 = _p8._0;
+			return A2(
+				_elm_lang$html$Html$div,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('answer'),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$p,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('answer-date'),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(
+								A2(_elm_lang$core$Basics_ops['++'], 'Answered at ', _p9.timeWritten)),
+							_1: {ctor: '[]'}
+						}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$p,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('answer-text'),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text(_p9.text),
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					}
+				});
+		} else {
+			return A2(
+				_elm_lang$html$Html$div,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('answer'),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$style(
+							{
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: 'display', _1: 'none'},
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					}
+				},
+				{ctor: '[]'});
+		}
+	}();
 	return A2(
 		_elm_lang$html$Html$tr,
 		{
@@ -9649,7 +9744,11 @@ var _user$project$Mode_Audience$viewQuestion = function (question) {
 									_0: _elm_lang$html$Html$text(question.text),
 									_1: {ctor: '[]'}
 								}),
-							_1: {ctor: '[]'}
+							_1: {
+								ctor: '::',
+								_0: viewAnswer,
+								_1: {ctor: '[]'}
+							}
 						}
 					}),
 				_1: {ctor: '[]'}
@@ -9665,12 +9764,12 @@ var _user$project$Mode_Audience$viewQuestionList = function (model) {
 			_1: {ctor: '[]'}
 		},
 		function () {
-			var _p8 = A2(
+			var _p10 = A2(
 				_user$project$Resource$map,
 				_elm_lang$core$List$map(_user$project$Mode_Audience$viewQuestion),
 				model.questions);
-			if (_p8.ctor === 'Loaded') {
-				if (_p8._0.ctor === '[]') {
+			if (_p10.ctor === 'Loaded') {
+				if (_p10._0.ctor === '[]') {
 					return {
 						ctor: '::',
 						_0: A2(
@@ -9772,7 +9871,7 @@ var _user$project$Mode_Audience$viewQuestionList = function (model) {
 									_0: A2(
 										_elm_lang$html$Html$tbody,
 										{ctor: '[]'},
-										_p8._0),
+										_p10._0),
 									_1: {ctor: '[]'}
 								}
 							}),
@@ -9839,7 +9938,7 @@ var _user$project$Mode_Audience$viewAskQuestion = function (model) {
 			}(
 				_elm_lang$core$Basics$toFloat(charactersUsed))));
 	var countColor = function () {
-		var _p9 = A2(
+		var _p11 = A2(
 			_elm_lang$core$List$map,
 			_elm_lang$core$List$member(limitPercentUsed),
 			{
@@ -9859,28 +9958,28 @@ var _user$project$Mode_Audience$viewAskQuestion = function (model) {
 					}
 				}
 			});
-		_v8_4:
+		_v9_4:
 		do {
-			if (((((_p9.ctor === '::') && (_p9._1.ctor === '::')) && (_p9._1._1.ctor === '::')) && (_p9._1._1._1.ctor === '::')) && (_p9._1._1._1._1.ctor === '[]')) {
-				if (_p9._0 === true) {
+			if (((((_p11.ctor === '::') && (_p11._1.ctor === '::')) && (_p11._1._1.ctor === '::')) && (_p11._1._1._1.ctor === '::')) && (_p11._1._1._1._1.ctor === '[]')) {
+				if (_p11._0 === true) {
 					return _user$project$Mode_Audience$constGreenText;
 				} else {
-					if (_p9._1._0 === true) {
+					if (_p11._1._0 === true) {
 						return _user$project$Mode_Audience$constYellowText;
 					} else {
-						if (_p9._1._1._0 === true) {
+						if (_p11._1._1._0 === true) {
 							return _user$project$Mode_Audience$constOrangeText;
 						} else {
-							if (_p9._1._1._1._0 === true) {
+							if (_p11._1._1._1._0 === true) {
 								return _user$project$Mode_Audience$constRedText;
 							} else {
-								break _v8_4;
+								break _v9_4;
 							}
 						}
 					}
 				}
 			} else {
-				break _v8_4;
+				break _v9_4;
 			}
 		} while(false);
 		return '';
@@ -10043,27 +10142,27 @@ var _user$project$Mode_Audience$APIQuestionAsked = function (a) {
 };
 var _user$project$Mode_Audience$update = F2(
 	function (msg, model) {
-		var _p10 = msg;
-		switch (_p10.ctor) {
+		var _p12 = msg;
+		switch (_p12.ctor) {
 			case 'BubblingError':
 				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 			case 'QuestionTextReceived':
-				var _p11 = _p10._0;
+				var _p13 = _p12._0;
 				return (_elm_lang$core$Native_Utils.cmp(
-					_elm_lang$core$String$length(_p11),
+					_elm_lang$core$String$length(_p13),
 					_user$project$Mode_Audience$constMaxQuestionLength) < 1) ? {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{question: _p11}),
+						{question: _p13}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				} : {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 			case 'QuestionAsked':
 				var command = A2(
 					_elm_lang$http$Http$send,
-					function (_p12) {
+					function (_p14) {
 						return _user$project$Mode_Audience$FromAPI(
-							_user$project$Mode_Audience$APIQuestionAsked(_p12));
+							_user$project$Mode_Audience$APIQuestionAsked(_p14));
 					},
 					A2(_user$project$Question$ask, model.presentation, model.question));
 				var newModel = _elm_lang$core$Native_Utils.update(
@@ -10073,44 +10172,33 @@ var _user$project$Mode_Audience$update = F2(
 			case 'QuestionNoddedTo':
 				var command = A2(
 					_elm_lang$http$Http$send,
-					function (_p13) {
+					function (_p15) {
 						return _user$project$Mode_Audience$FromAPI(
-							_user$project$Mode_Audience$APIQuestionUpdated(_p13));
+							_user$project$Mode_Audience$APIQuestionUpdated(_p15));
 					},
-					_user$project$Question$nod(_p10._0));
+					_user$project$Question$nod(_p12._0));
 				return {ctor: '_Tuple2', _0: model, _1: command};
 			case 'ShowQuestionInput':
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{showQuestionInput: _p10._0}),
+						{showQuestionInput: _p12._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			default:
-				switch (_p10._0.ctor) {
+				switch (_p12._0.ctor) {
 					case 'APIReceivedQuestions':
-						return A2(_user$project$Mode_Audience$updateQuestionsReceived, _p10._0._0, model);
+						return A2(_user$project$Mode_Audience$updateQuestionsReceived, _p12._0._0, model);
 					case 'APIQuestionAsked':
-						return A2(_user$project$Mode_Audience$updateQuestionAsked, _p10._0._0, model);
+						return A2(_user$project$Mode_Audience$updateQuestionAsked, _p12._0._0, model);
 					default:
-						return A2(_user$project$Mode_Audience$updateQuestionUpdated, _p10._0._0, model);
+						return A2(_user$project$Mode_Audience$updateQuestionUpdated, _p12._0._0, model);
 				}
 		}
 	});
 var _user$project$Mode_Audience$APIReceivedQuestions = function (a) {
 	return {ctor: 'APIReceivedQuestions', _0: a};
-};
-var _user$project$Mode_Audience$init = function (presentationID) {
-	var command = A2(
-		_elm_lang$http$Http$send,
-		function (_p14) {
-			return _user$project$Mode_Audience$FromAPI(
-				_user$project$Mode_Audience$APIReceivedQuestions(_p14));
-		},
-		_user$project$Question$list(presentationID));
-	var model = {presentation: presentationID, questions: _user$project$Resource$NotFetched, question: '', showQuestionInput: false};
-	return {ctor: '_Tuple2', _0: model, _1: command};
 };
 
 var _user$project$Mode_Landing$update = F2(
@@ -10784,6 +10872,635 @@ var _user$project$Presentation$Presentation = F4(
 		return {id: a, title: b, description: c, questions: d};
 	});
 
+var _user$project$Mode_Presenter$update = F2(
+	function (msg, model) {
+		var _p0 = msg;
+		switch (_p0.ctor) {
+			case 'ShowNewPresentationForm':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{showPresentationForm: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'EmailInput':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{emailAddress: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'CurrentPasswordInput':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{currentPassword: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'NewPasswordInput':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{newPassword: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'NewPasswordRepeatInput':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{newPasswordRepeat: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'AnswerQuestion':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							answeringQuestion: _elm_lang$core$Maybe$Just(_p0._0)
+						}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'AnswerInput':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{answer: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'SubmitAnswer':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{answeringQuestion: _elm_lang$core$Maybe$Nothing, answer: ''}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'RemoveQuestion':
+				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+			case 'HideQuestions':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{expanded: _elm_lang$core$Maybe$Nothing}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'Expanded':
+				var _p2 = _p0._0;
+				var newExpanded = function () {
+					var _p1 = model.expanded;
+					if (_p1.ctor === 'Just') {
+						return _elm_lang$core$Native_Utils.eq(_p1._0.id, _p2.id) ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$Maybe$Just(_p2);
+					} else {
+						return _elm_lang$core$Maybe$Just(_p2);
+					}
+				}();
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{expanded: newExpanded}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			default:
+				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+		}
+	});
+var _user$project$Mode_Presenter$init = F2(
+	function (token, emailAddress) {
+		var command = _elm_lang$core$Platform_Cmd$none;
+		var presentations = {
+			ctor: '::',
+			_0: {
+				id: 'first',
+				title: 'Using Capabilities to design APIs',
+				description: '',
+				questions: _user$project$Resource$Loaded(
+					{
+						ctor: '::',
+						_0: {id: 'firstq', presentation: 'first', text: 'What good are they?', nods: 32, timeAsked: 'some time ago', answer: _user$project$Resource$NotFetched},
+						_1: {
+							ctor: '::',
+							_0: {id: 'secondq', presentation: 'first', text: 'Where do capabilities come from?', nods: 50, timeAsked: 'two minutes ago', answer: _user$project$Resource$NotFetched},
+							_1: {ctor: '[]'}
+						}
+					})
+			},
+			_1: {
+				ctor: '::',
+				_0: {id: 'second', title: 'A critical evaluation of Golang', description: '', questions: _user$project$Resource$NotFetched},
+				_1: {
+					ctor: '::',
+					_0: {id: 'third', title: 'This is my third presentation ever!', description: '', questions: _user$project$Resource$NotFetched},
+					_1: {ctor: '[]'}
+				}
+			}
+		};
+		var model = {
+			sessionToken: token,
+			emailAddress: emailAddress,
+			currentPassword: '',
+			newPassword: '',
+			newPasswordRepeat: '',
+			presentations: _user$project$Resource$Loaded(presentations),
+			answeringQuestion: _elm_lang$core$Maybe$Nothing,
+			answer: '',
+			expanded: _elm_lang$core$Maybe$Nothing,
+			newPresentationTitle: '',
+			newPresentationDescription: '',
+			showPresentationForm: false
+		};
+		return {ctor: '_Tuple2', _0: model, _1: command};
+	});
+var _user$project$Mode_Presenter$Model = function (a) {
+	return function (b) {
+		return function (c) {
+			return function (d) {
+				return function (e) {
+					return function (f) {
+						return function (g) {
+							return function (h) {
+								return function (i) {
+									return function (j) {
+										return function (k) {
+											return function (l) {
+												return {sessionToken: a, emailAddress: b, currentPassword: c, newPassword: d, newPasswordRepeat: e, presentations: f, answeringQuestion: g, answer: h, expanded: i, newPresentationTitle: j, newPresentationDescription: k, showPresentationForm: l};
+											};
+										};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
+var _user$project$Mode_Presenter$BubblingError = function (a) {
+	return {ctor: 'BubblingError', _0: a};
+};
+var _user$project$Mode_Presenter$DeleteAccount = {ctor: 'DeleteAccount'};
+var _user$project$Mode_Presenter$ChangePassword = {ctor: 'ChangePassword'};
+var _user$project$Mode_Presenter$ChangeEmail = {ctor: 'ChangeEmail'};
+var _user$project$Mode_Presenter$NewPasswordRepeatInput = function (a) {
+	return {ctor: 'NewPasswordRepeatInput', _0: a};
+};
+var _user$project$Mode_Presenter$NewPasswordInput = function (a) {
+	return {ctor: 'NewPasswordInput', _0: a};
+};
+var _user$project$Mode_Presenter$CurrentPasswordInput = function (a) {
+	return {ctor: 'CurrentPasswordInput', _0: a};
+};
+var _user$project$Mode_Presenter$EmailInput = function (a) {
+	return {ctor: 'EmailInput', _0: a};
+};
+var _user$project$Mode_Presenter$viewAccountSettings = function (model) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('content card'),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$div,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('card-main'),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$h2,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text('Account settings'),
+							_1: {ctor: '[]'}
+						}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$h3,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('text-regular'),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('Email address'),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$input,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$type_('text'),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Events$onInput(_user$project$Mode_Presenter$EmailInput),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$value(model.emailAddress),
+											_1: {ctor: '[]'}
+										}
+									}
+								},
+								{ctor: '[]'}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$div,
+									{ctor: '[]'},
+									{
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$a,
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$href('#'),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$class('button'),
+													_1: {
+														ctor: '::',
+														_0: _elm_lang$html$Html_Events$onClick(_user$project$Mode_Presenter$ChangeEmail),
+														_1: {ctor: '[]'}
+													}
+												}
+											},
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html$text('Change'),
+												_1: {ctor: '[]'}
+											}),
+										_1: {ctor: '[]'}
+									}),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$h3,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$class('text-regular'),
+											_1: {ctor: '[]'}
+										},
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html$text('Password'),
+											_1: {ctor: '[]'}
+										}),
+									_1: {
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$div,
+											{ctor: '[]'},
+											{
+												ctor: '::',
+												_0: A2(
+													_elm_lang$html$Html$label,
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html_Attributes$for('currentPassword'),
+														_1: {ctor: '[]'}
+													},
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html$text('Current password'),
+														_1: {ctor: '[]'}
+													}),
+												_1: {
+													ctor: '::',
+													_0: A2(
+														_elm_lang$html$Html$input,
+														{
+															ctor: '::',
+															_0: _elm_lang$html$Html_Attributes$type_('password'),
+															_1: {
+																ctor: '::',
+																_0: _elm_lang$html$Html_Attributes$name('currentPassword'),
+																_1: {
+																	ctor: '::',
+																	_0: _elm_lang$html$Html_Events$onInput(_user$project$Mode_Presenter$CurrentPasswordInput),
+																	_1: {ctor: '[]'}
+																}
+															}
+														},
+														{ctor: '[]'}),
+													_1: {ctor: '[]'}
+												}
+											}),
+										_1: {
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$div,
+												{ctor: '[]'},
+												{
+													ctor: '::',
+													_0: A2(
+														_elm_lang$html$Html$label,
+														{
+															ctor: '::',
+															_0: _elm_lang$html$Html_Attributes$for('password'),
+															_1: {ctor: '[]'}
+														},
+														{
+															ctor: '::',
+															_0: _elm_lang$html$Html$text('New password'),
+															_1: {ctor: '[]'}
+														}),
+													_1: {
+														ctor: '::',
+														_0: A2(
+															_elm_lang$html$Html$input,
+															{
+																ctor: '::',
+																_0: _elm_lang$html$Html_Attributes$type_('password'),
+																_1: {
+																	ctor: '::',
+																	_0: _elm_lang$html$Html_Attributes$name('password'),
+																	_1: {
+																		ctor: '::',
+																		_0: _elm_lang$html$Html_Events$onInput(_user$project$Mode_Presenter$NewPasswordInput),
+																		_1: {ctor: '[]'}
+																	}
+																}
+															},
+															{ctor: '[]'}),
+														_1: {ctor: '[]'}
+													}
+												}),
+											_1: {
+												ctor: '::',
+												_0: A2(
+													_elm_lang$html$Html$div,
+													{ctor: '[]'},
+													{
+														ctor: '::',
+														_0: A2(
+															_elm_lang$html$Html$label,
+															{
+																ctor: '::',
+																_0: _elm_lang$html$Html_Attributes$for('passwordRepeat'),
+																_1: {ctor: '[]'}
+															},
+															{
+																ctor: '::',
+																_0: _elm_lang$html$Html$text('Repeat password'),
+																_1: {ctor: '[]'}
+															}),
+														_1: {
+															ctor: '::',
+															_0: A2(
+																_elm_lang$html$Html$input,
+																{
+																	ctor: '::',
+																	_0: _elm_lang$html$Html_Attributes$type_('password'),
+																	_1: {
+																		ctor: '::',
+																		_0: _elm_lang$html$Html_Attributes$name('passwordRepeat'),
+																		_1: {
+																			ctor: '::',
+																			_0: _elm_lang$html$Html_Events$onInput(_user$project$Mode_Presenter$NewPasswordRepeatInput),
+																			_1: {ctor: '[]'}
+																		}
+																	}
+																},
+																{ctor: '[]'}),
+															_1: {ctor: '[]'}
+														}
+													}),
+												_1: {
+													ctor: '::',
+													_0: A2(
+														_elm_lang$html$Html$div,
+														{ctor: '[]'},
+														{
+															ctor: '::',
+															_0: A2(
+																_elm_lang$html$Html$a,
+																{
+																	ctor: '::',
+																	_0: _elm_lang$html$Html_Attributes$href('#'),
+																	_1: {
+																		ctor: '::',
+																		_0: _elm_lang$html$Html_Attributes$class('button'),
+																		_1: {
+																			ctor: '::',
+																			_0: _elm_lang$html$Html_Events$onClick(_user$project$Mode_Presenter$ChangePassword),
+																			_1: {ctor: '[]'}
+																		}
+																	}
+																},
+																{
+																	ctor: '::',
+																	_0: _elm_lang$html$Html$text('Change'),
+																	_1: {ctor: '[]'}
+																}),
+															_1: {ctor: '[]'}
+														}),
+													_1: {ctor: '[]'}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$div,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('hrule'),
+						_1: {ctor: '[]'}
+					},
+					{ctor: '[]'}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$div,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('card-actions'),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$a,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$href('#'),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$class('dangerous button'),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Events$onClick(_user$project$Mode_Presenter$DeleteAccount),
+											_1: {ctor: '[]'}
+										}
+									}
+								},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text('Delete account'),
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				}
+			}
+		});
+};
+var _user$project$Mode_Presenter$RemoveQuestion = function (a) {
+	return {ctor: 'RemoveQuestion', _0: a};
+};
+var _user$project$Mode_Presenter$SubmitAnswer = function (a) {
+	return {ctor: 'SubmitAnswer', _0: a};
+};
+var _user$project$Mode_Presenter$AnswerInput = function (a) {
+	return {ctor: 'AnswerInput', _0: a};
+};
+var _user$project$Mode_Presenter$viewAnswerQuestion = function (model) {
+	var _p3 = model.answeringQuestion;
+	if (_p3.ctor === 'Just') {
+		var _p4 = _p3._0;
+		return A2(
+			_elm_lang$html$Html$div,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('content card'),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$div,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('card-main'),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$h2,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('Answer a question'),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$p,
+								{ctor: '[]'},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text(_p4.text),
+									_1: {ctor: '[]'}
+								}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$textarea,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Events$onInput(_user$project$Mode_Presenter$AnswerInput),
+										_1: {ctor: '[]'}
+									},
+									{ctor: '[]'}),
+								_1: {ctor: '[]'}
+							}
+						}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$div,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('hrule'),
+							_1: {ctor: '[]'}
+						},
+						{ctor: '[]'}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$div,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('card-actions'),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$a,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$href('#'),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$class('button'),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$html$Html_Events$onClick(
+													_user$project$Mode_Presenter$SubmitAnswer(_p4)),
+												_1: {ctor: '[]'}
+											}
+										}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text('Answer'),
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					}
+				}
+			});
+	} else {
+		return A2(
+			_elm_lang$html$Html$div,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$style(
+					{
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'display', _1: 'none'},
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			},
+			{ctor: '[]'});
+	}
+};
+var _user$project$Mode_Presenter$AnswerQuestion = function (a) {
+	return {ctor: 'AnswerQuestion', _0: a};
+};
 var _user$project$Mode_Presenter$viewQuestion = function (question) {
 	var people = (_elm_lang$core$Native_Utils.eq(question.nods, 0) || (_elm_lang$core$Native_Utils.cmp(question.nods, 1) > 0)) ? 'people' : 'person';
 	var nodMsg = A2(
@@ -10833,110 +11550,78 @@ var _user$project$Mode_Presenter$viewQuestion = function (question) {
 								_0: _elm_lang$html$Html$text(nodMsg),
 								_1: {ctor: '[]'}
 							}),
-						_1: {ctor: '[]'}
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$div,
+								{ctor: '[]'},
+								{
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$a,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$href('#'),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$class('button'),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$html$Html_Events$onClick(
+														_user$project$Mode_Presenter$AnswerQuestion(question)),
+													_1: {ctor: '[]'}
+												}
+											}
+										},
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html$text('Answer'),
+											_1: {ctor: '[]'}
+										}),
+									_1: {
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$a,
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$href('#'),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$class('dangerous button'),
+													_1: {
+														ctor: '::',
+														_0: _elm_lang$html$Html_Events$onClick(
+															_user$project$Mode_Presenter$RemoveQuestion(question)),
+														_1: {ctor: '[]'}
+													}
+												}
+											},
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html$text('Remove'),
+												_1: {ctor: '[]'}
+											}),
+										_1: {ctor: '[]'}
+									}
+								}),
+							_1: {ctor: '[]'}
+						}
 					}
 				}),
 			_1: {ctor: '[]'}
 		});
 };
-var _user$project$Mode_Presenter$update = F2(
-	function (msg, model) {
-		var _p0 = msg;
-		switch (_p0.ctor) {
-			case 'ShowNewPresentationForm':
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{showPresentationForm: _p0._0}),
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
-			case 'HideQuestions':
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{expanded: _elm_lang$core$Maybe$Nothing}),
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
-			case 'Expanded':
-				var _p2 = _p0._0;
-				var newExpanded = function () {
-					var _p1 = model.expanded;
-					if (_p1.ctor === 'Just') {
-						return _elm_lang$core$Native_Utils.eq(_p1._0.id, _p2.id) ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$Maybe$Just(_p2);
-					} else {
-						return _elm_lang$core$Maybe$Just(_p2);
-					}
-				}();
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{expanded: newExpanded}),
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
-			default:
-				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
-		}
-	});
-var _user$project$Mode_Presenter$init = function (token) {
-	var command = _elm_lang$core$Platform_Cmd$none;
-	var presentations = {
-		ctor: '::',
-		_0: {
-			id: 'first',
-			title: 'Using Capabilities to design APIs',
-			description: '',
-			questions: _user$project$Resource$Loaded(
-				{
-					ctor: '::',
-					_0: {id: 'firstq', presentation: 'first', text: 'What good are they?', nods: 32, answered: true, timeAsked: 'some time ago'},
-					_1: {
-						ctor: '::',
-						_0: {id: 'secondq', presentation: 'first', text: 'Where do capabilities come from?', nods: 50, answered: false, timeAsked: 'two minutes ago'},
-						_1: {ctor: '[]'}
-					}
-				})
-		},
-		_1: {
-			ctor: '::',
-			_0: {id: 'second', title: 'A critical evaluation of Golang', description: '', questions: _user$project$Resource$NotFetched},
-			_1: {
-				ctor: '::',
-				_0: {id: 'third', title: 'This is my third presentation ever!', description: '', questions: _user$project$Resource$NotFetched},
-				_1: {ctor: '[]'}
-			}
-		}
-	};
-	var model = {
-		sessionToken: token,
-		presentations: _user$project$Resource$Loaded(presentations),
-		expanded: _elm_lang$core$Maybe$Nothing,
-		newPresentationTitle: '',
-		newPresentationDescription: '',
-		showPresentationForm: false
-	};
-	return {ctor: '_Tuple2', _0: model, _1: command};
-};
-var _user$project$Mode_Presenter$Model = F6(
-	function (a, b, c, d, e, f) {
-		return {sessionToken: a, presentations: b, expanded: c, newPresentationTitle: d, newPresentationDescription: e, showPresentationForm: f};
-	});
-var _user$project$Mode_Presenter$BubblingError = function (a) {
-	return {ctor: 'BubblingError', _0: a};
-};
 var _user$project$Mode_Presenter$HideQuestions = {ctor: 'HideQuestions'};
 var _user$project$Mode_Presenter$viewQuestions = function (model) {
-	var _p3 = function () {
-		var _p4 = model.expanded;
-		if (_p4.ctor === 'Just') {
-			var _p6 = _p4._0;
-			var _p5 = _p6.questions;
-			if (_p5.ctor === 'Loaded') {
+	var _p5 = function () {
+		var _p6 = model.expanded;
+		if (_p6.ctor === 'Just') {
+			var _p8 = _p6._0;
+			var _p7 = _p8.questions;
+			if (_p7.ctor === 'Loaded') {
 				return {
 					ctor: '_Tuple3',
-					_0: _p6.title,
+					_0: _p8.title,
 					_1: {ctor: '[]'},
 					_2: A2(
 						_elm_lang$html$Html$table,
@@ -10956,7 +11641,7 @@ var _user$project$Mode_Presenter$viewQuestions = function (model) {
 								_0: A2(
 									_elm_lang$html$Html$tbody,
 									{ctor: '[]'},
-									A2(_elm_lang$core$List$map, _user$project$Mode_Presenter$viewQuestion, _p5._0)),
+									A2(_elm_lang$core$List$map, _user$project$Mode_Presenter$viewQuestion, _p7._0)),
 								_1: {ctor: '[]'}
 							}
 						})
@@ -10964,7 +11649,7 @@ var _user$project$Mode_Presenter$viewQuestions = function (model) {
 			} else {
 				return {
 					ctor: '_Tuple3',
-					_0: _p6.title,
+					_0: _p8.title,
 					_1: {ctor: '[]'},
 					_2: A2(
 						_elm_lang$html$Html$p,
@@ -10992,9 +11677,9 @@ var _user$project$Mode_Presenter$viewQuestions = function (model) {
 			};
 		}
 	}();
-	var title = _p3._0;
-	var styles = _p3._1;
-	var content = _p3._2;
+	var title = _p5._0;
+	var styles = _p5._1;
+	var content = _p5._2;
 	return A2(
 		_elm_lang$html$Html$div,
 		{
@@ -11276,7 +11961,31 @@ var _user$project$Mode_Presenter$viewCreatePresentation = function (model) {
 									_0: _elm_lang$html$Html$text('Create'),
 									_1: {ctor: '[]'}
 								}),
-							_1: {ctor: '[]'}
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$a,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$href('#'),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$class('button'),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$html$Html_Events$onClick(
+													_user$project$Mode_Presenter$ShowNewPresentationForm(false)),
+												_1: {ctor: '[]'}
+											}
+										}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text('Hide'),
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							}
 						}),
 					_1: {ctor: '[]'}
 				}
@@ -11301,14 +12010,14 @@ var _user$project$Mode_Presenter$Expanded = function (a) {
 var _user$project$Mode_Presenter$viewPresentation = F2(
 	function (expanded, presentation) {
 		var numQuestionsInfo = function () {
-			var _p7 = presentation.questions;
-			switch (_p7.ctor) {
+			var _p9 = presentation.questions;
+			switch (_p9.ctor) {
 				case 'Loaded':
 					return function (s) {
 						return A2(_elm_lang$core$Basics_ops['++'], s, ' questions');
 					}(
 						_elm_lang$core$Basics$toString(
-							_elm_lang$core$List$length(_p7._0)));
+							_elm_lang$core$List$length(_p9._0)));
 				case 'Loading':
 					return 'Loading questions...';
 				case 'NotFetched':
@@ -11369,9 +12078,9 @@ var _user$project$Mode_Presenter$viewPresentationList = function (model) {
 	var expandQuestionsIfSelected = _elm_lang$core$List$map(
 		_user$project$Mode_Presenter$viewPresentation(model.expanded));
 	var children = function () {
-		var _p8 = A2(_user$project$Resource$map, expandQuestionsIfSelected, model.presentations);
-		if (_p8.ctor === 'Loaded') {
-			if (_p8._0.ctor === '[]') {
+		var _p10 = A2(_user$project$Resource$map, expandQuestionsIfSelected, model.presentations);
+		if (_p10.ctor === 'Loaded') {
+			if (_p10._0.ctor === '[]') {
 				return {
 					ctor: '::',
 					_0: A2(
@@ -11458,7 +12167,7 @@ var _user$project$Mode_Presenter$viewPresentationList = function (model) {
 					_0: A2(
 						_elm_lang$html$Html$ul,
 						{ctor: '[]'},
-						_p8._0),
+						_p10._0),
 					_1: {ctor: '[]'}
 				};
 			}
@@ -11517,14 +12226,22 @@ var _user$project$Mode_Presenter$view = function (model) {
 			_0: _user$project$Mode_Presenter$viewCreatePresentation(model),
 			_1: {
 				ctor: '::',
-				_0: _user$project$Mode_Presenter$viewQuestions(model),
+				_0: _user$project$Mode_Presenter$viewAnswerQuestion(model),
 				_1: {
 					ctor: '::',
-					_0: _user$project$Mode_Presenter$viewPresentationList(model),
+					_0: _user$project$Mode_Presenter$viewQuestions(model),
 					_1: {
 						ctor: '::',
-						_0: _user$project$Mode_Presenter$viewCreatePresentationButton,
-						_1: {ctor: '[]'}
+						_0: _user$project$Mode_Presenter$viewPresentationList(model),
+						_1: {
+							ctor: '::',
+							_0: _user$project$Mode_Presenter$viewAccountSettings(model),
+							_1: {
+								ctor: '::',
+								_0: _user$project$Mode_Presenter$viewCreatePresentationButton,
+								_1: {ctor: '[]'}
+							}
+						}
 					}
 				}
 			}
@@ -11828,7 +12545,7 @@ var _user$project$Main$update = F2(
 								_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$AudienceModeMsg, audCmd)
 							};
 						case 'Login':
-							var _p7 = _user$project$Mode_Presenter$init('sessionToken');
+							var _p7 = A2(_user$project$Mode_Presenter$init, 'sessionToken', 'email@address.com');
 							var presModel = _p7._0;
 							var presCmd = _p7._1;
 							return {
@@ -11841,7 +12558,7 @@ var _user$project$Main$update = F2(
 								_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$PresenterModeMsg, presCmd)
 							};
 						case 'Register':
-							var _p8 = _user$project$Mode_Presenter$init('sessionToken');
+							var _p8 = A2(_user$project$Mode_Presenter$init, 'sessionToken', 'email@address.com');
 							var presModel = _p8._0;
 							var presCmd = _p8._1;
 							return {

@@ -83,7 +83,7 @@ update msg model =
             -- TODO - Login to the server
             let
                 ( presModel, presCmd ) =
-                    Mode.Presenter.init "sessionToken"
+                    Mode.Presenter.init "sessionToken" "email@address.com"
             in
                 ( { model | mode = Presenter presModel }, Cmd.map PresenterModeMsg presCmd )
 
@@ -91,7 +91,7 @@ update msg model =
             -- TODO - Register new presenter
             let
                 ( presModel, presCmd ) =
-                    Mode.Presenter.init "sessionToken"
+                    Mode.Presenter.init "sessionToken" "email@address.com"
             in
                 ( { model | mode = Presenter presModel }, Cmd.map PresenterModeMsg presCmd )
 
