@@ -296,6 +296,7 @@ viewAskQuestion model =
                 , div [ class "hrule" ] []
                 , div [ class "card-actions" ]
                     [ a [ href "#", class "button", onClick QuestionAsked ] [ text "Ask" ]
+                    , a [ href "#", class "button", onClick (ShowQuestionInput False) ] [ text "Hide" ]
                     ]
                 ]
         else
