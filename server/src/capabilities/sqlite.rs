@@ -15,9 +15,9 @@ pub struct SQLite {
     database: Arc<Mutex<Connection>>,
 }
 
-/// A type used as an input for queries to find all questions asked during a presentation.
-pub struct QuestionsForPresentation {
-    pub presentation_id: Id,
+/// A type used as an input for queries to find all of the presentations that a presenter has created.
+pub struct PresentationsForPresenter {
+    pub presenter_id: Id,
 }
 
 impl SQLite {
@@ -83,6 +83,15 @@ impl Capability<Save<Presenter>> for SQLite {
         let mut presenter = operation.0;
         presenter.email_address = Id("saved".to_string());
         Ok(presenter)
+    }
+}
+
+impl Capability<Search<Presenter>> for SQLite {
+    type Data = Presenter;
+    type Error = String;
+
+    fn perform(&self, operation: Search<Presenter>) -> Result<Self::Data, Self::Error> {
+        Ok(operation.0)
     }
 }
 

@@ -49,12 +49,14 @@ fn main() {
     let nod_to_question = api::questions::nod::NodHandler::new(db_authority.clone());
     let list_questions = api::questions::list::ListHandler::new(db_authority.clone());
     let register_presenter = api::presenters::register::RegistrationHandler::new(db_authority.clone());
+    let login_presenter = api::presenters::login::LoginHandler::new(db_authority.clone());
 
     let mut router = Router::new();
     router.get("/questions", list_questions, "list_questions");
     router.post("/questions/ask", ask_question, "ask_question");
     router.put("/questions/nod", nod_to_question, "nod_to_question");
     router.post("/presenters/register", register_presenter, "register_presenter");
+    router.post("/presenters/login", login_presenter, "login_presenter");
 
     let mut mount = Mount::new();
     mount.mount("/", Static::new(Path::new("../index.html")));
