@@ -6,13 +6,18 @@ use chrono::prelude::*;
 use sqlite::Connection;
 
 use capabilities::{Capability, CreateTable, FindAll, Save, Update, Delete, Search};
-use models::{Id, Question, Presenter, Session};
+use models::{Id, Question, Presenter, Presentation, Session};
 
 
 /// SQLite implements a number of capabilities enabling CRUD operations on various models.
 #[derive(Clone)]
 pub struct SQLite {
     database: Arc<Mutex<Connection>>,
+}
+
+/// A type used as an input for queries to find all questions asked during a presentation.
+pub struct QuestionsForPresentation {
+    pub presentation_id: Id,
 }
 
 /// A type used as an input for queries to find all of the presentations that a presenter has created.
@@ -101,5 +106,14 @@ impl Capability<Save<Session>> for SQLite {
 
     fn perform(&self, operation: Save<Session>) -> Result<Self::Data, Self::Error> {
         Ok(operation.0)
+    }
+}
+
+impl Capability<FindAll<PresentationsForPresenter>> for SQLite {
+    type Data = Vec<Presentation>;
+    type Error = String;
+
+    fn perform(&self, operation: FindAll<PresentationsForPresenter>) -> Result<Self::Data, Self::Error> {
+        Ok(vec![])
     }
 }

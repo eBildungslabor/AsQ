@@ -50,6 +50,7 @@ fn main() {
     let list_questions = api::questions::list::ListHandler::new(db_authority.clone());
     let register_presenter = api::presenters::register::RegistrationHandler::new(db_authority.clone());
     let login_presenter = api::presenters::login::LoginHandler::new(db_authority.clone());
+    let list_presentations = api::presentations::list::ListHandler::new(db_authority.clone());
 
     let mut router = Router::new();
     router.get("/questions", list_questions, "list_questions");
@@ -57,6 +58,7 @@ fn main() {
     router.put("/questions/nod", nod_to_question, "nod_to_question");
     router.post("/presenters/register", register_presenter, "register_presenter");
     router.post("/presenters/login", login_presenter, "login_presenter");
+    router.get("/presentations", list_presentations, "list_presentations");
 
     let mut mount = Mount::new();
     mount.mount("/", Static::new(Path::new("../index.html")));
