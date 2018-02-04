@@ -1,13 +1,12 @@
 use std::sync::{Arc, Mutex};
 
 
-
 /// A name to tie to a find-all operation on a particular data type.
 use chrono::prelude::*;
 use sqlite::Connection;
 
 use capabilities::{Capability, CreateTable, FindAll, Save, Update, Delete, Search};
-use models::{Id, Question};
+use models::{Id, Question, Presenter, Session};
 
 
 /// SQLite implements a number of capabilities enabling CRUD operations on various models.
@@ -73,5 +72,25 @@ impl Capability<FindAll<QuestionsForPresentation>> for SQLite {
 
     fn perform(&self, operation: FindAll<QuestionsForPresentation>) -> Result<Self::Data, Self::Error> {
         Ok(vec![])
+    }
+}
+
+impl Capability<Save<Presenter>> for SQLite {
+    type Data = Presenter;
+    type Error = String;
+
+    fn perform(&self, mut operation: Save<Presenter>) -> Result<Self::Data, Self::Error> {
+        let mut presenter = operation.0;
+        presenter.email_address = Id("saved".to_string());
+        Ok(presenter)
+    }
+}
+
+impl Capability<Save<Session>> for SQLite {
+    type Data = Session;
+    type Error = String;
+
+    fn perform(&self, operation: Save<Session>) -> Result<Self::Data, Self::Error> {
+        Ok(operation.0)
     }
 }

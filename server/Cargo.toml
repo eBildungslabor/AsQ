@@ -24,6 +24,8 @@ persistent = "*"
 router = "*"
 staticfile = "*"
 mount = "*"
+rand = "^0.4"
+base64 = "^0.9"
 
 [dependencies.chrono]
 version = "^0.4"
