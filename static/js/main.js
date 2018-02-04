@@ -10950,6 +10950,14 @@ var _user$project$Mode_Presenter$update = F2(
 						}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
+			case 'HideAnswerInput':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{answeringQuestion: _elm_lang$core$Maybe$Nothing}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
 			case 'AnswerInput':
 				return {
 					ctor: '_Tuple2',
@@ -11404,6 +11412,7 @@ var _user$project$Mode_Presenter$SubmitAnswer = function (a) {
 var _user$project$Mode_Presenter$AnswerInput = function (a) {
 	return {ctor: 'AnswerInput', _0: a};
 };
+var _user$project$Mode_Presenter$HideAnswerInput = {ctor: 'HideAnswerInput'};
 var _user$project$Mode_Presenter$viewAnswerQuestion = function (model) {
 	var _p3 = model.answeringQuestion;
 	if (_p3.ctor === 'Just') {
@@ -11500,7 +11509,30 @@ var _user$project$Mode_Presenter$viewAnswerQuestion = function (model) {
 										_0: _elm_lang$html$Html$text('Answer'),
 										_1: {ctor: '[]'}
 									}),
-								_1: {ctor: '[]'}
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$a,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$href('#'),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$class('button'),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$html$Html_Events$onClick(_user$project$Mode_Presenter$HideAnswerInput),
+													_1: {ctor: '[]'}
+												}
+											}
+										},
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html$text('Hide'),
+											_1: {ctor: '[]'}
+										}),
+									_1: {ctor: '[]'}
+								}
 							}),
 						_1: {ctor: '[]'}
 					}

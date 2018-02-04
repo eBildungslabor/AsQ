@@ -48,6 +48,7 @@ type Msg
     | ShowNewPresentationForm Bool
     | HideQuestions
     | AnswerQuestion Question
+    | HideAnswerInput
     | AnswerInput String
     | SubmitAnswer Question
     | RemoveQuestion Question
@@ -147,6 +148,9 @@ update msg model =
         AnswerQuestion question ->
             ( { model | answeringQuestion = Just question }, Cmd.none )
 
+        HideAnswerInput ->
+            ( { model | answeringQuestion = Nothing }, Cmd.none )
+
         AnswerInput answer ->
             ( { model | answer = answer }, Cmd.none )
 
@@ -234,6 +238,7 @@ viewAnswerQuestion model =
                 , div [ class "hrule" ] []
                 , div [ class "card-actions" ]
                     [ a [ href "#", class "button", onClick (SubmitAnswer question) ] [ text "Answer" ]
+                    , a [ href "#", class "button", onClick HideAnswerInput ] [ text "Hide" ]
                     ]
                 ]
 
