@@ -18,6 +18,7 @@ import Json.Decode exposing (Decoder, maybe, string)
 import Error exposing (Error)
 import Resource exposing (Resource)
 import Question exposing (Question)
+import Presentation exposing (Presentation)
 
 
 constMaxQuestionLength =
@@ -43,8 +44,8 @@ constRedText =
 {-| The model representing the state of the page audience members interact with.
 -}
 type alias Model =
-    { presentation : String
-    , questions : Resource (List Question) String
+    { presentation : Resource Presentation Error
+    , questions : Resource (List Question) Error
     , question : String
     , showQuestionInput : Bool
     }
@@ -72,6 +73,14 @@ type APIResponse
 init : String -> ( Model, Cmd Msg )
 init presentationID =
     let
+        presentation =
+            Resource.Loaded
+                { id = "banana"
+                , title = "This is a random presentation"
+                , description = "We are going to talk about some really cool stuff."
+                , questions = Resource.NotFetched
+                }
+
         questions =
             [ { id = "first"
               , presentation = ""
@@ -95,7 +104,7 @@ init presentationID =
             ]
 
         model =
-            { presentation = presentationID
+            { presentation = presentation
             , questions = Resource.Loaded questions
             , question = ""
             , showQuestionInput = False
@@ -134,8 +143,9 @@ update msg model =
                     }
 
                 command =
-                    Question.ask model.presentation model.question
-                        |> Http.send (APIQuestionAsked >> FromAPI)
+                    -- Question.ask model.presentation model.question
+                    --    |> Http.send (APIQuestionAsked >> FromAPI)
+                    Cmd.none
             in
                 ( newModel, command )
 
@@ -230,10 +240,31 @@ updateQuestionUpdated result model =
 view : Model -> Html Msg
 view model =
     div []
-        [ viewAskQuestion model
+        [ viewTitleCard model
+        , viewAskQuestion model
         , viewQuestionList model
         , viewAskQuestionButton
         ]
+
+
+viewTitleCard : Model -> Html Msg
+viewTitleCard model =
+    let
+        content =
+            case model.presentation of
+                Resource.Loaded presentation ->
+                    [ h2 [] [ text presentation.title ]
+                    , p [] [ text presentation.description ]
+                    ]
+
+                _ ->
+                    [ h2 [] [ text "Loading..." ]
+                    , p [] [ text "Please wait while we load this presentation's information." ]
+                    ]
+    in
+        div [ class "content card" ]
+            [ div [ class "card-main" ] content
+            ]
 
 
 viewAskQuestion : Model -> Html Msg

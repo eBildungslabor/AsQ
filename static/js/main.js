@@ -9351,6 +9351,11 @@ var _user$project$Question$QuestionUpdateResponse = F2(
 		return {error: a, question: b};
 	});
 
+var _user$project$Presentation$Presentation = F4(
+	function (a, b, c, d) {
+		return {id: a, title: b, description: c, questions: d};
+	});
+
 var _user$project$Mode_Audience$cleanDate = function (dateStr) {
 	var nth = F2(
 		function (i, ls) {
@@ -9374,6 +9379,80 @@ var _user$project$Mode_Audience$cleanDate = function (dateStr) {
 		return '???';
 	}
 };
+var _user$project$Mode_Audience$viewTitleCard = function (model) {
+	var content = function () {
+		var _p1 = model.presentation;
+		if (_p1.ctor === 'Loaded') {
+			var _p2 = _p1._0;
+			return {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$h2,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(_p2.title),
+						_1: {ctor: '[]'}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$p,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(_p2.description),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				}
+			};
+		} else {
+			return {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$h2,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text('Loading...'),
+						_1: {ctor: '[]'}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$p,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text('Please wait while we load this presentation\'s information.'),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				}
+			};
+		}
+	}();
+	return A2(
+		_elm_lang$html$Html$div,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('content card'),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$div,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('card-main'),
+					_1: {ctor: '[]'}
+				},
+				content),
+			_1: {ctor: '[]'}
+		});
+};
 var _user$project$Mode_Audience$init = function (presentationID) {
 	var command = _elm_lang$core$Platform_Cmd$none;
 	var questions = {
@@ -9393,8 +9472,10 @@ var _user$project$Mode_Audience$init = function (presentationID) {
 			_1: {ctor: '[]'}
 		}
 	};
+	var presentation = _user$project$Resource$Loaded(
+		{id: 'banana', title: 'This is a random presentation', description: 'We are going to talk about some really cool stuff.', questions: _user$project$Resource$NotFetched});
 	var model = {
-		presentation: presentationID,
+		presentation: presentation,
 		questions: _user$project$Resource$Loaded(questions),
 		question: '',
 		showQuestionInput: false
@@ -9415,36 +9496,6 @@ var _user$project$Mode_Audience$BubblingError = function (a) {
 };
 var _user$project$Mode_Audience$updateQuestionsReceived = F2(
 	function (result, model) {
-		var _p1 = result;
-		if (_p1.ctor === 'Err') {
-			return {
-				ctor: '_Tuple2',
-				_0: model,
-				_1: A2(_user$project$Error$bubble, _user$project$Mode_Audience$BubblingError, 'Failed to make request.')
-			};
-		} else {
-			var _p2 = _p1._0.error;
-			if (_p2.ctor === 'Just') {
-				return {
-					ctor: '_Tuple2',
-					_0: model,
-					_1: A2(_user$project$Error$bubble, _user$project$Mode_Audience$BubblingError, _p2._0)
-				};
-			} else {
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{
-							questions: _user$project$Resource$Loaded(_p1._0.questions)
-						}),
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
-			}
-		}
-	});
-var _user$project$Mode_Audience$updateQuestionAsked = F2(
-	function (result, model) {
 		var _p3 = result;
 		if (_p3.ctor === 'Err') {
 			return {
@@ -9453,41 +9504,27 @@ var _user$project$Mode_Audience$updateQuestionAsked = F2(
 				_1: A2(_user$project$Error$bubble, _user$project$Mode_Audience$BubblingError, 'Failed to make request.')
 			};
 		} else {
-			var _p4 = {ctor: '_Tuple2', _0: _p3._0.error, _1: _p3._0.question};
-			if (_p4._0.ctor === 'Just') {
+			var _p4 = _p3._0.error;
+			if (_p4.ctor === 'Just') {
 				return {
 					ctor: '_Tuple2',
 					_0: model,
-					_1: A2(_user$project$Error$bubble, _user$project$Mode_Audience$BubblingError, _p4._0._0)
+					_1: A2(_user$project$Error$bubble, _user$project$Mode_Audience$BubblingError, _p4._0)
 				};
 			} else {
-				if (_p4._1.ctor === 'Just') {
-					return {
-						ctor: '_Tuple2',
-						_0: _elm_lang$core$Native_Utils.update(
-							model,
-							{
-								questions: A2(
-									_user$project$Resource$map,
-									F2(
-										function (x, y) {
-											return {ctor: '::', _0: x, _1: y};
-										})(_p4._1._0),
-									model.questions)
-							}),
-						_1: _elm_lang$core$Platform_Cmd$none
-					};
-				} else {
-					return {
-						ctor: '_Tuple2',
-						_0: model,
-						_1: A2(_user$project$Error$bubble, _user$project$Mode_Audience$BubblingError, 'Got an unexpected response from the API server. ')
-					};
-				}
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							questions: _user$project$Resource$Loaded(_p3._0.questions)
+						}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
 			}
 		}
 	});
-var _user$project$Mode_Audience$updateQuestionUpdated = F2(
+var _user$project$Mode_Audience$updateQuestionAsked = F2(
 	function (result, model) {
 		var _p5 = result;
 		if (_p5.ctor === 'Err') {
@@ -9506,9 +9543,53 @@ var _user$project$Mode_Audience$updateQuestionUpdated = F2(
 				};
 			} else {
 				if (_p6._1.ctor === 'Just') {
-					var _p7 = _p6._1._0;
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{
+								questions: A2(
+									_user$project$Resource$map,
+									F2(
+										function (x, y) {
+											return {ctor: '::', _0: x, _1: y};
+										})(_p6._1._0),
+									model.questions)
+							}),
+						_1: _elm_lang$core$Platform_Cmd$none
+					};
+				} else {
+					return {
+						ctor: '_Tuple2',
+						_0: model,
+						_1: A2(_user$project$Error$bubble, _user$project$Mode_Audience$BubblingError, 'Got an unexpected response from the API server. ')
+					};
+				}
+			}
+		}
+	});
+var _user$project$Mode_Audience$updateQuestionUpdated = F2(
+	function (result, model) {
+		var _p7 = result;
+		if (_p7.ctor === 'Err') {
+			return {
+				ctor: '_Tuple2',
+				_0: model,
+				_1: A2(_user$project$Error$bubble, _user$project$Mode_Audience$BubblingError, 'Failed to make request.')
+			};
+		} else {
+			var _p8 = {ctor: '_Tuple2', _0: _p7._0.error, _1: _p7._0.question};
+			if (_p8._0.ctor === 'Just') {
+				return {
+					ctor: '_Tuple2',
+					_0: model,
+					_1: A2(_user$project$Error$bubble, _user$project$Mode_Audience$BubblingError, _p8._0._0)
+				};
+			} else {
+				if (_p8._1.ctor === 'Just') {
+					var _p9 = _p8._1._0;
 					var pickUpdated = function (newQuestion) {
-						return _elm_lang$core$Native_Utils.eq(_p7.id, newQuestion.id) ? _p7 : newQuestion;
+						return _elm_lang$core$Native_Utils.eq(_p9.id, newQuestion.id) ? _p9 : newQuestion;
 					};
 					var foldQuestions = F2(
 						function (nextQuestion, ls) {
@@ -9584,9 +9665,9 @@ var _user$project$Mode_Audience$QuestionNoddedTo = function (a) {
 };
 var _user$project$Mode_Audience$viewQuestion = function (question) {
 	var viewAnswer = function () {
-		var _p8 = question.answer;
-		if (_p8.ctor === 'Loaded') {
-			var _p9 = _p8._0;
+		var _p10 = question.answer;
+		if (_p10.ctor === 'Loaded') {
+			var _p11 = _p10._0;
 			return A2(
 				_elm_lang$html$Html$div,
 				{
@@ -9606,7 +9687,7 @@ var _user$project$Mode_Audience$viewQuestion = function (question) {
 						{
 							ctor: '::',
 							_0: _elm_lang$html$Html$text(
-								A2(_elm_lang$core$Basics_ops['++'], 'Answered at ', _p9.timeWritten)),
+								A2(_elm_lang$core$Basics_ops['++'], 'Answered at ', _p11.timeWritten)),
 							_1: {ctor: '[]'}
 						}),
 					_1: {
@@ -9620,7 +9701,7 @@ var _user$project$Mode_Audience$viewQuestion = function (question) {
 							},
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html$text(_p9.text),
+								_0: _elm_lang$html$Html$text(_p11.text),
 								_1: {ctor: '[]'}
 							}),
 						_1: {ctor: '[]'}
@@ -9764,12 +9845,12 @@ var _user$project$Mode_Audience$viewQuestionList = function (model) {
 			_1: {ctor: '[]'}
 		},
 		function () {
-			var _p10 = A2(
+			var _p12 = A2(
 				_user$project$Resource$map,
 				_elm_lang$core$List$map(_user$project$Mode_Audience$viewQuestion),
 				model.questions);
-			if (_p10.ctor === 'Loaded') {
-				if (_p10._0.ctor === '[]') {
+			if (_p12.ctor === 'Loaded') {
+				if (_p12._0.ctor === '[]') {
 					return {
 						ctor: '::',
 						_0: A2(
@@ -9871,7 +9952,7 @@ var _user$project$Mode_Audience$viewQuestionList = function (model) {
 									_0: A2(
 										_elm_lang$html$Html$tbody,
 										{ctor: '[]'},
-										_p10._0),
+										_p12._0),
 									_1: {ctor: '[]'}
 								}
 							}),
@@ -9938,7 +10019,7 @@ var _user$project$Mode_Audience$viewAskQuestion = function (model) {
 			}(
 				_elm_lang$core$Basics$toFloat(charactersUsed))));
 	var countColor = function () {
-		var _p11 = A2(
+		var _p13 = A2(
 			_elm_lang$core$List$map,
 			_elm_lang$core$List$member(limitPercentUsed),
 			{
@@ -9958,28 +10039,28 @@ var _user$project$Mode_Audience$viewAskQuestion = function (model) {
 					}
 				}
 			});
-		_v9_4:
+		_v10_4:
 		do {
-			if (((((_p11.ctor === '::') && (_p11._1.ctor === '::')) && (_p11._1._1.ctor === '::')) && (_p11._1._1._1.ctor === '::')) && (_p11._1._1._1._1.ctor === '[]')) {
-				if (_p11._0 === true) {
+			if (((((_p13.ctor === '::') && (_p13._1.ctor === '::')) && (_p13._1._1.ctor === '::')) && (_p13._1._1._1.ctor === '::')) && (_p13._1._1._1._1.ctor === '[]')) {
+				if (_p13._0 === true) {
 					return _user$project$Mode_Audience$constGreenText;
 				} else {
-					if (_p11._1._0 === true) {
+					if (_p13._1._0 === true) {
 						return _user$project$Mode_Audience$constYellowText;
 					} else {
-						if (_p11._1._1._0 === true) {
+						if (_p13._1._1._0 === true) {
 							return _user$project$Mode_Audience$constOrangeText;
 						} else {
-							if (_p11._1._1._1._0 === true) {
+							if (_p13._1._1._1._0 === true) {
 								return _user$project$Mode_Audience$constRedText;
 							} else {
-								break _v9_4;
+								break _v10_4;
 							}
 						}
 					}
 				}
 			} else {
-				break _v9_4;
+				break _v10_4;
 			}
 		} while(false);
 		return '';
@@ -10146,14 +10227,18 @@ var _user$project$Mode_Audience$view = function (model) {
 		{ctor: '[]'},
 		{
 			ctor: '::',
-			_0: _user$project$Mode_Audience$viewAskQuestion(model),
+			_0: _user$project$Mode_Audience$viewTitleCard(model),
 			_1: {
 				ctor: '::',
-				_0: _user$project$Mode_Audience$viewQuestionList(model),
+				_0: _user$project$Mode_Audience$viewAskQuestion(model),
 				_1: {
 					ctor: '::',
-					_0: _user$project$Mode_Audience$viewAskQuestionButton,
-					_1: {ctor: '[]'}
+					_0: _user$project$Mode_Audience$viewQuestionList(model),
+					_1: {
+						ctor: '::',
+						_0: _user$project$Mode_Audience$viewAskQuestionButton,
+						_1: {ctor: '[]'}
+					}
 				}
 			}
 		});
@@ -10161,34 +10246,25 @@ var _user$project$Mode_Audience$view = function (model) {
 var _user$project$Mode_Audience$APIQuestionUpdated = function (a) {
 	return {ctor: 'APIQuestionUpdated', _0: a};
 };
-var _user$project$Mode_Audience$APIQuestionAsked = function (a) {
-	return {ctor: 'APIQuestionAsked', _0: a};
-};
 var _user$project$Mode_Audience$update = F2(
 	function (msg, model) {
-		var _p12 = msg;
-		switch (_p12.ctor) {
+		var _p14 = msg;
+		switch (_p14.ctor) {
 			case 'BubblingError':
 				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 			case 'QuestionTextReceived':
-				var _p13 = _p12._0;
+				var _p15 = _p14._0;
 				return (_elm_lang$core$Native_Utils.cmp(
-					_elm_lang$core$String$length(_p13),
+					_elm_lang$core$String$length(_p15),
 					_user$project$Mode_Audience$constMaxQuestionLength) < 1) ? {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{question: _p13}),
+						{question: _p15}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				} : {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 			case 'QuestionAsked':
-				var command = A2(
-					_elm_lang$http$Http$send,
-					function (_p14) {
-						return _user$project$Mode_Audience$FromAPI(
-							_user$project$Mode_Audience$APIQuestionAsked(_p14));
-					},
-					A2(_user$project$Question$ask, model.presentation, model.question));
+				var command = _elm_lang$core$Platform_Cmd$none;
 				var newModel = _elm_lang$core$Native_Utils.update(
 					model,
 					{question: '', showQuestionInput: false});
@@ -10196,31 +10272,34 @@ var _user$project$Mode_Audience$update = F2(
 			case 'QuestionNoddedTo':
 				var command = A2(
 					_elm_lang$http$Http$send,
-					function (_p15) {
+					function (_p16) {
 						return _user$project$Mode_Audience$FromAPI(
-							_user$project$Mode_Audience$APIQuestionUpdated(_p15));
+							_user$project$Mode_Audience$APIQuestionUpdated(_p16));
 					},
-					_user$project$Question$nod(_p12._0));
+					_user$project$Question$nod(_p14._0));
 				return {ctor: '_Tuple2', _0: model, _1: command};
 			case 'ShowQuestionInput':
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{showQuestionInput: _p12._0}),
+						{showQuestionInput: _p14._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			default:
-				switch (_p12._0.ctor) {
+				switch (_p14._0.ctor) {
 					case 'APIReceivedQuestions':
-						return A2(_user$project$Mode_Audience$updateQuestionsReceived, _p12._0._0, model);
+						return A2(_user$project$Mode_Audience$updateQuestionsReceived, _p14._0._0, model);
 					case 'APIQuestionAsked':
-						return A2(_user$project$Mode_Audience$updateQuestionAsked, _p12._0._0, model);
+						return A2(_user$project$Mode_Audience$updateQuestionAsked, _p14._0._0, model);
 					default:
-						return A2(_user$project$Mode_Audience$updateQuestionUpdated, _p12._0._0, model);
+						return A2(_user$project$Mode_Audience$updateQuestionUpdated, _p14._0._0, model);
 				}
 		}
 	});
+var _user$project$Mode_Audience$APIQuestionAsked = function (a) {
+	return {ctor: 'APIQuestionAsked', _0: a};
+};
 var _user$project$Mode_Audience$APIReceivedQuestions = function (a) {
 	return {ctor: 'APIReceivedQuestions', _0: a};
 };
@@ -10890,11 +10969,6 @@ var _user$project$Mode_Landing$view = function (model) {
 			}
 		});
 };
-
-var _user$project$Presentation$Presentation = F4(
-	function (a, b, c, d) {
-		return {id: a, title: b, description: c, questions: d};
-	});
 
 var _user$project$Mode_Presenter$update = F2(
 	function (msg, model) {
