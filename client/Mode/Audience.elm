@@ -354,6 +354,10 @@ viewQuestionList model =
                     [ thead [] []
                     , tbody [] questions
                     ]
+                , div [ class "hrule" ] []
+                , div [ class "card-actions" ]
+                    [ a [ href "#", class "button", onClick (ShowQuestionInput True) ] [ text "Ask" ]
+                    ]
                 ]
 
             _ ->
