@@ -13,3 +13,16 @@ pub struct Presentation {
     #[serde(rename = "creationDate")]
     pub creation_date: DateTime<Utc>,
 }
+
+impl Presentation {
+    /// Create an instance of `Presentation` to pass to a search operation.
+    pub fn search_parameter(id: Id) -> Self {
+        Presentation {
+            id: id,
+            creator: Id(String::new()),
+            title: String::new(),
+            is_open_to_questions: true,
+            creation_date: Utc::now(),
+        }
+    }
+}

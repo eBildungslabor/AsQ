@@ -1,12 +1,10 @@
-use std::error::Error;
-
 use iron::prelude::*;
 use iron::Handler;
 use iron::status;
 
 use capabilities::{Capability, FindAll};
 use capabilities::sqlite::PresentationsForPresenter;
-use models::{Id, Presenter, Presentation};
+use models::{Id, Presentation};
 
 
 /// Handles requests to get a list of presentations created by a presenter.

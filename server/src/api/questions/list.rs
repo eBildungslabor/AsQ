@@ -1,11 +1,6 @@
-use std::error::Error;
-
-use iron::headers::ContentType;
-use iron::middleware::Handler;
+use iron::Handler;
 use iron::prelude::*;
 use iron::status;
-use serde_json as json;
-use urlencoded;
 
 use capabilities::{Capability, FindAll};
 use capabilities::sqlite::QuestionsForPresentation;

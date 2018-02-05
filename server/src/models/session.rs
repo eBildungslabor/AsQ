@@ -10,7 +10,8 @@ use models::{Id, Presenter};
 pub struct Session {
     pub token: Id,
     pub owner: Id,
-    pub createdAt: DateTime<Utc>,
+    #[serde(rename = "createdAt")]
+    pub created_at: DateTime<Utc>,
 }
 
 impl Session {
@@ -22,7 +23,15 @@ impl Session {
         Session {
             token: Id(token),
             owner: owner.email_address,
-            createdAt: Utc::now(),
+            created_at: Utc::now(),
+        }
+    }
+
+    pub fn search_parameter(token: Id) -> Self {
+        Session {
+            token: token,
+            owner: Id(String::new()),
+            created_at: Utc::now(),
         }
     }
 }

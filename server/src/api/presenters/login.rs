@@ -51,8 +51,7 @@ impl<DB> Handler for LoginHandler<DB>
         let db_result = try_do!({
             let to_find = Presenter::search_parameter(request_data.email_address);
             let presenter = self.database.perform(Search(to_find))?;
-            // TODO : For now, we're making this condition always pass for the sake of testing.
-            if presenter.password_matches(&request_data.password) || true {
+            if presenter.password_matches(&request_data.password) {
                 let session = Session::new(presenter);
                 self.database.perform(Save(session))
             } else {

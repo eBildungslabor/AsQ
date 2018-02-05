@@ -1,11 +1,8 @@
 use std::error::Error;
 
-use bodyparser;
-use iron::headers::ContentType;
-use iron::middleware::Handler;
+use iron::Handler;
 use iron::prelude::*;
 use iron::status;
-use serde_json as json;
 
 use capabilities::{Capability, Save};
 use models::{Id, Question};
