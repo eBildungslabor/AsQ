@@ -105,9 +105,6 @@ ask presentationID questionText =
 nod : Question -> Request QuestionUpdateResponse
 nod question =
     let
-        _ =
-            Debug.log "Nodding to" question
-
         url =
             "http://" ++ Config.apiServerAddress ++ "/api/questions/nod"
 
